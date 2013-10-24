@@ -22,16 +22,18 @@ namespace Omnibus.Interfaces
         void Call<TReq, TRes>(TReq request, Action<TRes> handler);
 
         // Calls to static routes
-        void Call<TReq>(TReq request);
+        Guid Call<TReq>(TReq request);
+
+        
 
         // Static routes
-        IResponseContext OnReply<T>(Action<T> handler);
-        IResponseContext OnReply<T1, T2>(Action<T1, T2> handler);
-        IResponseContext OnReply<T1, T2, T3>(Action<T1, T2, T3> handler);
-        IResponseContext OnReply<T1, T2, T3, T4>(Action<T1, T2, T3, T4> handler);
-        IResponseContext OnReply<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> handler);
-        IResponseContext OnReply<T1, T2, T3, T4, T5, T6>(Action<T1, T2, T3, T4, T5, T6> handler);
-        IResponseContext OnReply<T1, T2, T3, T4, T5, T6, T7>(Action<T1, T2, T3, T4, T5, T6, T7> handler);
+        IResponseContext OnReply<TReq, T>(Action<TReq, T> handler);
+        IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler);
+        IResponseContext OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler);
+        IResponseContext OnReply<TReq, T1, T2, T3, T4>(Action<TReq, T1, T2, T3, T4> handler);
+        IResponseContext OnReply<TReq, T1, T2, T3, T4, T5>(Action<TReq, T1, T2, T3, T4, T5> handler);
+        IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6>(Action<TReq, T1, T2, T3, T4, T5, T6> handler);
+        IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6, T7>(Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler);
 
         // Handle incoming message with a reply, "server side" logic
         void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler);
@@ -41,7 +43,7 @@ namespace Omnibus.Interfaces
         #region Publish/subscribe
 
         // Post an event on the bus
-        void Publish<T>(T request);      
+        void Publish<T>(T request);        
 
         // Act on events
         IResponseContext On<T>(Action<T> handler);

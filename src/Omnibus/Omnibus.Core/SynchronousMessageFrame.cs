@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Omnibus.Core
 {
-    public class SynchronousMessageFrame
+    public class SynchronousMessageFrame 
     {
         public Guid CorrelationId { get; set; }
 

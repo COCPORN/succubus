@@ -13,14 +13,17 @@ namespace OmnibusTest.Console
 
         public void Run()
         {
-            IBus bus = new Omnibus.Core.Omnibus();
+            IBus bus = new Omnibus.Core.Bus();
 
             bus.Initialize(omnibus =>
             {
                 omnibus.UseMessageHost();
             });
 
-            bus.OnReply<BasicResponse>(response => System.Console.WriteLine("OnReply<TRes>: Got a response handled on static route: {0}", response.Message));
+            bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
+                System.Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
+                request.Message, 
+                response.Message));
             bus.Call<BasicRequest>(new BasicRequest { Message = "This is a test of the static routes" });
 
             // Configure this process to handle some basic messages
@@ -39,7 +42,7 @@ namespace OmnibusTest.Console
                 new BasicRequest { Message = "Testing a call from the client" },
                 response =>
                 {
-                    System.Console.WriteLine("Call<TReq, TRes>: Got an answer from the server: {0}", response.Message);
+                    System.Console.WriteLine("Call<TReq, TRes>: Got a response handled on throwaway handler: {0}", response.Message);
                 });
         }
 

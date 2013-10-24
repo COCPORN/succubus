@@ -10,6 +10,8 @@ namespace OmnibusTest.Console
     {
         static void Main(string[] args)
         {
+            Test t = new Test();
+            t.Run();
         }
     }
 }
