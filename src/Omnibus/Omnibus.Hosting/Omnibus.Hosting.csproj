@@ -42,6 +42,12 @@
     <Compile Include="MessageHost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Omnibus.Interfaces\Omnibus.Interfaces.csproj">
+      <Project>{8d638add-d6b5-4c40-b43b-966d4dc2d7a7}</Project>
+      <Name>Omnibus.Interfaces</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

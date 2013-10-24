@@ -10,6 +10,8 @@ namespace Omnibus.Interfaces.ResponseContexts
     {
         IResponseContext Then<T>(Action<T> handler);
 
-        IResponseContext Finally<T>(Action<T> handler);        
+        IResponseContext Finally<T>(Action<T> handler);
+
+        IResponseContext Execute();
     }
 }

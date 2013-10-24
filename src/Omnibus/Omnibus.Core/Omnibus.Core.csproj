@@ -44,8 +44,13 @@
   <ItemGroup>
     <Compile Include="Omnibus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SynchronousMessageFrame.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Omnibus.Hosting\Omnibus.Hosting.csproj">
+      <Project>{2d20bcb6-5201-4ed4-8848-d1ae2faee2c0}</Project>
+      <Name>Omnibus.Hosting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Omnibus.Interfaces\Omnibus.Interfaces.csproj">
       <Project>{8d638add-d6b5-4c40-b43b-966d4dc2d7a7}</Project>
       <Name>Omnibus.Interfaces</Name>

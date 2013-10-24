@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="IBus.cs" />
     <Compile Include="IBusConfigurator.cs" />
+    <Compile Include="IMessageHost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseContexts\IResponseContext.cs" />
   </ItemGroup>
