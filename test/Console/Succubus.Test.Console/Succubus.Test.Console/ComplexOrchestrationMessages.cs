@@ -16,6 +16,11 @@ namespace SuccubusTest.Console
     }
 
     class Response2 {
-        public string Message2 { get; set; }
+        public string Message { get; set; }
+    }
+
+    class Response3
+    {
+        public string Message { get; set; }
     }
 }

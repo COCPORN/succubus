@@ -57,6 +57,7 @@
     <Compile Include="Synchronization\SynchronizationFrameOfT.cs" />
     <Compile Include="Synchronization\SynchronizationContext.cs" />
     <Compile Include="MessageFrames\SynchronousMessageFrame.cs" />
+    <Compile Include="Synchronization\SynchronizationStack.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Succubus.Hosting\Succubus.Hosting.csproj">

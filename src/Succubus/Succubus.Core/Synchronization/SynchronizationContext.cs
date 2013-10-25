@@ -11,65 +11,34 @@ namespace Succubus
     {
         public bool Static { get; set; }
 
-        public List<SynchronizationFrame> Frames { get; set; }
 
-        HashSet<Type> types = new HashSet<Type>();
+        public List<SynchronizationStack> Stacks;
 
-        Dictionary<Type, object> responses = new Dictionary<Type, object>();        
+        internal HashSet<Type> types = new HashSet<Type>();
+
+        internal Dictionary<Type, object> responses = new Dictionary<Type, object>();        
 
 
         public SynchronizationContext()
         {
-            Frames = new List<SynchronizationFrame>();
+            Stacks = new List<SynchronizationStack>();
         }
 
         public bool ResolveFor(object message)
         {
-            if (Frames == null || Frames.Count == 0) return false;
-           
-            types.Add(message.GetType());
-
             bool unresolvedFrames = false;
-            foreach (var frame in Frames)
+
+            foreach (var synchronizationStack in Stacks)
             {
-                if (frame.Resolved == true)
-                {
-                    continue;
-                }
-                
-                if (frame.CanHandle(message.GetType()) == false)
-                {
-                    unresolvedFrames = true;
-                    continue;
-                }
-
-                responses.Add(message.GetType(), message);
-
-                if (frame.Satisfies(types))
-                {
-                    if (Static == false)
-                    {
-                        frame.CallHandler(responses);
-                    }
-                    else
-                    {
-                        frame.CallStaticHandler(responses);
-                    }
-                    frame.Resolved = true;
-                }
-                else
+                if (synchronizationStack.ResolveFor(message) == false)
                 {
                     unresolvedFrames = true;
                 }
             }
 
-            if (unresolvedFrames == false)
-            {
-                // Finished resolving this context
-                return true;
-            }
-            else return false;
-           
+            if (unresolvedFrames) return false;
+            else return true;
         }
+      
     }
 }

@@ -32,7 +32,13 @@ namespace SuccubusTest.Console
 
             bus.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
                 {
-                    System.Console.WriteLine("The request {0} returned {1} and {2}", request.Message, response1.Message, response2.Message2);
+                    System.Console.WriteLine("The request {0} returned {1} and {2}", request.Message, response1.Message, response2.Message);
+                });
+
+            bus.OnReply<Request1, Response1, Response2, Response3>((request, response1, response2, response3) =>
+                {
+                    System.Console.WriteLine("TRIPLE: Req: {0} Res1: {1} Res2: {2}: Res3: {3}", request.Message, response1.Message,
+                        response2.Message, response3.Message);
                 });
 
             bus.ReplyTo<Request1, Response1>((req) =>
@@ -42,7 +48,12 @@ namespace SuccubusTest.Console
 
             bus.ReplyTo<Request1, Response2>((req) =>
                 {
-                    return new Response2 { Message2 = "RESPONSE 2 " + req.Message };
+                    return new Response2 { Message = "RESPONSE 2 " + req.Message };
+                });
+
+            bus.ReplyTo<Request1, Response3>((req) =>
+                {
+                    return new Response3 { Message = "RESPONSE 3 " + req.Message };
                 });
 
             bus.Call<Request1>(new Request1 { Message = "Hohey!" });

@@ -114,7 +114,12 @@ namespace Succubus.Core
         public void Call<TReq, TRes>(TReq request, Action<TRes> handler)
         {
             var synchronizationContext = new SynchronizationContext();
-            synchronizationContext.Frames.Add(new SynchronizationFrame<TReq, TRes> { Handler = handler });
+
+            
+            SynchronizationStack stack = new SynchronizationStack(synchronizationContext);
+            stack.Frames.Add(new SynchronizationFrame<TReq, TRes> { Handler = handler });
+            synchronizationContext.Stacks.Add(stack);
+
             var synchronizedRequest = FrameSynchronously(request);
             transientSynchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             ObjectPublish(synchronizedRequest);
@@ -131,9 +136,12 @@ namespace Succubus.Core
             if (staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out prototype)) {
                 var synchronizationContext = Serialization.ObjectCopier.Clone<SynchronizationContext>(prototype);
                 synchronizationContext.Static = true;
-                foreach (var frame in synchronizationContext.Frames)
+                foreach (var stack in synchronizationContext.Stacks)
                 {
-                    frame.Request = request;
+                    foreach (var frame in stack.Frames)
+                    {
+                        frame.Request = request;
+                    }
                 }
                 transientSynchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             }
@@ -201,57 +209,96 @@ namespace Succubus.Core
         #region OnReply<T, ...>
 
 
+        private void SetupContext<TReq>(out SynchronizationContext synchronizationContext, out SynchronizationStack synchronizationStack)
+        {
+            if (staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out synchronizationContext) == false)
+            {
+                synchronizationContext = new SynchronizationContext();
+                staticSynchronizationPrototypes.Add(typeof(TReq), synchronizationContext);
+            }
+
+            synchronizationStack = new SynchronizationStack(synchronizationContext);
+        }
+
         public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler)
         {
-            if (staticSynchronizationPrototypes.ContainsKey(typeof(TReq)))
-            {
-                throw new InvalidOperationException("Bus already contains a static route for this type");
-            }
-            
-            var synchronizationContext = new SynchronizationContext();
-            synchronizationContext.Frames.Add(new SynchronizationFrame<TReq, T> { StaticHandler = handler });
-            staticSynchronizationPrototypes.Add(typeof(TReq), synchronizationContext);
+            SynchronizationContext synchronizationContext;
+            SynchronizationStack synchronizationStack;
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T> { StaticHandler = handler });
+            synchronizationContext.Stacks.Add(synchronizationStack);            
             
             return new ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler)
         {
-            if (staticSynchronizationPrototypes.ContainsKey(typeof(TReq)))
-            {
-                throw new InvalidOperationException("Bus already contains a static route for this type");
-            }
-
-            var synchronizationContext = new SynchronizationContext();
-            synchronizationContext.Frames.Add(new SynchronizationFrame<TReq, T1, T2> { StaticHandler = handler });
-            staticSynchronizationPrototypes.Add(typeof(TReq), synchronizationContext);
+            SynchronizationContext synchronizationContext;
+            SynchronizationStack synchronizationStack;
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2> { StaticHandler = handler });
+            synchronizationContext.Stacks.Add(synchronizationStack);           
 
             return new ResponseContext(this);
         }
 
+  
+
         public IResponseContext OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler)
         {
-            throw new NotImplementedException();
+            SynchronizationContext synchronizationContext;
+            SynchronizationStack synchronizationStack;
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3> { StaticHandler = handler });
+            synchronizationContext.Stacks.Add(synchronizationStack);            
+
+            return new ResponseContext(this);
         }
+
+
 
         public IResponseContext OnReply<TReq, T1, T2, T3, T4>(Action<TReq, T1, T2, T3, T4> handler)
         {
-            throw new NotImplementedException();
+            SynchronizationContext synchronizationContext;
+            SynchronizationStack synchronizationStack;
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4> { StaticHandler = handler });
+            synchronizationContext.Stacks.Add(synchronizationStack);
+
+            return new ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5>(Action<TReq, T1, T2, T3, T4, T5> handler)
         {
-            throw new NotImplementedException();
+            SynchronizationContext synchronizationContext;
+            SynchronizationStack synchronizationStack;
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5> { StaticHandler = handler });
+            synchronizationContext.Stacks.Add(synchronizationStack);
+
+            return new ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6>(Action<TReq, T1, T2, T3, T4, T5, T6> handler)
         {
-            throw new NotImplementedException();
+            SynchronizationContext synchronizationContext;
+            SynchronizationStack synchronizationStack;
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5, T6> { StaticHandler = handler });
+            synchronizationContext.Stacks.Add(synchronizationStack);
+
+            return new ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6, T7>(Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler)
         {
-            throw new NotImplementedException();
+            SynchronizationContext synchronizationContext;
+            SynchronizationStack synchronizationStack;
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5, T6, T7> { StaticHandler = handler });
+            synchronizationContext.Stacks.Add(synchronizationStack);
+
+            return new ResponseContext(this);
         }
 
         #endregion
