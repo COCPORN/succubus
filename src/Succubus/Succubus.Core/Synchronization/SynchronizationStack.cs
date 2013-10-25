@@ -22,9 +22,7 @@ namespace Succubus
         public bool ResolveFor(object message)
         {
             if (Frames == null || Frames.Count == 0) return false;
-
-            ctx.types.Add(message.GetType());
-
+           
             bool unresolvedFrames = false;
             foreach (var frame in Frames)
             {
@@ -38,8 +36,15 @@ namespace Succubus
                     unresolvedFrames = true;
                     continue;
                 }
+                else
+                {
+                    ctx.types.Add(message.GetType());
+                }
 
-                ctx.responses.Add(message.GetType(), message);
+                if (ctx.responses.ContainsKey(message.GetType()) == false)
+                {
+                    ctx.responses.Add(message.GetType(), message);
+                }
 
                 if (frame.Satisfies(ctx.types))
                 {
@@ -56,7 +61,7 @@ namespace Succubus
                 else
                 {
                     unresolvedFrames = true;
-                }
+                }   
             }
 
             if (unresolvedFrames == false)

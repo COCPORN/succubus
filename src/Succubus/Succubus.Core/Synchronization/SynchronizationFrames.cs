@@ -61,7 +61,7 @@ namespace Succubus
             {
                 return false;
             }
-            else if (responses.Contains(typeof(TReq)))
+            else if (responses.Contains(typeof(TRes)))
             {
                 return true;
             }

@@ -41,20 +41,24 @@ namespace SuccubusTest.Console
                         response2.Message, response3.Message);
                 });
 
+            bus.ReplyTo<Request1, Response3>((req) =>
+            {
+                return new Response3 { Message = "RESPONSE 3 " + req.Message };
+            });
+
+            bus.ReplyTo<Request1, Response2>((req) =>
+            {
+                return new Response2 { Message = "RESPONSE 2 " + req.Message };
+            });
+
             bus.ReplyTo<Request1, Response1>((req) =>
                 {
                     return new Response1 { Message = "RESPONSE 1" + req.Message };
                 });
 
-            bus.ReplyTo<Request1, Response2>((req) =>
-                {
-                    return new Response2 { Message = "RESPONSE 2 " + req.Message };
-                });
 
-            bus.ReplyTo<Request1, Response3>((req) =>
-                {
-                    return new Response3 { Message = "RESPONSE 3 " + req.Message };
-                });
+
+ 
 
             bus.Call<Request1>(new Request1 { Message = "Hohey!" });
 
