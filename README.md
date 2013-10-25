@@ -20,15 +20,15 @@ Each handle will have a separate channel to the message host.
 Singleton instantiation
 -----------------------
 
-Omnibus allows you to get a 
+Succubus allows you to get a 
 
 Initialization
 --------------
 
 Initialize the bus returns a configuration handle.
 
-            bus.Initialize(succubus =>
-            {
-                succubus.UseMessageHost();               
-            });
+    bus.Initialize(succubus =>
+    {
+        succubus.UseMessageHost();               
+    });
 
