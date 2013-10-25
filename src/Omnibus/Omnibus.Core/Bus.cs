@@ -55,11 +55,11 @@ namespace Omnibus.Core
 
         #region Synchronization stores and event handlers
 
-        ConcurrentDictionary<Guid, SynchronizationContext> synchronizationContexts = new ConcurrentDictionary<Guid, SynchronizationContext>();
+        Dictionary<Guid, SynchronizationContext> synchronizationContexts = new Dictionary<Guid, SynchronizationContext>();
 
-        ConcurrentDictionary<Type, Action<object>> eventHandlers = new ConcurrentDictionary<Type, Action<object>>();
+        Dictionary<Type, Action<object>> eventHandlers = new Dictionary<Type, Action<object>>();
 
-        ConcurrentDictionary<Type, Func<object, object>> replyHandlers = new ConcurrentDictionary<Type, Func<object, object>>();
+        Dictionary<Type, Func<object, object>> replyHandlers = new Dictionary<Type, Func<object, object>>();
 
         #endregion
 
