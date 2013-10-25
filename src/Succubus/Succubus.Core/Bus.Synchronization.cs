@@ -1,84 +1,49 @@
-﻿using Succubus.Hosting;
-using Succubus.Interfaces;
-using Succubus.Interfaces.ResponseContexts;
+﻿using Succubus.Interfaces.ResponseContexts;
 using Succubus.Serialization;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using ZeroMQ;
 
 namespace Succubus.Core
 {
-    public partial class Bus : IBus
+    public partial class Bus
     {
-
-        class ResponseContext : IResponseContext
-        {
-            Bus bus;
-
-            public ResponseContext(Bus bus)
-            {
-                this.bus = bus;
-            }
-
-            public IResponseContext On<T>(Action<T> handler)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IResponseContext Then<T>(Action<T> handler)
-            {
-                throw new NotImplementedException();
-            }
-
-        }
-
-        #region Members
-
-        #region ØMQ
-
-
-        ZmqContext context;
-        ZmqSocket publishSocket;
-        ZmqSocket subscribeSocket;
-
-        #endregion
-
-        #region Threading
-
-        Thread subscriberThread;
-
-        #endregion
-
+        
         #region Synchronization stores and event handlers
 
+        /// <summary>
+        /// These are used to store synchronization contexts. Whenever
+        /// a synchronization context has been fulfilled, it should be removed
+        /// from this dictionary.
+        /// </summary>
         Dictionary<Guid, 
-            SynchronizationContext> transientSynchronizationContexts = 
+            SynchronizationContext> synchronizationContexts = 
             new Dictionary<Guid, SynchronizationContext>();
 
-        Dictionary<Type, 
-            Dictionary<Guid, SynchronizationContext>> staticSynchronizationContexts = 
-            new Dictionary<Type, Dictionary<Guid, SynchronizationContext>>();
-
+        /// <summary>
+        /// This is used to populate synchronizationcontexts with static
+        /// prototypes.
+        /// </summary>
         Dictionary<Type,
             SynchronizationContext> staticSynchronizationPrototypes = new Dictionary<Type, SynchronizationContext>();
 
+        /// <summary>
+        /// These are used with On to handle events.
+        /// </summary>
         Dictionary<Type, Action<object>> eventHandlers = new Dictionary<Type, Action<object>>();
 
+        /// <summary>
+        /// This is used to create "server" logic to respond to synchronous messages.
+        /// </summary>
         Dictionary<Type, List<Func<object, object>>> replyHandlers = new Dictionary<Type, List<Func<object, object>>>();
 
         #endregion
 
-
-
-        #endregion
-
+        
         #region Synchronous messaging
-
 
         SynchronousMessageFrame FrameSynchronously(object o, Guid? guid = null)
         {
@@ -121,7 +86,7 @@ namespace Succubus.Core
             synchronizationContext.Stacks.Add(stack);
 
             var synchronizedRequest = FrameSynchronously(request);
-            transientSynchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+            synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             ObjectPublish(synchronizedRequest);
         }
 
@@ -143,7 +108,7 @@ namespace Succubus.Core
                         frame.Request = request;
                     }
                 }
-                transientSynchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+                synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             }
 
             ObjectPublish(synchronizedRequest);
@@ -151,60 +116,6 @@ namespace Succubus.Core
         }
 
         #endregion
-
-       
-
-        #region Initialization
-
-
-        bool initialized = false;
-        public void Initialize()
-        {
-            lock (this)
-            {
-                if (initialized == true)
-                {
-                    throw new InvalidOperationException("Bus is already initialized");
-                }
-            }
-
-            if (startMessageHost == true)
-            {
-                if (messageHost == null) messageHost = new MessageHost();
-                messageHost.Start();
-            }
-
-            context = ZmqContext.Create();
-
-            ConnectPublisher();
-
-            subscriberThread = new Thread(new ThreadStart(Subscriber));
-            subscriberThread.IsBackground = true;
-            subscriberThread.Start();
-        }
-
-        public void Initialize(Action<IBusConfigurator> initializationHandler)
-        {
-            initializationHandler(this);
-            Initialize();
-        }
-
-        #endregion
-
-        private void ConnectPublisher()
-        {
-            publishSocket = context.CreateSocket(SocketType.PUB);
-            publishSocket.Connect(PublishAddress);
-        }
-
-        void ConnectSubscriber()
-        {
-            subscribeSocket.Connect(SubscribeAddress);
-            subscribeSocket.SubscribeAll();
-        }
-
-    
-
 
         #region OnReply<T, ...>
 
@@ -226,8 +137,8 @@ namespace Succubus.Core
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T> { StaticHandler = handler });
-            synchronizationContext.Stacks.Add(synchronizationStack);            
-            
+            synchronizationContext.Stacks.Add(synchronizationStack);
+
             return new ResponseContext(this);
         }
 
@@ -237,12 +148,12 @@ namespace Succubus.Core
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2> { StaticHandler = handler });
-            synchronizationContext.Stacks.Add(synchronizationStack);           
+            synchronizationContext.Stacks.Add(synchronizationStack);
 
             return new ResponseContext(this);
         }
 
-  
+
 
         public IResponseContext OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler)
         {
@@ -250,7 +161,7 @@ namespace Succubus.Core
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3> { StaticHandler = handler });
-            synchronizationContext.Stacks.Add(synchronizationStack);            
+            synchronizationContext.Stacks.Add(synchronizationStack);
 
             return new ResponseContext(this);
         }
@@ -304,7 +215,7 @@ namespace Succubus.Core
         #endregion
 
         public void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler)
-        {            
+        {
             Func<object, object> objectHandler = new Func<object, object>((req) => (TRes)handler((TReq)req));
             if (replyHandlers.ContainsKey(typeof(TReq)) == false)
             {
@@ -348,8 +259,6 @@ namespace Succubus.Core
         }
 
         #endregion
-
-  
 
     }
 }

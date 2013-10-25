@@ -72,41 +72,21 @@ namespace Succubus.Core
 
             ProcessReplies(synchronousFrame, type, message);
 
-            SynchronizationContext ctx = ProcessTransientHandlers(synchronousFrame, message);
-
-            //ctx = ProcessStaticHandlers(synchronousFrame, requestType, message, ctx);
+            SynchronizationContext ctx = ProcessTransientHandlers(synchronousFrame, message);            
         }
 
-        private SynchronizationContext ProcessStaticHandlers(SynchronousMessageFrame synchronousFrame, Type requestType, object message, SynchronizationContext ctx)
-        {
-            Dictionary<Guid, SynchronizationContext> staticContexts;
-            if (staticSynchronizationContexts.TryGetValue(requestType, out staticContexts))
-            {
-                try
-                {
-                    if (staticContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx))
-                    {
-                        if (ctx.ResolveFor(message))
-                        {
-                            staticContexts.Remove(synchronousFrame.CorrelationId);
-                        }
-                    }
-                }
-                catch { }
-            }
-            return ctx;
-        }
+      
 
         private SynchronizationContext ProcessTransientHandlers(SynchronousMessageFrame synchronousFrame, object message)
         {
             SynchronizationContext ctx = null;
-            if (transientSynchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx))
+            if (synchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx))
             {
                 try
                 {
                     if (ctx.ResolveFor(message) == true)
                     {
-                        transientSynchronizationContexts.Remove(synchronousFrame.CorrelationId);
+                        synchronizationContexts.Remove(synchronousFrame.CorrelationId);
                     }
                 }
                 catch { }

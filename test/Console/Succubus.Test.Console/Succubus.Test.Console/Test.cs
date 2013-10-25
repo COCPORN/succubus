@@ -77,7 +77,7 @@ namespace SuccubusTest.Console
                 new BasicRequest { Message = "Testing a call from the client" },
                 response =>
                 {
-                    System.Console.WriteLine("Call<TReq, TRes>: Got a response handled on throwaway handler: {0}", response.Message);
+                    System.Console.WriteLine("Call<TReq, TRes>: Got a response handled on transient route handler: {0}", response.Message);
                 });
 
             bus.Publish(new BasicEvent { Message = "Hello, world!" });
