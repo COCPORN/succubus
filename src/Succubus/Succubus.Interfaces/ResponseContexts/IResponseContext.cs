@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Omnibus.Interfaces.ResponseContexts
+namespace Succubus.Interfaces.ResponseContexts
 {
     public interface IResponseContext
     {

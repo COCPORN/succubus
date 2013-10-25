@@ -1,7 +1,7 @@
-﻿using Omnibus.Hosting;
-using Omnibus.Interfaces;
-using Omnibus.Interfaces.ResponseContexts;
-using Omnibus.Serialization;
+﻿using Succubus.Hosting;
+using Succubus.Interfaces;
+using Succubus.Interfaces.ResponseContexts;
+using Succubus.Serialization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ZeroMQ;
 
-namespace Omnibus.Core
+namespace Succubus.Core
 {
     public class Bus : IBus, IBusConfigurator
     {
@@ -218,7 +218,7 @@ namespace Omnibus.Core
                     {
                         string typename = subscribeSocket.Receive(Encoding.Unicode);
                         string serialized = subscribeSocket.Receive(Encoding.Unicode);
-                        Type coreType = Type.GetType(typename + ", Omnibus.Core");
+                        Type coreType = Type.GetType(typename + ", Succubus.Core");
 
                         object coreMessage = JsonFrame.Deserlialize(serialized, coreType);
 

@@ -1,4 +1,4 @@
-﻿using Omnibus.Interfaces;
+﻿using Succubus.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OmnibusTest.Console
+namespace SuccubusTest.Console
 {
     class Test
     {
@@ -14,11 +14,11 @@ namespace OmnibusTest.Console
 
         public void Run()
         {
-            IBus bus = new Omnibus.Core.Bus();
+            IBus bus = new Succubus.Core.Bus();
 
-            bus.Initialize(omnibus =>
+            bus.Initialize(Succubus =>
             {
-                omnibus.UseMessageHost();
+                Succubus.UseMessageHost();
                 
             });
 

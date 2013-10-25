@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OmnibusTest.Console
+namespace SuccubusTest.Console
 {
-    public class BasicResponse
+    public class BasicRequest
     {
         public string Message { get; set; }
     }

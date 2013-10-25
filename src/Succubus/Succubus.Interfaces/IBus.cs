@@ -1,11 +1,11 @@
-﻿using Omnibus.Interfaces.ResponseContexts;
+﻿using Succubus.Interfaces.ResponseContexts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Omnibus.Interfaces
+namespace Succubus.Interfaces
 {
     public interface IBus
     {

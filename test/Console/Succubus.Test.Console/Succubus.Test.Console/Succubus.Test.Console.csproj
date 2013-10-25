@@ -7,8 +7,8 @@
     <ProjectGuid>{0F603B1B-028D-4160-8A3F-DC0E46C8D2F6}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OmnibusTest.Console</RootNamespace>
-    <AssemblyName>OmnibusTest.Console</AssemblyName>
+    <RootNamespace>SuccubusTest.Console</RootNamespace>
+    <AssemblyName>SuccubusTest.Console</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -52,13 +52,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Omnibus\Omnibus.Core\Omnibus.Core.csproj">
+    <ProjectReference Include="..\..\..\..\src\Succubus\Succubus.Core\Succubus.Core.csproj">
       <Project>{f7efb776-3bf5-41f6-9ed2-0f92e38da4ac}</Project>
-      <Name>Omnibus.Core</Name>
+      <Name>Succubus.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\src\Omnibus\Omnibus.Interfaces\Omnibus.Interfaces.csproj">
+    <ProjectReference Include="..\..\..\..\src\Succubus\Succubus.Interfaces\Succubus.Interfaces.csproj">
       <Project>{8d638add-d6b5-4c40-b43b-966d4dc2d7a7}</Project>
-      <Name>Omnibus.Interfaces</Name>
+      <Name>Succubus.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

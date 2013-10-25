@@ -7,11 +7,11 @@
     <ProjectGuid>{F7EFB776-3BF5-41F6-9ED2-0F92E38DA4AC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Omnibus.Core</RootNamespace>
-    <AssemblyName>Omnibus.Core</AssemblyName>
+    <RootNamespace>Succubus.Core</RootNamespace>
+    <AssemblyName>Succubus.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\test\Console\OmnibusTest.Console\</SolutionDir>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\test\Console\SuccubusTest.Console\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -33,11 +33,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="clrzmq">
-      <HintPath>..\..\..\test\Console\OmnibusTest.Console\packages\clrzmq.3.0.0-rc1\lib\net40\clrzmq.dll</HintPath>
+      <HintPath>..\..\..\test\Console\SuccubusTest.Console\packages\clrzmq.3.0.0-rc1\lib\net40\clrzmq.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\test\Console\OmnibusTest.Console\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -56,13 +56,13 @@
     <Compile Include="SynchronousMessageFrame.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Omnibus.Hosting\Omnibus.Hosting.csproj">
+    <ProjectReference Include="..\Succubus.Hosting\Succubus.Hosting.csproj">
       <Project>{2d20bcb6-5201-4ed4-8848-d1ae2faee2c0}</Project>
-      <Name>Omnibus.Hosting</Name>
+      <Name>Succubus.Hosting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Omnibus.Interfaces\Omnibus.Interfaces.csproj">
+    <ProjectReference Include="..\Succubus.Interfaces\Succubus.Interfaces.csproj">
       <Project>{8d638add-d6b5-4c40-b43b-966d4dc2d7a7}</Project>
-      <Name>Omnibus.Interfaces</Name>
+      <Name>Succubus.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

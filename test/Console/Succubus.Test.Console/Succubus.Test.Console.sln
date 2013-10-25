@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OmnibusTest.Console", "OmnibusTest.Console\OmnibusTest.Console.csproj", "{0F603B1B-028D-4160-8A3F-DC0E46C8D2F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuccubusTest.Console", "Succubus.Test.Console\Succubus.Test.Console.csproj", "{0F603B1B-028D-4160-8A3F-DC0E46C8D2F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Omnibus.Interfaces", "..\..\..\src\Omnibus\Omnibus.Interfaces\Omnibus.Interfaces.csproj", "{8D638ADD-D6B5-4C40-B43B-966D4DC2D7A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Interfaces", "..\..\..\src\Succubus\Succubus.Interfaces\Succubus.Interfaces.csproj", "{8D638ADD-D6B5-4C40-B43B-966D4DC2D7A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Omnibus.Core", "..\..\..\src\Omnibus\Omnibus.Core\Omnibus.Core.csproj", "{F7EFB776-3BF5-41F6-9ED2-0F92E38DA4AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Core", "..\..\..\src\Succubus\Succubus.Core\Succubus.Core.csproj", "{F7EFB776-3BF5-41F6-9ED2-0F92E38DA4AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Omnibus.Hosting", "..\..\..\src\Omnibus\Omnibus.Hosting\Omnibus.Hosting.csproj", "{2D20BCB6-5201-4ED4-8848-D1AE2FAEE2C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Hosting", "..\..\..\src\Succubus\Succubus.Hosting\Succubus.Hosting.csproj", "{2D20BCB6-5201-4ED4-8848-D1AE2FAEE2C0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4C40E603-E5C2-4362-90EA-387DBDD5575D}"
 	ProjectSection(SolutionItems) = preProject

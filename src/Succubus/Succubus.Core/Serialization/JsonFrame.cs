@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZeroMQ;
 
-namespace Omnibus.Serialization
+namespace Succubus.Serialization
 {
     public static class JsonFrame
     {
