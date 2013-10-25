@@ -47,10 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bus.Configurator.cs" />
-    <Compile Include="Bus.cs" />
-    <Compile Include="Bus.Subscriber.cs" />
-    <Compile Include="Bus.Synchronization.cs" />
+    <Compile Include="Bus\Bus.Configurator.cs" />
+    <Compile Include="Bus\Bus.Initialization.cs" />
+    <Compile Include="Bus\Bus.Subscriber.cs" />
+    <Compile Include="Bus\Bus.Synchronization.cs" />
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\JsonFrame.cs" />
@@ -71,7 +71,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bus.Singleton.cs" />
+    <Compile Include="Bus\Bus.Singleton.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
