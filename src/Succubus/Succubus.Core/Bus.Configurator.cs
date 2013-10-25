@@ -41,8 +41,12 @@ namespace Succubus.Core
             this.messageHostname = hostname;
         }
 
-        
 
+        string networkName;
+        public void SetNetwork(string networkName)
+        {
+            this.networkName = networkName;
+        }
 
         string publishAddress = null;
         public string PublishAddress

@@ -6,15 +6,10 @@ using System.Threading.Tasks;
 
 namespace Succubus.Core
 {
-    public class SynchronousMessageFrame 
-    {
-        public Guid CorrelationId { get; set; }
-
+    class EventMessageFrame
+    {        
         public string EmbeddedType { get; set; }
 
-        public string RequestType { get; set; }
-
         public string Message { get; set; }
-
     }
 }

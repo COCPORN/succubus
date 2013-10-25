@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="Bus.Configurator.cs" />
     <Compile Include="Bus.cs" />
+    <Compile Include="Bus.Subscriber.cs" />
+    <Compile Include="MessageFrames\EventMessageFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\JsonFrame.cs" />
     <Compile Include="Synchronization\SynchronizationFrameOfT.cs" />

@@ -17,10 +17,6 @@ namespace SuccubusTest.Console
         {
             IBus bus = new Succubus.Core.Bus();
 
-         
-        
-        
-
             bus.Initialize(Succubus =>
             {                
                 Succubus.StartupMessageHost();
@@ -38,11 +34,10 @@ namespace SuccubusTest.Console
 #endif
 
             // Configure this process to handle some basic messages
-            bus.On<BasicEvent>(
-                (basicEvent) =>
-                {
-                    System.Console.WriteLine("On<BasicEvent>: Received BasicEvent: {0}", basicEvent.Message);
-                });
+            bus.On<BasicEvent>((basicEvent) =>
+            {
+                System.Console.WriteLine("On<BasicEvent>: Received BasicEvent: {0}", basicEvent.Message);
+            });
 
             bus.ReplyTo<BasicRequest, BasicResponse>((req) =>
             {

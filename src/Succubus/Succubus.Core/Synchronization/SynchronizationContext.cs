@@ -10,20 +10,37 @@ namespace Succubus
     {
         public List<SynchronizationFrame> Frames { get; set; }
 
+        HashSet<Type> types = new HashSet<Type>();
+
         public SynchronizationContext()
         {
             Frames = new List<SynchronizationFrame>();
         }
 
-        public void ResolveFor(object message)
+        public bool ResolveFor(object message)
         {
-            if (Frames == null || Frames.Count == 0) return;
-            Type genericType = Frames.First().GetType().GetGenericArguments()[0];
-            
-            if (genericType == message.GetType())
+            if (Frames == null || Frames.Count == 0) return false;
+
+            types.Add(message.GetType());
+
+            bool unresolvedFrames = false;
+            foreach (var frame in Frames)
             {
-                Frames.First().CallHandler(message);
+                if (frame.Resolved == true) continue;
+                unresolvedFrames = true;
+                if (frame.Satisfies(types))
+                {
+                    frame.CallHandler(message);
+                }
             }
+
+            if (unresolvedFrames == false)
+            {
+                // Finished resolving this context
+                return true;
+            }
+            else return false;
+           
         }
     }
 }
