@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OmnibusTest.Console
@@ -18,13 +19,19 @@ namespace OmnibusTest.Console
             bus.Initialize(omnibus =>
             {
                 omnibus.UseMessageHost();
+                
             });
+
+            Thread.Sleep(3000);
+
+#if false
 
             bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
                 System.Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
                 request.Message, 
                 response.Message));
             bus.Call<BasicRequest>(new BasicRequest { Message = "This is a test of the static routes" });
+#endif
 
             // Configure this process to handle some basic messages
             bus.On<BasicEvent>(
@@ -35,7 +42,7 @@ namespace OmnibusTest.Console
 
             bus.ReplyTo<BasicRequest, BasicResponse>((req) =>
             {
-                return new BasicResponse { Message = req.Message };
+                return new BasicResponse { Message = "Reply from server: " + req.Message };
             });
 
             bus.Call<BasicRequest, BasicResponse>(
@@ -44,6 +51,8 @@ namespace OmnibusTest.Console
                 {
                     System.Console.WriteLine("Call<TReq, TRes>: Got a response handled on throwaway handler: {0}", response.Message);
                 });
+
+            bus.Publish(new BasicEvent { });
         }
 
 

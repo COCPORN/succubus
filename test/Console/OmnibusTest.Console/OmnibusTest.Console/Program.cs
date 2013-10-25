@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OmnibusTest.Console
@@ -12,6 +13,7 @@ namespace OmnibusTest.Console
         {
             Test t = new Test();
             t.Run();
+            new AutoResetEvent(false).WaitOne();
         }
     }
 }

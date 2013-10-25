@@ -9,10 +9,24 @@ namespace Omnibus
     abstract class SynchronizationFrame
     {
         public abstract bool Satisfies(List<Type> responses);
+
+        public Type GenericType { get; set; }
+
+        protected Action<object> handler;
+
+        public void CallHandler(object message)
+        {
+            handler(message);
+        }
     }
 
     class SynchronizationFrame<T> : SynchronizationFrame
     {
+        public SynchronizationFrame()
+        {
+            handler = new Action<object>(message => Handler((T)message));
+        }
+
         public Action<T> Handler { get; set; }
 
         public override bool Satisfies(List<Type> responses)
