@@ -8,14 +8,22 @@ namespace Succubus
 {
     class SynchronizationContext
     {
-        public bool Static { get; set; }
-
         public List<SynchronizationFrame> Frames { get; set; }
 
         public SynchronizationContext()
         {
-            Static = false;
             Frames = new List<SynchronizationFrame>();
+        }
+
+        public void ResolveFor(object message)
+        {
+            if (Frames == null || Frames.Count == 0) return;
+            Type genericType = Frames.First().GetType().GetGenericArguments()[0];
+            
+            if (genericType == message.GetType())
+            {
+                Frames.First().CallHandler(message);
+            }
         }
     }
 }

@@ -56,7 +56,13 @@ namespace Succubus.Core
 
         #region Synchronization stores and event handlers
 
-        Dictionary<Guid, SynchronizationContext> synchronizationContexts = new Dictionary<Guid, SynchronizationContext>();
+        Dictionary<Guid, 
+            SynchronizationContext> transientSynchronizationContexts = 
+            new Dictionary<Guid, SynchronizationContext>();
+
+        Dictionary<Type, 
+            Dictionary<Guid, SynchronizationContext>> staticSynchronizationContexts = 
+            new Dictionary<Type, Dictionary<Guid, SynchronizationContext>>();
 
         Dictionary<Type, Action<object>> eventHandlers = new Dictionary<Type, Action<object>>();
 
@@ -83,17 +89,17 @@ namespace Succubus.Core
 
         public void Call<TReq, TRes>(TReq request, Action<TRes> handler)
         {
-            var synchronizationContext = new SynchronizationContext { Static = false };
+            var synchronizationContext = new SynchronizationContext();
             synchronizationContext.Frames.Add(new SynchronizationFrame<TRes> { Handler = handler });
             var synchronizedRequest = FrameSynchronously(request);
-            synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+            transientSynchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             Publish(synchronizedRequest);
         }
 
         public Guid Call<TReq>(TReq request)
         {
             var synchronizedRequest = FrameSynchronously(request);
-            Publish(synchronizationContexts);
+            Publish(transientSynchronizationContexts);
             return synchronizedRequest.CorrelationId;
         }
 
@@ -204,18 +210,10 @@ namespace Succubus.Core
                             }
 
                             SynchronizationContext ctx = null;
-                            if (synchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx))
-                            {
-                                Type genericType = ctx.Frames.First().GetType().GetGenericArguments()[0];
-
-                                if (genericType == message.GetType())
-                                {
-                                    ctx.Frames.First().CallHandler(message);
-                                }
-                                //if (ctx.Frames.First().Satisfies(new List<Type>{ type }))
-                                //{
-                                    
-                                //}
+                            if (transientSynchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx))
+                            {                                
+                                ctx.ResolveFor(message);
+                                transientSynchronizationContexts.Remove(synchronousFrame.CorrelationId);                                
                             }
 
                          
@@ -286,7 +284,7 @@ namespace Succubus.Core
 
         public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler)
         {
-            throw new NotImplementedException();
+            return new ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler)

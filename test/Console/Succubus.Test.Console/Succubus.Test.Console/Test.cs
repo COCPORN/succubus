@@ -17,21 +17,18 @@ namespace SuccubusTest.Console
         {
             IBus bus = new Succubus.Core.Bus();
 
-            Bus.Instance.Initialize(config => {
-                config.UseMessageHost();
-            });
+         
         
         
 
             bus.Initialize(Succubus =>
-            {
-                Succubus.UseMessageHost();
-                
+            {                
+                Succubus.StartupMessageHost();
             });
 
             Thread.Sleep(3000);
 
-#if true
+#if false
 
             bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
                 System.Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
@@ -44,7 +41,7 @@ namespace SuccubusTest.Console
             bus.On<BasicEvent>(
                 (basicEvent) =>
                 {
-                    System.Console.WriteLine("On<BasicEvent>: Received BasicEvent: {0}", basicEvent.ToString());
+                    System.Console.WriteLine("On<BasicEvent>: Received BasicEvent: {0}", basicEvent.Message);
                 });
 
             bus.ReplyTo<BasicRequest, BasicResponse>((req) =>
@@ -59,7 +56,7 @@ namespace SuccubusTest.Console
                     System.Console.WriteLine("Call<TReq, TRes>: Got a response handled on throwaway handler: {0}", response.Message);
                 });
 
-            bus.Publish(new BasicEvent { });
+            bus.Publish(new BasicEvent { Message = "Hello, world!" });
         }
 
 

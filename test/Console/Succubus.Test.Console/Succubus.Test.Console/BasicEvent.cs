@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SuccubusTest.Console
 {
-    class BasicEvent
+    public class BasicEvent
     {
+        public string Message { get; set; }
     }
 }
