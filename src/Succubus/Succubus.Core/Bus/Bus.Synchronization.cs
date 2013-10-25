@@ -30,10 +30,7 @@ namespace Succubus.Core
         Dictionary<Type,
             SynchronizationContext> staticSynchronizationPrototypes = new Dictionary<Type, SynchronizationContext>();
 
-        /// <summary>
-        /// These are used with On to handle events.
-        /// </summary>
-        Dictionary<Type, Action<object>> eventHandlers = new Dictionary<Type, Action<object>>();
+       
 
         /// <summary>
         /// This is used to create "server" logic to respond to synchronous messages.
@@ -229,36 +226,10 @@ namespace Succubus.Core
             }
         }
 
-        void ObjectPublish(object message)
-        {
-            lock (publishSocket)
-            {
-                var typeIndentifier = message.GetType().ToString();
-                publishSocket.SendMore(typeIndentifier, Encoding.Unicode);
-                var serialized = JsonFrame.Serialize(message);
-                publishSocket.Send(serialized, Encoding.Unicode);
-            }
-        }
+     
+     
 
-        public void Publish<T>(T request)
-        {
-            ObjectPublish(FrameEvent(request));
-        }
-
-        #region On<T>
-
-        public IResponseContext On<T>(Action<T> handler)
-        {
-            if (eventHandlers.ContainsKey(typeof(T)))
-            {
-                throw new ArgumentException("Type already has a handler");
-            }
-            Action<object> myHandler = new Action<object>(response => handler((T)response));
-            eventHandlers.Add(typeof(T), myHandler);
-            return new ResponseContext(this);
-        }
-
-        #endregion
+     
 
     }
 }

@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bus\Bus.Configurator.cs" />
+    <Compile Include="Bus\Bus.Core.cs" />
+    <Compile Include="Bus\Bus.Events.cs" />
     <Compile Include="Bus\Bus.Initialization.cs" />
     <Compile Include="Bus\Bus.Subscriber.cs" />
     <Compile Include="Bus\Bus.Synchronization.cs" />
