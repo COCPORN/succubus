@@ -13,8 +13,10 @@ using ZeroMQ;
 
 namespace Succubus.Core
 {
-    public class Bus : IBus, IBusConfigurator
+    public partial class Bus : IBus, IBusConfigurator
     {
+
+
         class ResponseContext : IResponseContext
         {
             Bus bus;
