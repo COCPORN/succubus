@@ -20,15 +20,24 @@ Each handle will have a separate channel to the message host.
 Singleton instantiation
 -----------------------
 
-Succubus allows you to get a 
+Succubus allows you to get a singleton instance in addition to newing up objects. Note that the singleton object will always (obviously) point to the same instance, while all newed objects will be different. These can co-exist and will use separate message channels:
+
+	Bus.Instance.Initialize(config => {
+	    config.UseMessageHost();
+	});
 
 Initialization
 --------------
 
-Initialize the bus returns a configuration handle.
+Before using the bus, it needs to be initialized:
+
+	Bus.Instance.Initialize();
+
+The `Initialize`-call to the bus alternatively returns a configuration handle.
 
     bus.Initialize(succubus =>
     {
         succubus.UseMessageHost();               
     });
 
+When using the parameterless Initialize call, the bus will be initialized with default values.
