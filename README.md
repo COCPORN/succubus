@@ -10,9 +10,6 @@ Succubus is a simple (at this point) implementation of convenience functions for
 
 Because it uses ØMQ, all brokers live in the Succubus process space, and you do not install anything besides the dependencies in the library.
 
-![A nice succubus](http://images3.wikia.nocookie.net/__cb20130714043348/valkyriecrusade/images/f/fe/Queen_Succubus_SR.PNG "A Succubus")
-
-
 Getting started
 ---------------
 

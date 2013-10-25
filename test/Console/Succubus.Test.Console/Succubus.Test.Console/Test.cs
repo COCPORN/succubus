@@ -31,7 +31,7 @@ namespace SuccubusTest.Console
 
             Thread.Sleep(3000);
 
-#if false
+#if true
 
             bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
                 System.Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
