@@ -18,6 +18,11 @@ Getting started
 
 A quickstart guide to getting started with Succubus.
 
+Installation
+------------
+
+Get lastest version of Succubus from GitHub or NuGet.
+
 Instantiation
 -------------
 
@@ -88,6 +93,43 @@ Events
 
 Synchronous processing
 ----------------------
+
+Succubus supports two types of synchronous calling; static and transient routes. A transient route is setup as the call is made, and is removed after a call has been processed, while a static route is permanent in the bus.
+
+When using synchronous processing, the _client_ side of the interaction needs to use a variation of the `Call`-method and the _server_ side then replies using the `ReplyTo`-method.
+
+### Replying to messages
+
+When a message is presented from the bus after being sent with the `Call`-method, it can be handled with the `ReplyTo`-method:
+
+	bus.ReplyTo<BasicRequest, BasicResponse>(request => {
+		return new BasicResponse { Message = request.Message + " echoed from server" };
+	});
+
+Note that `BasicRequest` and `BasicResponse` are user defined POCO-classes; Succubus will handle any routing information behind the scenes.
+
+### Transient routes
+
+Transient routes are simple request/response-pairs.
+
+	bus.Call<Request, Response>(new Request { Message = "Hi from client"},
+		response => {
+			Console.WriteLine("Got response from server: {0}", response.Message);
+		});
+
+A transient call with request/response-parameters will register a route and wrap the request/response objects in a `SynchronousMessageFrame` which decorates the messages with `CorrelationId`s. If multiple responses are made to the same synchronous call, only the first will be handled in the defined response handler, while the other messages will be raised as events.
+
+### Static routes
+
+Static routes allow for reuse of handler structures and more advanced orchestration.
+
+    bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
+        System.Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
+        request.Message, 
+        response.Message));
+    bus.Call<BasicRequest>(new BasicRequest { Message = "Hello from client"} );
+
+Succubus will store the request until the response arrives, so both can be handled in the same context.
 
 Orchestration
 -------------
