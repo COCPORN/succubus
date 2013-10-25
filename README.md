@@ -88,6 +88,29 @@ If this configuration method is called, the bus will run a messagehost on localh
 Events
 ------
 
+Succubus supports publishing and consuming events. Events are agnostic to where they are posted from and who consumes them. A single event can have multiple consumers.
+
+### Publishing events
+
+Publish events by calling the `Publish`-method:
+
+	bus.Publish(new BasicEvent { Message = "Hi, there! "});
+
+`BasicEvent` is a user defined POCO-class:
+
+    public class BasicEvent
+    {
+        public string Message { get; set; }
+    }
+
+### Consuming events
+
+If you are interested in handling an event, use the `On`-method:
+
+	bus.On<BasicEvent>(e => {
+		Console.WriteLine("Got event: {0}", e.Message)
+	});
+
 Synchronous processing
 ----------------------
 
@@ -128,8 +151,40 @@ Static routes allow for reuse of handler structures and more advanced orchestrat
 
 Succubus will store the request until the response arrives, so both can be handled in the same context.
 
-Orchestration
--------------
+### Orchestration
+
+Synchronous processing in Succubus opens up for some complex orchestration. Example:
+
+	bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
+	{
+		Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
+		Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
+	});
+
+Succubus will orchestrate up to 7 response messages. Replies can also be chained.
+
+	bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
+	{
+		Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
+		Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
+	})
+		.Then<DataStored>(ds => {
+			Console.WriteLine("The data has been successfully stored.")	
+		});
+
+You can also have multiple `OnReply`/`Then`-blocks:
+
+	bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
+	{
+		Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
+		Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
+	})
+		.Then<DataStored>(ds => {
+			Console.WriteLine("The data has been successfully stored.")	
+		})
+	.OnReply<Error>(err => {
+		Console.WriteLine("An error occurred handling update.");
+	});
 
 Workload management
 -------------------
