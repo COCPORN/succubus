@@ -1,4 +1,5 @@
 ﻿using Succubus.Interfaces.ResponseContexts;
+using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Succubus.Core
         /// <summary>
         /// These are used with On to handle events.
         /// </summary>
-        Dictionary<Type, Action<object>> eventHandlers = new Dictionary<Type, Action<object>>();
+        Dictionary<Type, List<Action<object>>> eventHandlers = new Dictionary<Type, List<Action<object>>>();
 
         public void Publish<T>(T request)
         {
@@ -20,15 +21,33 @@ namespace Succubus.Core
         }        
 
         public IResponseContext On<T>(Action<T> handler)
-        {
-            if (eventHandlers.ContainsKey(typeof(T)))
-            {
-                throw new ArgumentException("Type already has a handler");
-            }
+        {   
             Action<object> myHandler = new Action<object>(response => handler((T)response));
-            eventHandlers.Add(typeof(T), myHandler);
+            List<Action<object>> handlers;
+            if (eventHandlers.TryGetValue(typeof(T), out handlers) == false) {
+                handlers = new List<Action<object>>();
+                eventHandlers.Add(typeof(T), handlers);
+            }
+
+            handlers.Add(myHandler);
             return new ResponseContext(this);
         }
-       
+
+        private void ProcessEvents(EventMessageFrame eventFrame)
+        {
+            Type type = Type.GetType(eventFrame.EmbeddedType);
+            Type eventType = Type.GetType(eventFrame.EmbeddedType);
+            object message = JsonFrame.Deserlialize(eventFrame.Message, type);
+
+            List<Action<object>> handlers;
+
+            if (eventHandlers.TryGetValue(eventType, out handlers))
+            {
+                foreach (var eventHandler in handlers)
+                {
+                    eventHandler(message);
+                }
+            }
+        }
     }
 }

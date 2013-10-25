@@ -50,19 +50,7 @@ namespace Succubus.Core
             }
         }
 
-        private void ProcessEvents(EventMessageFrame eventFrame)
-        {
-            Type type = Type.GetType(eventFrame.EmbeddedType);
-            Type eventType = Type.GetType(eventFrame.EmbeddedType);
-            object message = JsonFrame.Deserlialize(eventFrame.Message, type);
 
-            Action<object> eventHandler;
-
-            if (eventHandlers.TryGetValue(eventType, out eventHandler))
-            {
-                eventHandler(message);
-            }
-        }
 
         private void ProcessSynchronousMessages(SynchronousMessageFrame synchronousFrame)
         {

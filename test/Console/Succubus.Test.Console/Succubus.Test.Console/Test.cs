@@ -69,6 +69,7 @@ namespace SuccubusTest.Console
             bus.On<BasicEvent>((basicEvent) =>
             {
                 System.Console.WriteLine("On<BasicEvent>: Received BasicEvent: {0}", basicEvent.Message);
+               
             });
 
 
@@ -81,6 +82,15 @@ namespace SuccubusTest.Console
                 });
 
             bus.Publish(new BasicEvent { Message = "Hello, world!" });
+
+            Thread.Sleep(500);
+            bus.On<BasicEvent>((basicEvent2) =>
+            {
+                System.Console.WriteLine("On<BasicEvent>: HORY SHEET! {0}", basicEvent2.Message);
+            });
+            bus.Publish(new BasicEvent { Message = "We meet again, world!" });
+
+
 #endif
         }
 
