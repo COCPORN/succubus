@@ -29,7 +29,23 @@ namespace SuccubusTest.Console
                 return new BasicResponse { Message = "Reply from server: " + req.Message };
             });
 #if true
-            
+
+            bus.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
+                {
+                    System.Console.WriteLine("The request {0} returned {1} and {2}", request.Message, response1.Message, response2.Message2);
+                });
+
+            bus.ReplyTo<Request1, Response1>((req) =>
+                {
+                    return new Response1 { Message = "RESPONSE 1" + req.Message };
+                });
+
+            bus.ReplyTo<Request1, Response2>((req) =>
+                {
+                    return new Response2 { Message2 = "RESPONSE 2 " + req.Message };
+                });
+
+            bus.Call<Request1>(new Request1 { Message = "Hohey!" });
 
             bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
                 System.Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 

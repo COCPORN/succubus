@@ -15,6 +15,9 @@ namespace Succubus
 
         HashSet<Type> types = new HashSet<Type>();
 
+        Dictionary<Type, object> responses = new Dictionary<Type, object>();        
+
+
         public SynchronizationContext()
         {
             Frames = new List<SynchronizationFrame>();
@@ -40,15 +43,17 @@ namespace Succubus
                     continue;
                 }
 
+                responses.Add(message.GetType(), message);
+
                 if (frame.Satisfies(types))
                 {
                     if (Static == false)
                     {
-                        frame.CallHandler(message);
+                        frame.CallHandler(responses);
                     }
                     else
                     {
-                        frame.CallStaticHandler(message);
+                        frame.CallStaticHandler(responses);
                     }
                     frame.Resolved = true;
                 }

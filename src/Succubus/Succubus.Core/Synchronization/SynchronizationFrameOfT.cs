@@ -13,19 +13,19 @@ namespace Succubus
 
         public Type GenericType { get; set; }
 
-        protected Action<object> handler;
+        protected Action<Dictionary<Type,object>> handler;
 
-        protected Action<object, object> staticHandler;
+        protected Action<object, Dictionary<Type, object>> staticHandler;
 
-        public void CallHandler(object message)
+        public void CallHandler(Dictionary<Type,object> messages)
         {
-            handler(message);
+            handler(messages);
         }
 
-        public void CallStaticHandler(object message)
+        public void CallStaticHandler(Dictionary<Type,object> messages)
         {
-            staticHandler(Request, message);
-        }
+            staticHandler(Request, messages);
+        }        
 
         public object Request { get; set; }
 
@@ -39,8 +39,11 @@ namespace Succubus
     {
         public SynchronizationFrame()
         {
-            handler = new Action<object>(message => Handler((TRes)message));
-            staticHandler = new Action<object, object>((request, response) => StaticHandler((TReq)request, (TRes)response));
+            handler = new Action<Dictionary<Type,object>>(
+                messages => Handler((TRes)messages[typeof(TRes)])
+            );
+            staticHandler = new Action<object, Dictionary<Type, object>>(
+                (request, responses) => StaticHandler((TReq)request, (TRes)responses[typeof(TRes)]));
         }
 
         public Action<TRes> Handler { get; set; }
@@ -51,6 +54,43 @@ namespace Succubus
             if (type == typeof(TRes)) return true;
             else return false;
         } 
+
+        public override bool Satisfies(HashSet<Type> responses)
+        {
+            if (responses.Count == 0)
+            {
+                return false;
+            }
+            else if (responses.Contains(typeof(TReq)))
+            {
+                return true;
+            }
+            else return false;
+        }
+    }
+
+    [Serializable]
+    class SynchronizationFrame<TReq, TRes1, TRes2> : SynchronizationFrame
+    {
+        public SynchronizationFrame()
+        {
+            handler = new Action<Dictionary<Type, object>>(
+                messages => Handler((TRes1)messages[typeof(TRes1)], (TRes2)messages[typeof(TRes2)])
+            );
+            staticHandler = new Action<object, Dictionary<Type, object>>(
+                (request, responses) => 
+                    StaticHandler((TReq)request, (TRes1)responses[typeof(TRes1)],
+                        (TRes2)responses[typeof(TRes2)]));
+        }
+
+        public Action<TRes1, TRes2> Handler { get; set; }
+        public Action<TReq, TRes1, TRes2> StaticHandler { get; set; }
+
+        public override bool CanHandle(Type type)
+        {
+            if (type == typeof(TRes1) || type == typeof(TRes2)) return true;
+            else return false;
+        }
 
         public override bool Satisfies(HashSet<Type> responses)
         {

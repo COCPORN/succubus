@@ -69,7 +69,7 @@ namespace Succubus.Core
 
         Dictionary<Type, Action<object>> eventHandlers = new Dictionary<Type, Action<object>>();
 
-        Dictionary<Type, Func<object, object>> replyHandlers = new Dictionary<Type, Func<object, object>>();
+        Dictionary<Type, List<Func<object, object>>> replyHandlers = new Dictionary<Type, List<Func<object, object>>>();
 
         #endregion
 
@@ -217,7 +217,16 @@ namespace Succubus.Core
 
         public IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler)
         {
-            throw new NotImplementedException();
+            if (staticSynchronizationPrototypes.ContainsKey(typeof(TReq)))
+            {
+                throw new InvalidOperationException("Bus already contains a static route for this type");
+            }
+
+            var synchronizationContext = new SynchronizationContext();
+            synchronizationContext.Frames.Add(new SynchronizationFrame<TReq, T1, T2> { StaticHandler = handler });
+            staticSynchronizationPrototypes.Add(typeof(TReq), synchronizationContext);
+
+            return new ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler)
@@ -250,7 +259,16 @@ namespace Succubus.Core
         public void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler)
         {            
             Func<object, object> objectHandler = new Func<object, object>((req) => (TRes)handler((TReq)req));
-            replyHandlers.Add(typeof(TReq), objectHandler);
+            if (replyHandlers.ContainsKey(typeof(TReq)) == false)
+            {
+                var handlers = new List<Func<object, object>>();
+                handlers.Add(objectHandler);
+                replyHandlers.Add(typeof(TReq), handlers);
+            }
+            else
+            {
+                replyHandlers[typeof(TReq)].Add(objectHandler);
+            }
         }
 
         void ObjectPublish(object message)

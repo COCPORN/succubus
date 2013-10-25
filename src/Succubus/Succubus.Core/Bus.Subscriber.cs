@@ -116,14 +116,17 @@ namespace Succubus.Core
 
         private void ProcessReplies(SynchronousMessageFrame synchronousFrame, Type type, object message)
         {
-            Func<object, object> replyHandler;
-            if (replyHandlers.TryGetValue(type, out replyHandler))
+            List<Func<object, object>> handlers;
+            if (replyHandlers.TryGetValue(type, out handlers))
             {
                 try
                 {
-                    var response = replyHandler(message);
-                    var framedResponse = FrameResponseSynchronously(synchronousFrame, response, synchronousFrame.CorrelationId);
-                    ObjectPublish(framedResponse);
+                    foreach (var replyHandler in handlers)
+                    {
+                        var response = replyHandler(message);
+                        var framedResponse = FrameResponseSynchronously(synchronousFrame, response, synchronousFrame.CorrelationId);
+                        ObjectPublish(framedResponse);
+                    }
                 }
                 catch { }
             }
