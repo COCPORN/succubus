@@ -1,4 +1,5 @@
-﻿using Succubus.Interfaces;
+﻿using Succubus.Core;
+using Succubus.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,12 @@ namespace SuccubusTest.Console
         public void Run()
         {
             IBus bus = new Succubus.Core.Bus();
+
+            Bus.Instance.Initialize(config => {
+                config.UseMessageHost();
+            });
+        
+        
 
             bus.Initialize(Succubus =>
             {
