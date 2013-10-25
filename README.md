@@ -1,7 +1,7 @@
 Succubus
 ========
 
-A .NET "service bus" implementation created on top of ZeroMQ.
+A light .NET "service bus" implementation created on top of ØMQ/ZeroMQ.
 
 About
 -----
@@ -9,6 +9,9 @@ About
 Succubus is a simple (at this point) implementation of convenience functions for .NET on top of ØMQ, presenting an interface similar to that of MassTransit. It is similar to an Enterprise Service Bus, but lacks a lot of features at its current state.
 
 Because it uses ØMQ, all brokers live in the Succubus process space, and you do not install anything besides the dependencies in the library.
+
+![A nice succubus](http://images3.wikia.nocookie.net/__cb20130714043348/valkyriecrusade/images/f/fe/Queen_Succubus_SR.PNG "A Succubus")
+
 
 Getting started
 ---------------
@@ -79,3 +82,15 @@ If you are running with a remote messagehost, you can set the hostname for the m
 ### StartupMessageHost
 
 If this configuration method is called, the bus will run a messagehost on localhost as part of this bus instance.
+
+Events
+------
+
+Synchronous processing
+----------------------
+
+Orchestration
+-------------
+
+Workload management
+-------------------
