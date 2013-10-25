@@ -74,7 +74,7 @@ namespace Succubus.Core
 
             SynchronizationContext ctx = ProcessTransientHandlers(synchronousFrame, message);
 
-            ctx = ProcessStaticHandlers(synchronousFrame, requestType, message, ctx);
+            //ctx = ProcessStaticHandlers(synchronousFrame, requestType, message, ctx);
         }
 
         private SynchronizationContext ProcessStaticHandlers(SynchronousMessageFrame synchronousFrame, Type requestType, object message, SynchronizationContext ctx)

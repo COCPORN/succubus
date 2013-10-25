@@ -64,6 +64,9 @@ namespace Succubus.Core
             Dictionary<Guid, SynchronizationContext>> staticSynchronizationContexts = 
             new Dictionary<Type, Dictionary<Guid, SynchronizationContext>>();
 
+        Dictionary<Type,
+            SynchronizationContext> staticSynchronizationPrototypes = new Dictionary<Type, SynchronizationContext>();
+
         Dictionary<Type, Action<object>> eventHandlers = new Dictionary<Type, Action<object>>();
 
         Dictionary<Type, Func<object, object>> replyHandlers = new Dictionary<Type, Func<object, object>>();
@@ -123,15 +126,19 @@ namespace Succubus.Core
         {
             var synchronizedRequest = FrameSynchronously(request);
 
-            Dictionary<Guid, SynchronizationContext> synchronizationContexts;
+            SynchronizationContext prototype;
 
-
-            if (staticSynchronizationContexts.TryGetValue(typeof(TReq), out synchronizationContexts))
-            {
-                //synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+            if (staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out prototype)) {
+                var synchronizationContext = Serialization.ObjectCopier.Clone<SynchronizationContext>(prototype);
+                synchronizationContext.Static = true;
+                foreach (var frame in synchronizationContext.Frames)
+                {
+                    frame.Request = request;
+                }
+                transientSynchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             }
 
-            ObjectPublish(transientSynchronizationContexts);
+            ObjectPublish(synchronizedRequest);
             return synchronizedRequest.CorrelationId;
         }
 
@@ -196,14 +203,15 @@ namespace Succubus.Core
 
         public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler)
         {
-            if (staticSynchronizationContexts.ContainsKey(typeof(TReq)))
+            if (staticSynchronizationPrototypes.ContainsKey(typeof(TReq)))
             {
                 throw new InvalidOperationException("Bus already contains a static route for this type");
             }
-            staticSynchronizationContexts.Add(typeof(TReq), new Dictionary<Guid, SynchronizationContext>());
-
+            
             var synchronizationContext = new SynchronizationContext();
             synchronizationContext.Frames.Add(new SynchronizationFrame<TReq, T> { StaticHandler = handler });
+            staticSynchronizationPrototypes.Add(typeof(TReq), synchronizationContext);
+            
             return new ResponseContext(this);
         }
 

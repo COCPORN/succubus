@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Succubus
 {
+    [Serializable]
     class SynchronizationContext
     {
+        public bool Static { get; set; }
+
         public List<SynchronizationFrame> Frames { get; set; }
 
         HashSet<Type> types = new HashSet<Type>();
@@ -20,17 +23,38 @@ namespace Succubus
         public bool ResolveFor(object message)
         {
             if (Frames == null || Frames.Count == 0) return false;
-
+           
             types.Add(message.GetType());
 
             bool unresolvedFrames = false;
             foreach (var frame in Frames)
             {
-                if (frame.Resolved == true) continue;
-                unresolvedFrames = true;
+                if (frame.Resolved == true)
+                {
+                    continue;
+                }
+                
+                if (frame.CanHandle(message.GetType()) == false)
+                {
+                    unresolvedFrames = true;
+                    continue;
+                }
+
                 if (frame.Satisfies(types))
                 {
-                    frame.CallHandler(message);
+                    if (Static == false)
+                    {
+                        frame.CallHandler(message);
+                    }
+                    else
+                    {
+                        frame.CallStaticHandler(message);
+                    }
+                    frame.Resolved = true;
+                }
+                else
+                {
+                    unresolvedFrames = true;
                 }
             }
 

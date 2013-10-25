@@ -54,6 +54,7 @@
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\JsonFrame.cs" />
+    <Compile Include="Serialization\ObjectCopier.cs" />
     <Compile Include="Synchronization\SynchronizationFrameOfT.cs" />
     <Compile Include="Synchronization\SynchronizationContext.cs" />
     <Compile Include="MessageFrames\SynchronousMessageFrame.cs" />

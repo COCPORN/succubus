@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Succubus
 {
+    [Serializable]
     abstract class SynchronizationFrame
     {
         public abstract bool Satisfies(HashSet<Type> responses);
@@ -29,8 +30,11 @@ namespace Succubus
         public object Request { get; set; }
 
         public bool Resolved { get; set; }
+
+        public abstract bool CanHandle(Type type);
     }
 
+    [Serializable]
     class SynchronizationFrame<TReq, TRes> : SynchronizationFrame
     {
         public SynchronizationFrame()
@@ -42,6 +46,11 @@ namespace Succubus
         public Action<TRes> Handler { get; set; }
         public Action<TReq, TRes> StaticHandler { get; set; }
 
+        public override bool CanHandle(Type type)
+        {
+            if (type == typeof(TRes)) return true;
+            else return false;
+        } 
 
         public override bool Satisfies(HashSet<Type> responses)
         {
