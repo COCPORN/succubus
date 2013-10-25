@@ -10,8 +10,7 @@ namespace Succubus.Core
 {
     public partial class Bus : IBusConfigurator
     {
-        #region Configuration
-
+        
         int publishPort = 9000;
         int subscribePort = 9001;
         bool startMessageHost = false;
@@ -64,14 +63,11 @@ namespace Succubus.Core
 
         public string MessageNamespace { get; set; }
 
-        
-
-        #endregion
-
-
         public void StartupMessageHost()
         {
             startMessageHost = true;
         }
+
+        
     }
 }
