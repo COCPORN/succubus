@@ -9,6 +9,10 @@ namespace SuccubusTest.Console
         public void Run()
         {
             IBus bus = new Bus();
+            IBus bus2 = new Bus();
+            bus2.Initialize();
+
+            bus2.On<BasicEvent>(e => System.Console.WriteLine("Bus2::On<BasicEvent>: {0}", e.Message));
 
             // SETUP BUS WITH HOST
 
@@ -48,9 +52,9 @@ namespace SuccubusTest.Console
 
             // MAKE CALLS
 
-            bus.Call(new Request1 {Message = "Hohey!"});
-            bus.Call(new BasicRequest {Message = "This is a test of the static routes"});
-            bus.Call(new BasicRequest {Message = "Habahaba zutzut"});
+            bus.Call(new Request1 {Message = "STATIC Request1"});
+            bus.Call(new BasicRequest {Message = "STATIC BasicRequest 1"});
+            bus.Call(new BasicRequest {Message = "STATIC BasicRequest 2"});
 
             // SETUP EVENT HANDLERS
             
@@ -75,7 +79,7 @@ namespace SuccubusTest.Console
             // ADD NEW EVENT TO EXISTING TO CHECK MULTICAST
 
             bus.On<BasicEvent>(
-                basicEvent2 => System.Console.WriteLine("On<BasicEvent>: HORY SHEET! {0}", basicEvent2.Message));
+                basicEvent2 => System.Console.WriteLine("On<BasicEvent>2: {0}", basicEvent2.Message));
             bus.Publish(new BasicEvent {Message = "We meet again, world!"});
         }
     }
