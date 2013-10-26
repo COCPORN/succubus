@@ -27,7 +27,7 @@ Instantiation
 
 To instantiate a handle to the bus, create an instance of `Succubus.Core.Bus`:
 ```C#
-	IBus bus = new Succubus.Core.Bus();
+IBus bus = new Succubus.Core.Bus();
 ```
 
 Each handle will have a separate channel to the message host.
@@ -37,23 +37,29 @@ Singleton instantiation
 
 Succubus allows you to get a singleton instance in addition to newing up objects. Note that the singleton object will always (obviously) point to the same instance, while all newed objects will be different. These can co-exist and will use separate message channels:
 
-	Bus.Instance.Initialize(config => {
-	    config.UseMessageHost();
-	});
+```C#
+Bus.Instance.Initialize(config => {
+    config.UseMessageHost();
+});
+```
 
 Initialization
 --------------
 
 Before using the bus, it needs to be initialized:
 
-	Bus.Instance.Initialize();
+```C#
+Bus.Instance.Initialize();
+```
 
 The `Initialize`-call to the bus alternatively returns a configuration handle.
 
-    bus.Initialize(succubus =>
-    {
-        succubus.UseMessageHost();               
-    });
+```C#
+bus.Initialize(succubus =>
+{
+    succubus.UseMessageHost();               
+});
+```
 
 When using the parameterless Initialize call, the bus will be initialized with default values.
 
@@ -62,13 +68,15 @@ Configuration
 
 There are a number of methods that allow you to configure your bus instance before using it. These calls can be found in the `IBusConfigurator`-interface, but will be documented in detail in the future.
 
-    public interface IBusConfigurator
-    {        
-        void UseMessageHost(int publishPort = 9000, int subscribePort = 9001, bool setupHost = true);
-        void UseMessageHost(IMessageHost messageHost);
-        void SetNetwork(string networkName);
-        void SetMessageHostname(string hostname);
-    }
+```C#
+public interface IBusConfigurator
+{        
+    void UseMessageHost(int publishPort = 9000, int subscribePort = 9001, bool setupHost = true);
+    void UseMessageHost(IMessageHost messageHost);
+    void SetNetwork(string networkName);
+    void SetMessageHostname(string hostname);
+}
+```
 
 Most of these should be self explanatory.
 
@@ -97,22 +105,28 @@ Succubus supports publishing and consuming events. Events are agnostic to where 
 
 Publish events by calling the `Publish`-method:
 
-	bus.Publish(new BasicEvent { Message = "Hi, there! "});
+```C#
+bus.Publish(new BasicEvent { Message = "Hi, there! "});
+```
 
 `BasicEvent` is a user defined POCO-class:
 
-    public class BasicEvent
-    {
-        public string Message { get; set; }
-    }
+```C#
+public class BasicEvent
+{
+    public string Message { get; set; }
+}
+```
 
 ### Consuming events
 
 If you are interested in handling an event, use the `On`-method:
 
-	bus.On<BasicEvent>(e => {
-		Console.WriteLine("Got event: {0}", e.Message)
-	});
+```C#
+bus.On<BasicEvent>(e => {
+	Console.WriteLine("Got event: {0}", e.Message)
+});
+```
 
 Synchronous processing
 ----------------------
@@ -125,9 +139,11 @@ When using synchronous processing, the _client_ side of the interaction needs to
 
 When a message is presented from the bus after being sent with the `Call`-method, it can be handled with the `ReplyTo`-method:
 
-	bus.ReplyTo<BasicRequest, BasicResponse>(request => {
-		return new BasicResponse { Message = request.Message + " echoed from server" };
-	});
+```C#
+bus.ReplyTo<BasicRequest, BasicResponse>(request => {
+	return new BasicResponse { Message = request.Message + " echoed from server" };
+});
+```
 
 Note that `BasicRequest` and `BasicResponse` are user defined POCO-classes; Succubus will handle any routing information behind the scenes.
 
@@ -135,10 +151,12 @@ Note that `BasicRequest` and `BasicResponse` are user defined POCO-classes; Succ
 
 Transient routes are simple request/response-pairs.
 
-	bus.Call<Request, Response>(new Request { Message = "Hi from client"},
-		response => {
-			Console.WriteLine("Got response from server: {0}", response.Message);
-		});
+```C#
+bus.Call<Request, Response>(new Request { Message = "Hi from client"},
+	response => {
+		Console.WriteLine("Got response from server: {0}", response.Message);
+	});
+```
 
 A transient call with request/response-parameters will register a route and wrap the request/response objects in a `SynchronousMessageFrame` which decorates the messages with `CorrelationId`s. If multiple responses are made to the same synchronous call, only the first will be handled in the defined response handler, while the other messages will be raised as events.
 
@@ -146,11 +164,13 @@ A transient call with request/response-parameters will register a route and wrap
 
 Static routes allow for reuse of handler structures and more advanced orchestration.
 
-    bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
-        Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
-        request.Message, 
-        response.Message));
-    bus.Call<BasicRequest>(new BasicRequest { Message = "Hello from client"} );
+```C#
+bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
+    Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
+    request.Message, 
+    response.Message));
+bus.Call<BasicRequest>(new BasicRequest { Message = "Hello from client"} );
+```
 
 Succubus will store the request until the response arrives, so both can be handled in the same context.
 
@@ -158,38 +178,44 @@ Succubus will store the request until the response arrives, so both can be handl
 
 Synchronous processing in Succubus opens up for some complex orchestration. Example:
 
-	bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
-	{
-		Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
-		Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
-	});
+```C#
+bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
+{
+	Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
+	Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
+});
+```
 
 Succubus will orchestrate up to 7 response messages. Replies can also be chained.
 
-	bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
-	{
-		Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
-		Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
-	})
-		.Then<DataStored>(ds => {
-			Console.WriteLine("The data has been successfully stored.")	
-		});
+```C#
+bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
+{
+	Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
+	Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
+})
+	.Then<DataStored>(ds => {
+		Console.WriteLine("The data has been successfully stored.")	
+	});
+```
 
 The `Then`-block is guaranteed not to be fired before the preceding `OnReply`-block. This makes it possible to do sequencial and partial handling of responses. This kind of orchestration is able to give you guarantees as to in _which order_ a set of messages are processed, regardless of the order in which they are delivered from the messagebus.
 
 You can also have multiple `OnReply`/`Then`-blocks:
 
-	bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
-	{
-		Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
-		Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
+```C#
+bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
+{
+	Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
+	Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
+})
+	.Then<DataStored>(ds => {
+		Console.WriteLine("The data has been successfully stored.")	
 	})
-		.Then<DataStored>(ds => {
-			Console.WriteLine("The data has been successfully stored.")	
-		})
-	.OnReply<Error>(err => {
-		Console.WriteLine("An error occurred handling update.");
-	});
+.OnReply<Error>(err => {
+	Console.WriteLine("An error occurred handling update.");
+});
+```
 
 Workload management
 -------------------
