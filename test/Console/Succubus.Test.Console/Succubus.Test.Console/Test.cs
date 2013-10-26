@@ -1,11 +1,5 @@
-﻿using Succubus.Core;
-using Succubus.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Succubus.Interfaces;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SuccubusTest.Console
 {

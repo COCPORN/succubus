@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Succubus
 {
@@ -19,13 +16,13 @@ namespace Succubus
 
         public void CallHandler(Dictionary<Type,object> messages)
         {
-            handler(messages);
+            if (handler != null) handler(messages);
         }
 
         public void CallStaticHandler(Dictionary<Type,object> messages)
         {
-            staticHandler(Request, messages);
-        }        
+            if (staticHandler != null) staticHandler(Request, messages);
+        }
 
         public object Request { get; set; }
 
