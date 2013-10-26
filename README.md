@@ -188,7 +188,9 @@ bus.OnReply<BasicRequest, BasicReponse>((request, response) => return new BasicR
 
 The timeout parameters can also go into the `Call` for the synchronous processing:
 
+```C#
 bus.Call(new BasicRequest { Message = "Hello!"}, 2500);
+```
 
 For a given `SynchronizationStack`, the parameter in the OnReply takes prescedence.
 
