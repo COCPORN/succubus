@@ -179,7 +179,9 @@ Succubus will store the request until the response arrives, so both can be handl
 Synchronized processing supports timeout handlers on a per-SynchronizationStack basis. A SynchronizationStack is an internal structure, and one is created for every set of OnReply's added to a request-type. In other words:
 
 ```C#
-bus.OnReply<BasicRequest, BasicReponse>((request, response) => return new BasicResponse { },
+bus.OnReply<BasicRequest, BasicReponse>((request, response) => {
+		// Got response from server
+	},
 	request => {
 		// TimeoutHandler
 		Console.WriteLine("The request timed out for: {0}", request.ToString());
