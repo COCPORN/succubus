@@ -144,7 +144,7 @@ A transient call with request/response-parameters will register a route and wrap
 Static routes allow for reuse of handler structures and more advanced orchestration.
 
     bus.OnReply<BasicRequest, BasicResponse>((request, response) => 
-        System.Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
+        Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}", 
         request.Message, 
         response.Message));
     bus.Call<BasicRequest>(new BasicRequest { Message = "Hello from client"} );
