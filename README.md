@@ -174,6 +174,25 @@ bus.Call<BasicRequest>(new BasicRequest { Message = "Hello from client"} );
 
 Succubus will store the request until the response arrives, so both can be handled in the same context.
 
+### Timeouts
+
+Synchronized processing supports timeout handlers on a per-SynchronizationStack basis. A SynchronizationStack is an internal structure, and one is created for every set of OnReply's added to a request-type. In other words:
+
+```C#
+bus.OnReply<BasicRequest, BasicReponse>((request, response) => return new BasicResponse { },
+	request => {
+		// TimeoutHandler
+		Console.WriteLine("The request timed out for: {0}", request.ToString());
+	}, 1000); // Last parameter is the amount of milliseconds for the timeout
+```	
+
+The timeout parameters can also go into the `Call` for the synchronous processing:
+
+bus.Call(new BasicRequest { Message = "Hello!"}, 2500);
+
+For a given `SynchronizationStack`, the parameter in the OnReply takes prescedence.
+
+
 ### Orchestration
 
 Synchronous processing in Succubus opens up for some complex orchestration. Example:
