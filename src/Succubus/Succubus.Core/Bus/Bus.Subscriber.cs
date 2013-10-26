@@ -58,12 +58,12 @@ namespace Succubus.Core
 
             ProcessReplies(synchronousFrame, type, message);
 
-            SynchronizationContext ctx = ProcessTransientHandlers(synchronousFrame, message);            
+            SynchronizationContext ctx = ProcessSynchrohousHandlers(synchronousFrame, message);            
         }
 
       
 
-        private SynchronizationContext ProcessTransientHandlers(SynchronousMessageFrame synchronousFrame, object message)
+        private SynchronizationContext ProcessSynchrohousHandlers(SynchronousMessageFrame synchronousFrame, object message)
         {
             SynchronizationContext ctx = null;
             if (synchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx))
