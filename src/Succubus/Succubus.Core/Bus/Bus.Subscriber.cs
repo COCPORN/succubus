@@ -66,24 +66,38 @@ namespace Succubus.Core
         private SynchronizationContext ProcessSynchrohousHandlers(SynchronousMessageFrame synchronousFrame, object message)
         {
             SynchronizationContext ctx = null;
-            if (synchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx))
+
+            lock (synchronizationContexts)
+            {
+                synchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx);
+            }
+            if (ctx != null)
             {
                 try
                 {
                     if (ctx.ResolveFor(message) == true)
                     {
-                        synchronizationContexts.Remove(synchronousFrame.CorrelationId);
+                        lock (synchronizationContexts)
+                        {
+                            synchronizationContexts.Remove(synchronousFrame.CorrelationId);
+                        }
                     }
-                }
+                }                
                 catch { }
+
             }
             return ctx;
         }
 
         private void ProcessReplies(SynchronousMessageFrame synchronousFrame, Type type, object message)
         {
-            List<Func<object, object>> handlers;
-            if (replyHandlers.TryGetValue(type, out handlers))
+            List<Func<object, object>> handlers = null;
+
+            lock (replyHandlers)
+            {
+                replyHandlers.TryGetValue(type, out handlers);
+            }
+            if (handlers != null)
             {
                 try
                 {

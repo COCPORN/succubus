@@ -7,7 +7,7 @@ namespace Succubus.Core
 {
     public partial class Bus
     {
-        
+
         #region Synchronization stores and event handlers
 
         /// <summary>
@@ -15,8 +15,8 @@ namespace Succubus.Core
         /// a synchronization context has been fulfilled, it should be removed
         /// from this dictionary.
         /// </summary>
-        Dictionary<Guid, 
-            SynchronizationContext> synchronizationContexts = 
+        Dictionary<Guid,
+            SynchronizationContext> synchronizationContexts =
             new Dictionary<Guid, SynchronizationContext>();
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Succubus.Core
         Dictionary<Type,
             SynchronizationContext> staticSynchronizationPrototypes = new Dictionary<Type, SynchronizationContext>();
 
-       
+
 
         /// <summary>
         /// This is used to create "server" logic to respond to synchronous messages.
@@ -35,7 +35,7 @@ namespace Succubus.Core
 
         #endregion
 
-        
+
         #region Synchronous messaging
 
         SynchronousMessageFrame FrameSynchronously(object o, Guid? guid = null)
@@ -73,13 +73,16 @@ namespace Succubus.Core
         {
             var synchronizationContext = new SynchronizationContext();
 
-            
+
             SynchronizationStack stack = new SynchronizationStack(synchronizationContext);
             stack.Frames.Add(new SynchronizationFrame<TReq, TRes> { Handler = handler });
             synchronizationContext.Stacks.Add(stack);
 
             var synchronizedRequest = FrameSynchronously(request);
-            synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+            lock (synchronizationContexts)
+            {
+                synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+            }
             ObjectPublish(synchronizedRequest);
         }
 
@@ -89,9 +92,14 @@ namespace Succubus.Core
         {
             var synchronizedRequest = FrameSynchronously(request);
 
-            SynchronizationContext prototype;
+            SynchronizationContext prototype = null;
 
-            if (staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out prototype)) {
+            lock (staticSynchronizationPrototypes)
+            {
+                staticSynchronizationPrototypes.TryGetValue(typeof (TReq), out prototype);
+            }
+            if (prototype != null)
+            {
                 var synchronizationContext = Serialization.ObjectCopier.Clone<SynchronizationContext>(prototype);
                 synchronizationContext.Static = true;
                 foreach (var stack in synchronizationContext.Stacks)
@@ -101,7 +109,10 @@ namespace Succubus.Core
                         frame.Request = request;
                     }
                 }
-                synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+                lock (synchronizationContexts)
+                {
+                    synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+                }
             }
 
             ObjectPublish(synchronizedRequest);
@@ -115,10 +126,18 @@ namespace Succubus.Core
 
         private void SetupContext<TReq>(out SynchronizationContext synchronizationContext, out SynchronizationStack synchronizationStack)
         {
-            if (staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out synchronizationContext) == false)
+            bool success = false;
+            lock (staticSynchronizationPrototypes)
+            {
+                success = staticSynchronizationPrototypes.TryGetValue(typeof (TReq), out synchronizationContext);
+            }
+            if (success == false)
             {
                 synchronizationContext = new SynchronizationContext();
-                staticSynchronizationPrototypes.Add(typeof(TReq), synchronizationContext);
+                lock (staticSynchronizationPrototypes)
+                {
+                    staticSynchronizationPrototypes.Add(typeof (TReq), synchronizationContext);
+                }
             }
 
             synchronizationStack = new SynchronizationStack(synchronizationContext);
@@ -210,22 +229,25 @@ namespace Succubus.Core
         public void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler)
         {
             Func<object, object> objectHandler = new Func<object, object>((req) => (TRes)handler((TReq)req));
-            if (replyHandlers.ContainsKey(typeof(TReq)) == false)
+            lock (replyHandlers)
             {
-                var handlers = new List<Func<object, object>>();
-                handlers.Add(objectHandler);
-                replyHandlers.Add(typeof(TReq), handlers);
-            }
-            else
-            {
-                replyHandlers[typeof(TReq)].Add(objectHandler);
+                if (replyHandlers.ContainsKey(typeof (TReq)) == false)
+                {
+                    var handlers = new List<Func<object, object>>();
+                    handlers.Add(objectHandler);
+                    replyHandlers.Add(typeof (TReq), handlers);
+                }
+                else
+                {
+                    replyHandlers[typeof (TReq)].Add(objectHandler);
+                }
             }
         }
 
-     
-     
 
-     
+
+
+
 
     }
 }
