@@ -1,7 +1,11 @@
-﻿using Succubus.Interfaces.ResponseContexts;
+﻿using System.Security.AccessControl;
+using Succubus.Interfaces.ResponseContexts;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Succubus.Core
 {
@@ -21,12 +25,16 @@ namespace Succubus.Core
         {   
             Action<object> myHandler = new Action<object>(response => handler((T)response));
             List<Action<object>> handlers;
-            if (eventHandlers.TryGetValue(typeof(T), out handlers) == false) {
-                handlers = new List<Action<object>>();
-                eventHandlers.Add(typeof(T), handlers);
-            }
+            lock (eventHandlers)
+            {
+                if (eventHandlers.TryGetValue(typeof (T), out handlers) == false)
+                {
+                    handlers = new List<Action<object>>();
+                    eventHandlers.Add(typeof (T), handlers);
+                }
 
-            handlers.Add(myHandler);
+                handlers.Add(myHandler);
+            }
             return new ResponseContext(this);
         }
 
@@ -36,9 +44,18 @@ namespace Succubus.Core
             Type eventType = Type.GetType(eventFrame.EmbeddedType);
             object message = JsonFrame.Deserlialize(eventFrame.Message, type);
 
-            List<Action<object>> handlers;
+            if (type == null || eventType == null || message == null) return;
 
-            if (eventHandlers.TryGetValue(eventType, out handlers))
+            List<Action<object>> handlers = null;
+            
+            lock (eventHandlers)
+            {
+                eventHandlers.TryGetValue(eventType, out handlers);
+            }
+
+            // TODO: This has a potential race condition in where
+            // handlers are added to/subtracted from while iterating on it
+            if (handlers != null)
             {
                 foreach (var eventHandler in handlers)
                 {
