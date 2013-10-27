@@ -109,7 +109,18 @@ namespace Succubus.Core
                     {
                         if (timeoutHandler != null) stack.SetTimeoutHandler(timeoutHandler);
                         stack.CorrelationId = synchronizedRequest.CorrelationId;
-                        timeoutStacks.Add(synchronizedRequest.CorrelationId, Timeout(stack, timeout));
+                        List<Int64> keys;
+                        if (timeoutStacks.TryGetValue(synchronizedRequest.CorrelationId, out keys) == false)
+                        {
+                            keys = new List<long>();
+                            keys.Add(Timeout(stack, timeout));
+                            timeoutStacks.Add(synchronizedRequest.CorrelationId, keys);
+                        }
+                        else
+                        {
+                            keys.Add(Timeout(stack, timeout));
+                        }
+                        
                     }
 
                 }

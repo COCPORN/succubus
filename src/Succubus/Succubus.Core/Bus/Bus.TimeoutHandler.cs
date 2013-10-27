@@ -11,7 +11,7 @@ namespace Succubus.Core
             = new SortedDictionary<long, SynchronizationStack>();
         readonly AutoResetEvent timeoutResetEvent = new AutoResetEvent(false);
 
-        Dictionary<Guid, Int64> timeoutStacks = new Dictionary<Guid, long>();
+        Dictionary<Guid, List<Int64>> timeoutStacks = new Dictionary<Guid, List<Int64>>();
 
         private Thread timeoutThread;
 
@@ -86,10 +86,13 @@ namespace Succubus.Core
         {
             lock (sortedTimeoutSynchronizationStacks)
             {
-                Int64 key;
-                if (timeoutStacks.TryGetValue(correlationId, out key))
+                List<Int64> keys;
+                if (timeoutStacks.TryGetValue(correlationId, out keys))
                 {
-                    sortedTimeoutSynchronizationStacks.Remove(key);
+                    foreach (var key in keys)
+                    {
+                        sortedTimeoutSynchronizationStacks.Remove(key);    
+                    }                    
                     timeoutStacks.Remove(correlationId);
                 }
             }
