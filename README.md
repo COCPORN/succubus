@@ -19,13 +19,13 @@ Features
 
 These are the current and planned features of Succubus:
 
-	- Event publishing and consumption
-	- Synchronous calls with request/response
-	- Orchestration of synchronous messages
-	- Timeouts of synchronous messages
-	- Planned for 0.3:
-		- Deferred messaging (0.3)
-		- Addressable commands
+- Event publishing and consumption
+- Synchronous calls with request/response
+- Orchestration of synchronous messages
+- Timeouts of synchronous messages
+- Planned for 0.3:
+	- Deferred messaging (0.3)
+	- Addressable commands
 
 
 Getting started
