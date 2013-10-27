@@ -1,7 +1,7 @@
 Succubus
 ========
 
-A light .NET "service bus" implementation created on top of ØMQ/ZeroMQ.
+A light .NET "service bus" implementation created on top of &OSlash;MQ/ZeroMQ.
 
 About
 -----
