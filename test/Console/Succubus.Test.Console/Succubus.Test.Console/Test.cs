@@ -64,11 +64,15 @@ namespace SuccubusTest.Console
 
             bus.Call(new Request1 { Message = "STATIC Request1" });
 
-            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 100);
-            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 100);
-            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 100);
-            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 100);
-            bus.Call(new BasicRequest { Message = "TimeoutReq" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1);
+            bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 10);
+            bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 2" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 145);
+            bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 3" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1000);
+            bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 4" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 50);
+            bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 5" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1);
+
+            //(bus as Bus).DumpTimeoutTable();
+            //Thread.Sleep(50);
+            //(bus as Bus).DumpTimeoutTable();
 
             //bus.Call(new BasicRequest {Message = "STATIC BasicRequest 2"});
 
@@ -97,6 +101,9 @@ namespace SuccubusTest.Console
             bus.On<BasicEvent>(
                 basicEvent2 => System.Console.WriteLine("On<BasicEvent>2: {0}", basicEvent2.Message));
             bus.Publish(new BasicEvent { Message = "We meet again, world!" });
+            bus.Call(new BasicRequest { Message = "TimeoutReq" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1);
+            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1000);
+            
         }
     }
 }

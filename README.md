@@ -212,14 +212,14 @@ bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
 Succubus will orchestrate up to 7 response messages. Replies can also be chained.
 
 ```C#
-bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
+bus.OnReply<UpdateRequest, 
+            ImageProcessed, 
+            FriendNotified>((ur, ip, fn) =>
 {
 	Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
 	Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
-})
-	.Then<DataStored>(ds => {
-		Console.WriteLine("The data has been successfully stored.")	
-	});
+});
+	
 ```
 
 The `Then`-block is guaranteed not to be fired before the preceding `OnReply`-block. This makes it possible to do sequencial and partial handling of responses. This kind of orchestration is able to give you guarantees as to in _which order_ a set of messages are processed, regardless of the order in which they are delivered from the messagebus.

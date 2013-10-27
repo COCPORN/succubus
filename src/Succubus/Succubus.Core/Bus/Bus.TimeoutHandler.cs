@@ -11,58 +11,53 @@ namespace Succubus.Core
             = new SortedDictionary<long, SynchronizationStack>();
         readonly AutoResetEvent timeoutResetEvent = new AutoResetEvent(false);
 
-        Dictionary<Guid, Int64>  timeoutStacks = new Dictionary<Guid, long>();
+        Dictionary<Guid, Int64> timeoutStacks = new Dictionary<Guid, long>();
 
         private Thread timeoutThread;
 
         void TimeoutThread()
         {
-            int resetEventTimeout = -1;
+            int waitmilliseconds = 100;
             while (true)
             {
-                timeoutResetEvent.WaitOne(resetEventTimeout);
-
+                //Console.WriteLine("Waiting {0} ms, {1}/{2} entries", waitmilliseconds, sortedTimeoutSynchronizationStacks.Count, timeoutStacks.Count);
+                if (waitmilliseconds != 0) timeoutResetEvent.WaitOne(waitmilliseconds);
+                var removeKeys = new List<Int64>();
                 lock (sortedTimeoutSynchronizationStacks)
                 {
-                    if (sortedTimeoutSynchronizationStacks.Count != 0)
-                    {
-                        bool moreStacks = true;
-
-                        Int64 currentTick = DateTime.Now.Ticks;
-                        while (moreStacks)
+                    waitmilliseconds = -1;
+                    foreach (var entry in sortedTimeoutSynchronizationStacks)
+                    {                  
+                        var timespan = TimeSpan.FromTicks(entry.Key - DateTime.Now.Ticks);
+                        var comparison = timespan.CompareTo(new TimeSpan(0, 0, 0));
+                        if (comparison == 1)
                         {
-                            if (sortedTimeoutSynchronizationStacks.Count == 0)
-                            {
-                                moreStacks = false;
-                                resetEventTimeout = -1; // If we empty the dictionary, wait forever
-                                continue;
-                            }
-
-                            var stack = sortedTimeoutSynchronizationStacks.FirstOrDefault();
-
-                            if (stack.Key < currentTick)
-                            {
-                                stack.Value.TimedOut = true;
-                                {
-                                    if (stack.Value.TimeoutHandler != null) stack.Value.TimeoutHandler();
-                                }
-                                sortedTimeoutSynchronizationStacks.Remove(stack.Key);
-                                timeoutStacks.Remove(stack.Value.CorrelationId);
-                            }
-                            else
-                            {
-                                // If we have more frames to be timed out
-                                resetEventTimeout = (int) (stack.Key - currentTick)/10;
-                                moreStacks = false;
-                            }
+                            waitmilliseconds = timespan.Milliseconds;
+                            break;
                         }
+                        entry.Value.TimedOut = true;
+                        {
+                            if (entry.Value.TimeoutHandler != null) entry.Value.TimeoutHandler();
+                        }
+                        removeKeys.Add(entry.Key);
+                        timeoutStacks.Remove(entry.Value.CorrelationId);
+                    }
 
-                    }
-                    else
+                    foreach (var key in removeKeys)
                     {
-                        // We have zero stacks to wait on, wait indefinitely
-                        resetEventTimeout = -1;
+                        sortedTimeoutSynchronizationStacks.Remove(key);
                     }
+                }
+            }
+        }       
+
+        public void DumpTimeoutTable()
+        {
+            lock (sortedTimeoutSynchronizationStacks)
+            {
+                foreach (var entry in sortedTimeoutSynchronizationStacks)
+                {
+                    Console.WriteLine("In {0}", TimeSpan.FromTicks((entry.Key - DateTime.Now.Ticks)));
                 }
             }
         }
@@ -76,12 +71,12 @@ namespace Succubus.Core
 
             lock (sortedTimeoutSynchronizationStacks)
             {
-                
+
                 while (sortedTimeoutSynchronizationStacks.ContainsKey((timeoutTick)))
                 {
                     timeoutTick++;
                 }
-                sortedTimeoutSynchronizationStacks.Add(timeoutTick, stack);                                
+                sortedTimeoutSynchronizationStacks.Add(timeoutTick, stack);            
             }
             timeoutResetEvent.Set();
             return timeoutTick;
