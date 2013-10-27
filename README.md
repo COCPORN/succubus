@@ -24,8 +24,9 @@ These are the current and planned features of Succubus:
 - Orchestration of synchronous messages
 - Timeouts of synchronous messages
 - Planned for 0.3:
-	- Deferred messaging (0.3)
+	- Deferred messaging
 	- Addressable commands
+	- Work-item fan out
 
 
 Getting started
@@ -219,7 +220,7 @@ bus.OnReply<UpdateRequest,
 	
 ```
 
-### Deferrence
+### Deferrence (0.3)
 
 Succubus supports deferring message handling. This is convenient when you are doing synchronous processing, but the response set needs to be handled in another context than where the request was posted.
 
@@ -241,6 +242,7 @@ bus.Pickup<BasicRequest, BasicResponse>(cId, (req, res) =>
 ```
 
 The call to `Pickup` will _block_. Also, deferred calls will by default be held for one minute, or be removed from the bus as soon as they are picked up.
+
 
 Workload management
 -------------------
