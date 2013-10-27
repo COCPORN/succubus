@@ -96,7 +96,7 @@ namespace Succubus.Core
 
             lock (staticSynchronizationPrototypes)
             {
-                staticSynchronizationPrototypes.TryGetValue(typeof (TReq), out prototype);
+                staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out prototype);
             }
             if (prototype != null)
             {
@@ -110,9 +110,22 @@ namespace Succubus.Core
                         if (timeoutHandler != null) stack.SetTimeoutHandler(timeoutHandler);
                         stack.CorrelationId = synchronizedRequest.CorrelationId;
                         timeoutStacks.Add(synchronizedRequest.CorrelationId, Timeout(stack, timeout));
-                    }                    
-                    
+                    }
+
                 }
+                // The static route implementation of timeouts needs to wait because
+                // anonymous methods cannot be serialized. This will be implemented in the
+                // future when I find a better way of cloning the prototypes.
+
+                //else
+                //{
+                //    foreach (var stack in synchronizationContext.Stacks)
+                //    {
+                //        if (timeoutHandler != null) stack.SetTimeoutHandler(timeoutHandler);
+                //        stack.CorrelationId = synchronizedRequest.CorrelationId;
+                //        timeoutStacks.Add(synchronizedRequest.CorrelationId, Timeout(stack, stack.TimeoutMilliseconds));
+                //    }
+                //}
                 foreach (var stack in synchronizationContext.Stacks)
                 {
                     foreach (var frame in stack.Frames)
@@ -140,27 +153,33 @@ namespace Succubus.Core
             bool success = false;
             lock (staticSynchronizationPrototypes)
             {
-                success = staticSynchronizationPrototypes.TryGetValue(typeof (TReq), out synchronizationContext);
+                success = staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out synchronizationContext);
             }
             if (success == false)
             {
                 synchronizationContext = new SynchronizationContext();
                 lock (staticSynchronizationPrototypes)
                 {
-                    staticSynchronizationPrototypes.Add(typeof (TReq), synchronizationContext);
+                    staticSynchronizationPrototypes.Add(typeof(TReq), synchronizationContext);
                 }
             }
 
             synchronizationStack = new SynchronizationStack(synchronizationContext);
         }
 
-        public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler, Action<TReq> timeoutHandler = null, int timeout = 0 )
+        public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler)
+            //, Action<TReq> timeoutHandler = null, int timeout = 0)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
             var synchronizationFrame = new SynchronizationFrame<TReq, T> {StaticHandler = handler};
-       
+
+            //if (timeout != 0 && timeoutHandler != null)
+            //{
+            //    synchronizationStack.SetTimeoutHandler(timeoutHandler);              
+            //}
+          
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
@@ -244,15 +263,15 @@ namespace Succubus.Core
             Func<object, object> objectHandler = new Func<object, object>((req) => (TRes)handler((TReq)req));
             lock (replyHandlers)
             {
-                if (replyHandlers.ContainsKey(typeof (TReq)) == false)
+                if (replyHandlers.ContainsKey(typeof(TReq)) == false)
                 {
                     var handlers = new List<Func<object, object>>();
                     handlers.Add(objectHandler);
-                    replyHandlers.Add(typeof (TReq), handlers);
+                    replyHandlers.Add(typeof(TReq), handlers);
                 }
                 else
                 {
-                    replyHandlers[typeof (TReq)].Add(objectHandler);
+                    replyHandlers[typeof(TReq)].Add(objectHandler);
                 }
             }
         }

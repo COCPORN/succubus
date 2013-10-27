@@ -35,5 +35,6 @@ namespace Succubus.Core.Serialization
                 return (T)formatter.Deserialize(stream);
             }
         }
+
     }
 }

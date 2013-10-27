@@ -176,19 +176,7 @@ Succubus will store the request until the response arrives, so both can be handl
 
 ### Timeouts
 
-Synchronized processing supports timeout handlers on a per-SynchronizationStack basis. A SynchronizationStack is an internal structure, and one is created for every set of OnReply's added to a request-type. In other words:
-
-```C#
-bus.OnReply<BasicRequest, BasicReponse>((request, response) => {
-		// Got response from server
-	},
-	request => {
-		// TimeoutHandler
-		Console.WriteLine("The request timed out for: {0}", request.ToString());
-	}, 1000); // Last parameter is the amount of milliseconds for the timeout
-```	
-
-The timeout parameters can also go into the `Call` for the synchronous processing:
+Synchronized processing supports timeout handlers on a per-`Call` basis. Example:
 
 ```C#
 bus.Call(new BasicRequest { Message = "Hello! "}, (req) => {
@@ -196,22 +184,13 @@ bus.Call(new BasicRequest { Message = "Hello! "}, (req) => {
 }, 2500); // Timeout in milliseconds
 ```
 
-For a given `SynchronizationStack`, the parameter in the OnReply takes prescedence.
-
+If no parameters are provided, the call will time out silently after 
+one minute. To make a response handler never time out, manually provide
+the value of 0.
 
 ### Orchestration
 
-Synchronous processing in Succubus opens up for some complex orchestration. Example:
-
-```C#
-bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
-{
-	Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
-	Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
-});
-```
-
-Succubus will orchestrate up to 7 response messages. Replies can also be chained (coming soon).
+Synchronous processing in Succubus opens up for complex orchestration of up to 7 responses. Example:
 
 ```C#
 bus.OnReply<UpdateRequest, 

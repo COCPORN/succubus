@@ -26,6 +26,8 @@ namespace Succubus
             this.TimeoutHandler = () => timeoutHandler((T)ctx.Request);
         }
 
+        public int TimeoutMilliseconds { get; set; }
+        
         public bool ResolveFor(object message)
         {
             if (TimedOut || Frames == null || Frames.Count == 0) return false;
