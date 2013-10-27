@@ -6,9 +6,6 @@ namespace Succubus.Core
     public partial class Bus
     {
 
-
-
-
         public IResponseContext Defer<TReq, T>()
         {
             throw new NotImplementedException();
