@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bus\Bus.Singleton.cs" />
+    <Compile Include="Bus\Bus.Deferrence.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

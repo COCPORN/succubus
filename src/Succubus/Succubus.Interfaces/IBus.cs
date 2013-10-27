@@ -37,6 +37,26 @@ namespace Succubus.Interfaces
 
         #endregion
 
+        #region Deferrence
+        
+        IResponseContext Defer<TReq, T>();
+        IResponseContext Defer<TReq, T1, T2>();
+        IResponseContext Defer<TReq, T1, T2, T3>();
+        IResponseContext Defer<TReq, T1, T2, T3, T4>();
+        IResponseContext Defer<TReq, T1, T2, T3, T4, T5>();
+        IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6>();
+        IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6, T7>();
+
+        IResponseContext Pickup<TReq, T>(Guid correlationId, Action<TReq, T> handler);
+        IResponseContext Pickup<TReq, T1, T2>(Guid correlationId, Action<TReq, T1, T2> handler);
+        IResponseContext Pickup<TReq, T1, T2, T3>(Guid correlationId, Action<TReq, T1, T2, T3> handler);
+        IResponseContext Pickup<TReq, T1, T2, T3, T4>(Guid correlationId, Action<TReq, T1, T2, T3, T4> handler);
+        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5> handler);
+        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler);
+        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler);
+
+        #endregion
+
         #region Publish/subscribe
 
         // Post an event on the bus

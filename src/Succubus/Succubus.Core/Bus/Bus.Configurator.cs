@@ -64,6 +64,37 @@ namespace Succubus.Core
             startMessageHost = true;
         }
 
-        
+
+
+
+        public void GetFromConfigurationFile()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public string MessageHostPublishAddress
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string MessageHostSubscribeAddress
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

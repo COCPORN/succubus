@@ -10,9 +10,9 @@ namespace Succubus.Core
     public partial class Bus : IBus
     {
 
-        class ResponseContext : IResponseContext
+        private class ResponseContext : IResponseContext
         {
-            Bus bus;
+            private Bus bus;
 
             public ResponseContext(Bus bus)
             {
@@ -36,15 +36,15 @@ namespace Succubus.Core
         #region ØMQ
 
 
-        ZmqContext context;
-        ZmqSocket publishSocket;
-        ZmqSocket subscribeSocket;
+        private ZmqContext context;
+        private ZmqSocket publishSocket;
+        private ZmqSocket subscribeSocket;
 
         #endregion
 
         #region Threading
 
-        Thread subscriberThread;
+        private Thread subscriberThread;
 
         #endregion
 
@@ -54,7 +54,8 @@ namespace Succubus.Core
         #region Initialization
 
 
-        bool initialized = false;
+        private bool initialized = false;
+
         public void Initialize()
         {
             lock (this)
@@ -98,17 +99,16 @@ namespace Succubus.Core
             publishSocket.Connect(PublishAddress);
         }
 
-        void ConnectSubscriber()
+        private void ConnectSubscriber()
         {
             subscribeSocket.Connect(SubscribeAddress);
             subscribeSocket.SubscribeAll();
         }
 
-    
-
-
-       
-  
 
     }
+
+
+
+
 }

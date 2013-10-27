@@ -203,6 +203,28 @@ bus.OnReply<UpdateRequest,
 	
 ```
 
+### Deferrence
+
+Succubus supports deferring message handling. This is convenient when you are doing synchronous processing, but the response set needs to be handled in another context than where the request was posted.
+
+To use, simply:
+
+```C#
+bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse {
+	Message = "From server: " + req.Message;
+});
+
+bus.Defer<BasicRequest, BasicResponse>();
+
+Guid cId = bus.Call(new BasicRequest { Message = "Deferred "});
+
+bus.Pickup<BasicRequest, BasicResponse>(cId, (req, res) =>
+{
+
+});
+```
+
+The call to `Pickup` will _block_. Also, deferred calls will by default be held for one minute, or be removed from the bus as soon as they are picked up.
 
 Workload management
 -------------------
