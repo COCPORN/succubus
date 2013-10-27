@@ -12,6 +12,8 @@ Because it uses ØMQ, all brokers live in the Succubus process space, and you do
 
 For more in-depth documentation, check the [wiki](https://github.com/COCPORN/succubus/wiki).
 
+Succubus is currently in a pre-release but usable state. The repository will go public once it reaches a 0.2-release.
+
 Getting started
 ---------------
 
