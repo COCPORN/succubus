@@ -193,7 +193,7 @@ The timeout parameters can also go into the `Call` for the synchronous processin
 ```C#
 bus.Call(new BasicRequest { Message = "Hello! "}, (req) => {
 	Console.WriteLine("BasicRequest timed out for: {0}", req.Message)
-} 2500); // Timeout in milliseconds
+}, 2500); // Timeout in milliseconds
 ```
 
 For a given `SynchronizationStack`, the parameter in the OnReply takes prescedence.
