@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Succubus : A &quot;service bus&quot; implementation created on top of ZeroMQ" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Succubus</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/COCPORN/succubus">View on GitHub</a>
+
+          <h1 id="project_title">Succubus</h1>
+          <h2 id="project_tagline">A &quot;service bus&quot; implementation created on top of ZeroMQ</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/COCPORN/succubus/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/COCPORN/succubus/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="succubus" class="anchor" href="#succubus"><span class="octicon octicon-link"></span></a>Succubus</h1>
+
+<p>A light .NET "service bus" implementation created on top of ØMQ/ZeroMQ.</p>
+
+<h2>
+<a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About</h2>
+
+<p>Succubus is a simple (at this point) implementation of convenience functions for .NET on top of ØMQ, presenting an interface similar to that of MassTransit. It is similar to an Enterprise Service Bus, but lacks a lot of features at its current state.</p>
+
+<p>Because it uses ØMQ, all brokers live in the Succubus process space, and you do not install anything besides the dependencies in the library.</p>
+
+<p>For more in-depth documentation, check the <a href="https://github.com/COCPORN/succubus/wiki">wiki</a>.</p>
+
+<h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
+
+<p>A quickstart guide to getting started with Succubus.</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Get lastest version of Succubus from GitHub or NuGet.</p>
+
+<h2>
+<a name="instantiation" class="anchor" href="#instantiation"><span class="octicon octicon-link"></span></a>Instantiation</h2>
+
+<p>To instantiate a handle to the bus, create an instance of <code>Succubus.Core.Bus</code>:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">IBus</span> <span class="n">bus</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Succubus</span><span class="p">.</span><span class="n">Core</span><span class="p">.</span><span class="n">Bus</span><span class="p">();</span>
+</pre></div>
+
+<p>Each handle will have a separate channel to the message host.</p>
+
+<h2>
+<a name="singleton-instantiation" class="anchor" href="#singleton-instantiation"><span class="octicon octicon-link"></span></a>Singleton instantiation</h2>
+
+<p>Succubus allows you to get a singleton instance in addition to newing up objects. Note that the singleton object will always (obviously) point to the same instance, while all newed objects will be different. These can co-exist and will use separate message channels:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">Bus</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">config</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="n">config</span><span class="p">.</span><span class="n">UseMessageHost</span><span class="p">();</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="initialization" class="anchor" href="#initialization"><span class="octicon octicon-link"></span></a>Initialization</h2>
+
+<p>Before using the bus, it needs to be initialized:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">Bus</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">Initialize</span><span class="p">();</span>
+</pre></div>
+
+<p>The <code>Initialize</code>-call to the bus alternatively returns a configuration handle.</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">succubus</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="n">succubus</span><span class="p">.</span><span class="n">UseMessageHost</span><span class="p">();</span>               
+<span class="p">});</span>
+</pre></div>
+
+<p>When using the parameterless Initialize call, the bus will be initialized with default values.</p>
+
+<h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>There are a number of methods that allow you to configure your bus instance before using it. These calls can be found in the <code>IBusConfigurator</code>-interface, but will be documented in detail in the future.</p>
+
+<div class="highlight highlight-C#"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">IBusConfigurator</span>
+<span class="p">{</span>        
+    <span class="k">void</span> <span class="nf">UseMessageHost</span><span class="p">(</span><span class="kt">int</span> <span class="n">publishPort</span> <span class="p">=</span> <span class="m">9000</span><span class="p">,</span> <span class="kt">int</span> <span class="n">subscribePort</span> <span class="p">=</span> <span class="m">9001</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">setupHost</span> <span class="p">=</span> <span class="k">true</span><span class="p">);</span>
+    <span class="k">void</span> <span class="nf">UseMessageHost</span><span class="p">(</span><span class="n">IMessageHost</span> <span class="n">messageHost</span><span class="p">);</span>
+    <span class="k">void</span> <span class="nf">SetNetwork</span><span class="p">(</span><span class="kt">string</span> <span class="n">networkName</span><span class="p">);</span>
+    <span class="k">void</span> <span class="nf">SetMessageHostname</span><span class="p">(</span><span class="kt">string</span> <span class="n">hostname</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Most of these should be self explanatory.</p>
+
+<h3>
+<a name="usemessagehost" class="anchor" href="#usemessagehost"><span class="octicon octicon-link"></span></a>UseMessageHost</h3>
+
+<p>Where to find the message host. </p>
+
+<h3>
+<a name="setnetwork" class="anchor" href="#setnetwork"><span class="octicon octicon-link"></span></a>SetNetwork</h3>
+
+<p>This is the most coarse filter Succubus allows you to set. If you have multiple services running on the messagehost, you can set the network name to different strings, and the messages will not be published on other clients.</p>
+
+<h3>
+<a name="setmessagehostname" class="anchor" href="#setmessagehostname"><span class="octicon octicon-link"></span></a>SetMessageHostname</h3>
+
+<p>If you are running with a remote messagehost, you can set the hostname for the messagehost here.</p>
+
+<h3>
+<a name="startupmessagehost" class="anchor" href="#startupmessagehost"><span class="octicon octicon-link"></span></a>StartupMessageHost</h3>
+
+<p>If this configuration method is called, the bus will run a messagehost on localhost as part of this bus instance.</p>
+
+<h2>
+<a name="events" class="anchor" href="#events"><span class="octicon octicon-link"></span></a>Events</h2>
+
+<p>Succubus supports publishing and consuming events. Events are agnostic to where they are posted from and who consumes them. A single event can have multiple consumers.</p>
+
+<h3>
+<a name="publishing-events" class="anchor" href="#publishing-events"><span class="octicon octicon-link"></span></a>Publishing events</h3>
+
+<p>Publish events by calling the <code>Publish</code>-method:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Publish</span><span class="p">(</span><span class="k">new</span> <span class="n">BasicEvent</span> <span class="p">{</span> <span class="n">Message</span> <span class="p">=</span> <span class="s">"Hi, there! "</span><span class="p">});</span>
+</pre></div>
+
+<p><code>BasicEvent</code> is a user defined POCO-class:</p>
+
+<div class="highlight highlight-C#"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">BasicEvent</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Message</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>
+<a name="consuming-events" class="anchor" href="#consuming-events"><span class="octicon octicon-link"></span></a>Consuming events</h3>
+
+<p>If you are interested in handling an event, use the <code>On</code>-method:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">On</span><span class="p">&lt;</span><span class="n">BasicEvent</span><span class="p">&gt;(</span><span class="n">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Got event: {0}"</span><span class="p">,</span> <span class="n">e</span><span class="p">.</span><span class="n">Message</span><span class="p">)</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="synchronous-processing" class="anchor" href="#synchronous-processing"><span class="octicon octicon-link"></span></a>Synchronous processing</h2>
+
+<p>Succubus supports two types of synchronous calling; static and transient routes. A transient route is setup as the call is made, and is removed after a call has been processed, while a static route is permanent in the bus.</p>
+
+<p>When using synchronous processing, the <em>client</em> side of the interaction needs to use a variation of the <code>Call</code>-method and the <em>server</em> side then replies using the <code>ReplyTo</code>-method.</p>
+
+<h3>
+<a name="replying-to-messages" class="anchor" href="#replying-to-messages"><span class="octicon octicon-link"></span></a>Replying to messages</h3>
+
+<p>When a message is presented from the bus after being sent with the <code>Call</code>-method, it can be handled with the <code>ReplyTo</code>-method:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">ReplyTo</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">,</span> <span class="n">BasicResponse</span><span class="p">&gt;(</span><span class="n">request</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">BasicResponse</span> <span class="p">{</span> <span class="n">Message</span> <span class="p">=</span> <span class="n">request</span><span class="p">.</span><span class="n">Message</span> <span class="p">+</span> <span class="s">" echoed from server"</span> <span class="p">};</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Note that <code>BasicRequest</code> and <code>BasicResponse</code> are user defined POCO-classes; Succubus will handle any routing information behind the scenes.</p>
+
+<h3>
+<a name="transient-routes" class="anchor" href="#transient-routes"><span class="octicon octicon-link"></span></a>Transient routes</h3>
+
+<p>Transient routes are simple request/response-pairs.</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Call</span><span class="p">&lt;</span><span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">&gt;(</span><span class="k">new</span> <span class="n">Request</span> <span class="p">{</span> <span class="n">Message</span> <span class="p">=</span> <span class="s">"Hi from client"</span><span class="p">},</span>
+    <span class="n">response</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Got response from server: {0}"</span><span class="p">,</span> <span class="n">response</span><span class="p">.</span><span class="n">Message</span><span class="p">);</span>
+    <span class="p">});</span>
+</pre></div>
+
+<p>A transient call with request/response-parameters will register a route and wrap the request/response objects in a <code>SynchronousMessageFrame</code> which decorates the messages with <code>CorrelationId</code>s. If multiple responses are made to the same synchronous call, only the first will be handled in the defined response handler, while the other messages will be raised as events.</p>
+
+<h3>
+<a name="static-routes" class="anchor" href="#static-routes"><span class="octicon octicon-link"></span></a>Static routes</h3>
+
+<p>Static routes allow for reuse of handler structures and more advanced orchestration.</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">OnReply</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">,</span> <span class="n">BasicResponse</span><span class="p">&gt;((</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="p">=&gt;</span> 
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"OnReply&lt;TReq, TRes&gt;: Got a response handled on static handler: {0} =&gt; {1}"</span><span class="p">,</span> 
+    <span class="n">request</span><span class="p">.</span><span class="n">Message</span><span class="p">,</span> 
+    <span class="n">response</span><span class="p">.</span><span class="n">Message</span><span class="p">));</span>
+<span class="n">bus</span><span class="p">.</span><span class="n">Call</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">&gt;(</span><span class="k">new</span> <span class="n">BasicRequest</span> <span class="p">{</span> <span class="n">Message</span> <span class="p">=</span> <span class="s">"Hello from client"</span><span class="p">}</span> <span class="p">);</span>
+</pre></div>
+
+<p>Succubus will store the request until the response arrives, so both can be handled in the same context.</p>
+
+<h3>
+<a name="timeouts" class="anchor" href="#timeouts"><span class="octicon octicon-link"></span></a>Timeouts</h3>
+
+<p>Synchronized processing supports timeout handlers on a per-<code>Call</code> basis. Example:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Call</span><span class="p">(</span><span class="k">new</span> <span class="n">BasicRequest</span> <span class="p">{</span> <span class="n">Message</span> <span class="p">=</span> <span class="s">"Hello! "</span><span class="p">},</span> <span class="p">(</span><span class="n">req</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"BasicRequest timed out for: {0}"</span><span class="p">,</span> <span class="n">req</span><span class="p">.</span><span class="n">Message</span><span class="p">)</span>
+<span class="p">},</span> <span class="m">2500</span><span class="p">);</span> <span class="c1">// Timeout in milliseconds</span>
+</pre></div>
+
+<p>If no parameters are provided, the call will time out silently after 
+one minute. To make a response handler never time out, manually provide
+the value of 0.</p>
+
+<h3>
+<a name="orchestration" class="anchor" href="#orchestration"><span class="octicon octicon-link"></span></a>Orchestration</h3>
+
+<p>Synchronous processing in Succubus opens up for complex orchestration of up to 7 responses. Example:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">OnReply</span><span class="p">&lt;</span><span class="n">UpdateRequest</span><span class="p">,</span> 
+            <span class="n">ImageProcessed</span><span class="p">,</span> 
+            <span class="n">FriendNotified</span><span class="p">&gt;((</span><span class="n">ur</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"New profile image has been processed with response: {0}"</span><span class="p">,</span> <span class="n">ip</span><span class="p">.</span><span class="n">Status</span><span class="p">);</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Friends have been notified with response: {0}"</span><span class="p">,</span> <span class="n">fn</span><span class="p">.</span><span class="n">Status</span><span class="p">);</span>
+<span class="p">});</span>
+
+</pre></div>
+
+<h3>
+<a name="deferrence" class="anchor" href="#deferrence"><span class="octicon octicon-link"></span></a>Deferrence</h3>
+
+<p>Succubus supports deferring message handling. This is convenient when you are doing synchronous processing, but the response set needs to be handled in another context than where the request was posted.</p>
+
+<p>To use, simply:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">ReplyTo</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">,</span> <span class="n">BasicResponse</span><span class="p">&gt;(</span><span class="n">req</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">BasicResponse</span> <span class="p">{</span>
+    <span class="n">Message</span> <span class="p">=</span> <span class="s">"From server: "</span> <span class="p">+</span> <span class="n">req</span><span class="p">.</span><span class="n">Message</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="n">bus</span><span class="p">.</span><span class="n">Defer</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">,</span> <span class="n">BasicResponse</span><span class="p">&gt;();</span>
+
+<span class="n">Guid</span> <span class="n">cId</span> <span class="p">=</span> <span class="n">bus</span><span class="p">.</span><span class="n">Call</span><span class="p">(</span><span class="k">new</span> <span class="n">BasicRequest</span> <span class="p">{</span> <span class="n">Message</span> <span class="p">=</span> <span class="s">"Deferred "</span><span class="p">});</span>
+
+<span class="n">bus</span><span class="p">.</span><span class="n">Pickup</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">,</span> <span class="n">BasicResponse</span><span class="p">&gt;(</span><span class="n">cId</span><span class="p">,</span> <span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+
+<span class="p">});</span>
+</pre></div>
+
+<p>The call to <code>Pickup</code> will <em>block</em>. Also, deferred calls will by default be held for one minute, or be removed from the bus as soon as they are picked up.</p>
+
+<h2>
+<a name="workload-management" class="anchor" href="#workload-management"><span class="octicon octicon-link"></span></a>Workload management</h2>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Succubus maintained by <a href="https://github.com/COCPORN">COCPORN</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
