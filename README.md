@@ -14,6 +14,20 @@ For more in-depth documentation, check the [wiki](https://github.com/COCPORN/suc
 
 Succubus is currently in a pre-release but usable state. The repository will go public once it reaches a 0.2-release.
 
+Features
+--------
+
+These are the current and planned features of Succubus:
+
+	- Event publishing and consumption
+	- Synchronous calls with request/response
+	- Orchestration of synchronous messages
+	- Timeouts of synchronous messages
+	- Planned for 0.3:
+		- Deferred messaging (0.3)
+		- Addressable commands
+
+
 Getting started
 ---------------
 
