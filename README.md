@@ -191,7 +191,9 @@ bus.OnReply<BasicRequest, BasicReponse>((request, response) => {
 The timeout parameters can also go into the `Call` for the synchronous processing:
 
 ```C#
-bus.Call(new BasicRequest { Message = "Hello!"}, 2500);
+bus.Call(new BasicRequest { Message = "Hello! "}, (req) => {
+	Console.WriteLine("BasicRequest timed out for: {0}", req.Message)
+} 2500); // Timeout in milliseconds
 ```
 
 For a given `SynchronizationStack`, the parameter in the OnReply takes prescedence.
@@ -209,7 +211,7 @@ bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
 });
 ```
 
-Succubus will orchestrate up to 7 response messages. Replies can also be chained.
+Succubus will orchestrate up to 7 response messages. Replies can also be chained (coming soon).
 
 ```C#
 bus.OnReply<UpdateRequest, 
@@ -222,23 +224,6 @@ bus.OnReply<UpdateRequest,
 	
 ```
 
-The `Then`-block is guaranteed not to be fired before the preceding `OnReply`-block. This makes it possible to do sequencial and partial handling of responses. This kind of orchestration is able to give you guarantees as to in _which order_ a set of messages are processed, regardless of the order in which they are delivered from the messagebus.
-
-You can also have multiple `OnReply`/`Then`-blocks:
-
-```C#
-bus.OnReply<ImageProcessed, FriendNotified>((ip, fn) =>
-{
-	Console.WriteLine("New profile image has been processed with response: {0}", ip.Status);
-	Console.WriteLine("Friends have been notified with response: {0}", fn.Status);
-})
-	.Then<DataStored>(ds => {
-		Console.WriteLine("The data has been successfully stored.")	
-	})
-.OnReply<Error>(err => {
-	Console.WriteLine("An error occurred handling update.");
-});
-```
 
 Workload management
 -------------------
