@@ -19,18 +19,18 @@ namespace Succubus.Core
         public void Publish<T>(T request)
         {
             ObjectPublish(FrameEvent(request));
-        }        
+        }
 
         public IResponseContext On<T>(Action<T> handler)
-        {   
+        {
             Action<object> myHandler = new Action<object>(response => handler((T)response));
             List<Action<object>> handlers;
             lock (eventHandlers)
             {
-                if (eventHandlers.TryGetValue(typeof (T), out handlers) == false)
+                if (eventHandlers.TryGetValue(typeof(T), out handlers) == false)
                 {
                     handlers = new List<Action<object>>();
-                    eventHandlers.Add(typeof (T), handlers);
+                    eventHandlers.Add(typeof(T), handlers);
                 }
 
                 handlers.Add(myHandler);
@@ -47,7 +47,7 @@ namespace Succubus.Core
             if (type == null || eventType == null || message == null) return;
 
             List<Action<object>> handlers = null;
-            
+
             lock (eventHandlers)
             {
                 eventHandlers.TryGetValue(eventType, out handlers);
@@ -59,7 +59,8 @@ namespace Succubus.Core
             {
                 foreach (var eventHandler in handlers)
                 {
-                    eventHandler(message);
+                    Action<object> handler = eventHandler;
+                    Task.Factory.StartNew(() => handler(message));
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Succubus
 {
@@ -10,15 +11,24 @@ namespace Succubus
 
         SynchronizationContext ctx;
 
+        internal SynchronizationContext Context { get { return ctx; } }
+
         public SynchronizationStack(SynchronizationContext ctx)
         {
             Frames = new List<SynchronizationFrame>();
             this.ctx = ctx;
+        }        
+
+        internal Action TimeoutHandler;
+
+        public void SetTimeoutHandler<T>(Action<T> timeoutHandler)
+        {
+            this.TimeoutHandler = () => timeoutHandler((T)ctx.Request);
         }
 
         public bool ResolveFor(object message)
         {
-            if (Frames == null || Frames.Count == 0) return false;
+            if (TimedOut || Frames == null || Frames.Count == 0) return false;
            
             bool unresolvedFrames = false;
             foreach (var frame in Frames)
@@ -45,14 +55,18 @@ namespace Succubus
 
                 if (frame.Satisfies(ctx.types))
                 {
-                    if (ctx.Static == false)
+                    SynchronizationFrame localFrame = frame;
+                    Task.Factory.StartNew(() =>
                     {
-                        frame.CallHandler(ctx.responses);
-                    }
-                    else
-                    {
-                        frame.CallStaticHandler(ctx.responses);
-                    }
+                        if (ctx.Static == false)
+                        {
+                            localFrame.CallHandler(ctx.responses);
+                        }
+                        else
+                        {
+                            localFrame.CallStaticHandler(ctx.responses);
+                        }
+                    });
                     frame.Resolved = true;
                 }
                 else
@@ -69,5 +83,9 @@ namespace Succubus
             else return false;
 
         }
+
+        public bool TimedOut { get; set; }
+
+        public Guid CorrelationId { get; set; }
     }
 }

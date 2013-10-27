@@ -18,12 +18,12 @@ namespace Succubus.Interfaces
         void Call<TReq, TRes>(TReq request, Action<TRes> handler);
 
         // Calls to static routes
-        Guid Call<TReq>(TReq request);
+        Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, int timeout = 0);
 
         
 
         // Static routes
-        IResponseContext OnReply<TReq, T>(Action<TReq, T> handler);
+        IResponseContext OnReply<TReq, T>(Action<TReq, T> handler, Action<TReq> timeoutHandler = null, int timeout = 0);
         IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler);
         IResponseContext OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler);
         IResponseContext OnReply<TReq, T1, T2, T3, T4>(Action<TReq, T1, T2, T3, T4> handler);

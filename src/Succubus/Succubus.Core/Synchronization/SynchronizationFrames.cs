@@ -12,7 +12,7 @@ namespace Succubus
 
         protected Action<Dictionary<Type,object>> handler;
 
-        protected Action<object, Dictionary<Type, object>> staticHandler;
+        protected Action<object, Dictionary<Type, object>> staticHandler;        
 
         public void CallHandler(Dictionary<Type,object> messages)
         {
@@ -27,7 +27,8 @@ namespace Succubus
         public object Request { get; set; }
 
         public bool Resolved { get; set; }
-
+        
+        
         public abstract bool CanHandle(Type type);
     }
 

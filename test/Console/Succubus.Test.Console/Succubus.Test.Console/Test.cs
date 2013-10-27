@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Succubus.Core;
 using Succubus.Interfaces;
 
@@ -26,7 +27,16 @@ namespace SuccubusTest.Console
 
             // SETUP ReplyTo-HANDLERS
 
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse {Message = "Reply from server: " + req.Message});
+            bus.ReplyTo<BasicRequest, BasicResponse>(req =>
+            {
+                Thread.Sleep(100);
+                return new BasicResponse
+                {
+
+                    Message = "Reply from server: " + req.Message
+                };
+            });
+
             bus.ReplyTo<Request1, Response3>(req => new Response3 { Message = "RESPONSE 3 " + req.Message });
             bus.ReplyTo<Request1, Response2>(req => new Response2 { Message = "RESPONSE 2 " + req.Message });
             bus.ReplyTo<Request1, Response1>(req => new Response1 { Message = "RESPONSE 1" + req.Message });
@@ -44,20 +54,26 @@ namespace SuccubusTest.Console
                     response1.Message,
                     response2.Message, response3.Message));
 
-            bus.OnReply<BasicRequest, BasicResponse>((request, response) =>
-                System.Console.WriteLine("OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}",
-                    request.Message,
-                    response.Message));
+            bus.OnReply<BasicRequest, BasicResponse>((request, response) => System.Console.WriteLine(
+                "NOTICE! OnReply<TReq, TRes>: Got a response handled on static handler: {0} => {1}",
+                request.Message,
+                response.Message));
 
 
             // MAKE CALLS
 
-            bus.Call(new Request1 {Message = "STATIC Request1"});
-            bus.Call(new BasicRequest {Message = "STATIC BasicRequest 1"});
-            bus.Call(new BasicRequest {Message = "STATIC BasicRequest 2"});
+            bus.Call(new Request1 { Message = "STATIC Request1" });
+
+            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 100);
+            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 100);
+            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 100);
+            bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 100);
+            bus.Call(new BasicRequest { Message = "TimeoutReq" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1);
+
+            //bus.Call(new BasicRequest {Message = "STATIC BasicRequest 2"});
 
             // SETUP EVENT HANDLERS
-            
+
             bus.On<BasicEvent>(
                 basicEvent => System.Console.WriteLine("On<BasicEvent>: Received BasicEvent: {0}", basicEvent.Message));
 
@@ -65,14 +81,14 @@ namespace SuccubusTest.Console
             // TRANSIENT ROUTING
 
             bus.Call<BasicRequest, BasicResponse>(
-                new BasicRequest {Message = "Testing a call from the client"},
+                new BasicRequest { Message = "Testing a call from the client" },
                 response =>
                     System.Console.WriteLine(
                         "Call<TReq, TRes>: Got a response handled on transient route handler: {0}", response.Message));
 
             // FIRE EVENTS
 
-            bus.Publish(new BasicEvent {Message = "Hello, world!"});
+            bus.Publish(new BasicEvent { Message = "Hello, world!" });
 
             Thread.Sleep(500);
 
@@ -80,7 +96,7 @@ namespace SuccubusTest.Console
 
             bus.On<BasicEvent>(
                 basicEvent2 => System.Console.WriteLine("On<BasicEvent>2: {0}", basicEvent2.Message));
-            bus.Publish(new BasicEvent {Message = "We meet again, world!"});
+            bus.Publish(new BasicEvent { Message = "We meet again, world!" });
         }
     }
 }

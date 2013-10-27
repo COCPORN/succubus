@@ -88,11 +88,11 @@ namespace Succubus.Core
 
         // TODO: Decide whether static routes are really necessary, as the tree
         // needs to be built on a per call basis anyway.
-        public Guid Call<TReq>(TReq request)
+        public Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, int timeout = 0)
         {
             var synchronizedRequest = FrameSynchronously(request);
 
-            SynchronizationContext prototype = null;
+            SynchronizationContext prototype;
 
             lock (staticSynchronizationPrototypes)
             {
@@ -100,8 +100,19 @@ namespace Succubus.Core
             }
             if (prototype != null)
             {
-                var synchronizationContext = Serialization.ObjectCopier.Clone<SynchronizationContext>(prototype);
+                var synchronizationContext = Serialization.ObjectCopier.Clone(prototype);
                 synchronizationContext.Static = true;
+                synchronizationContext.Request = request;
+                if (timeout != 0)
+                {
+                    foreach (var stack in synchronizationContext.Stacks)
+                    {
+                        if (timeoutHandler != null) stack.SetTimeoutHandler(timeoutHandler);
+                        stack.CorrelationId = synchronizedRequest.CorrelationId;
+                        timeoutStacks.Add(synchronizedRequest.CorrelationId, Timeout(stack, timeout));
+                    }                    
+                    
+                }
                 foreach (var stack in synchronizationContext.Stacks)
                 {
                     foreach (var frame in stack.Frames)
@@ -143,12 +154,14 @@ namespace Succubus.Core
             synchronizationStack = new SynchronizationStack(synchronizationContext);
         }
 
-        public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler)
+        public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler, Action<TReq> timeoutHandler = null, int timeout = 0 )
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
-            synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T> { StaticHandler = handler });
+            var synchronizationFrame = new SynchronizationFrame<TReq, T> {StaticHandler = handler};
+       
+            synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
             return new ResponseContext(this);

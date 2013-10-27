@@ -1,4 +1,5 @@
-﻿using Succubus.Serialization;
+﻿using System.Threading.Tasks;
+using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -52,8 +53,7 @@ namespace Succubus.Core
 
         private void ProcessSynchronousMessages(SynchronousMessageFrame synchronousFrame)
         {
-            Type type = Type.GetType(synchronousFrame.EmbeddedType);
-            Type requestType = Type.GetType(synchronousFrame.RequestType);
+            Type type = Type.GetType(synchronousFrame.EmbeddedType);            
             object message = JsonFrame.Deserlialize(synchronousFrame.Message, type);
 
             ProcessReplies(synchronousFrame, type, message);
@@ -65,7 +65,7 @@ namespace Succubus.Core
 
         private SynchronizationContext ProcessSynchrohousHandlers(SynchronousMessageFrame synchronousFrame, object message)
         {
-            SynchronizationContext ctx = null;
+            SynchronizationContext ctx;
 
             lock (synchronizationContexts)
             {
@@ -80,6 +80,7 @@ namespace Succubus.Core
                         lock (synchronizationContexts)
                         {
                             synchronizationContexts.Remove(synchronousFrame.CorrelationId);
+                            RemoveTimeout(synchronousFrame.CorrelationId);
                         }
                     }
                 }                
@@ -103,9 +104,13 @@ namespace Succubus.Core
                 {
                     foreach (var replyHandler in handlers)
                     {
-                        var response = replyHandler(message);
-                        var framedResponse = FrameResponseSynchronously(synchronousFrame, response, synchronousFrame.CorrelationId);
-                        ObjectPublish(framedResponse);
+                        Func<object, object> handler = replyHandler;
+                        Task.Factory.StartNew(() =>
+                        {
+                            var response = handler(message);
+                            var framedResponse = FrameResponseSynchronously(synchronousFrame, response, synchronousFrame.CorrelationId);
+                            ObjectPublish(framedResponse);                            
+                        });
                     }
                 }
                 catch { }

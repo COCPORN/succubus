@@ -1,6 +1,6 @@
-﻿using Succubus.Hosting;
+﻿using System;
+using Succubus.Hosting;
 using Succubus.Interfaces;
-using System;
 
 namespace Succubus.Core
 {
