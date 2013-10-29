@@ -7,11 +7,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Succubus")]
 [assembly: AssemblyDescription("Succubus Service Bus")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Succubus.io")]
 [assembly: AssemblyProduct("Succubus")]
-[assembly: AssemblyCopyright("Copyright © UDT 2013")]
+[assembly: AssemblyCopyright("Copyright © Succubus.io 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: AssemblyInformationalVersion("0.1.0-alpha")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
