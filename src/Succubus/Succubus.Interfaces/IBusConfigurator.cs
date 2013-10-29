@@ -13,11 +13,11 @@ namespace Succubus.Interfaces
         string MessageHostPublishAddress { get; set; }
         string MessageHostSubscribeAddress { get; set; }
 
-        void StartupMessageHost();
+        bool StartMessageHost { get; set; }
         #endregion
 
         #region Filtering
-        void SetNetwork(string networkName);
+        string Network { get; set;  }        
         #endregion
 
         #region Configuration sources

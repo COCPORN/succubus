@@ -64,9 +64,10 @@ namespace Succubus.Core
                 {
                     throw new InvalidOperationException("Bus is already initialized");
                 }
+                initialized = true;
             }
 
-            if (startMessageHost == true)
+            if (StartMessageHost == true)
             {
                 if (messageHost == null) messageHost = new MessageHost();
                 messageHost.Start();
@@ -87,6 +88,8 @@ namespace Succubus.Core
 
         public void Initialize(Action<IBusConfigurator> initializationHandler)
         {
+            PublishAddress = "tcp://localhost:9001";
+            SubscribeAddress = "tcp://localhost:9000";
             initializationHandler(this);
             Initialize();
         }

@@ -1,75 +1,41 @@
 ﻿using System;
 using Succubus.Hosting;
 using Succubus.Interfaces;
+using System.Configuration;
 
 namespace Succubus.Core
 {
     public partial class Bus : IBusConfigurator
     {
+
+        public bool StartMessageHost { get; set; }
         
-        int publishPort = 9000;
-        int subscribePort = 9001;
-        bool startMessageHost = false;
-        string messageHostname = "localhost";
+        IMessageHost messageHost = null;    
 
-        IMessageHost messageHost = null;
+        public string Network { get; set;  }
 
-        public void UseMessageHost(int publishPort = 9000, int subscribePort = 9001)
-        {            
-            this.publishPort = publishPort;
-            this.subscribePort = subscribePort;
+        public string PublishAddress { get; set;  }
 
-            if (startMessageHost == true)
-            {
-                this.messageHost = new MessageHost();
-            }
-
-        }
-
-        public void UseMessageHost(IMessageHost host)
-        {
-            this.messageHost = host;
-        }
-
-        public void SetMessageHostname(string hostname)
-        {
-            this.messageHostname = hostname;
-        }
-
-
-        string networkName;
-        public void SetNetwork(string networkName)
-        {
-            this.networkName = networkName;
-        }
-
-        string publishAddress = null;
-        public string PublishAddress
-        {
-            get { return publishAddress ?? String.Format("tcp://{0}:{1}", messageHostname, publishPort); }
-            set { publishAddress = value; }
-        }
-
-        string subscribeAddress = null;
-        public string SubscribeAddress
-        {
-            get { return subscribeAddress ?? String.Format("tcp://{0}:{1}", messageHostname, subscribePort); }
-            set { subscribeAddress = value; }
-        }
+        public string SubscribeAddress { get; set; }
 
         public string MessageNamespace { get; set; }
-
-        public void StartupMessageHost()
-        {
-            startMessageHost = true;
-        }
-
-
-
+       
 
         public void GetFromConfigurationFile()
         {
-            throw new NotImplementedException();
+            PublishAddress = ConfigurationManager.AppSettings["Succubus.PublishAddress"];
+            SubscribeAddress = ConfigurationManager.AppSettings["Succubus.SubscribeAddress"];
+
+            bool startMessageHost = false;
+            if (bool.TryParse(ConfigurationManager.AppSettings["Succubus.Hosting.StartMessageHost"], out startMessageHost) == false) {
+                StartMessageHost = false;
+            }
+            StartMessageHost = startMessageHost;
+
+            MessageHostPublishAddress = ConfigurationManager.AppSettings["Succubus.Hosting.PublishAddress"];
+            MessageHostSubscribeAddress = ConfigurationManager.AppSettings["Succubus.Hosting.SubscribeAddress"];
+
+            Network = ConfigurationManager.AppSettings["Succubus.Network"];
         }
 
 
@@ -77,11 +43,18 @@ namespace Succubus.Core
         {
             get
             {
-                throw new NotImplementedException();
+                if (messageHost != null)
+                {
+                    return messageHost.PublishAddress;
+                }
+                else return null;
             }
             set
             {
-                throw new NotImplementedException();
+                if (messageHost != null)
+                {
+                    messageHost.PublishAddress = value;
+                }
             }
         }
 
@@ -89,11 +62,18 @@ namespace Succubus.Core
         {
             get
             {
-                throw new NotImplementedException();
+                if (messageHost != null)
+                {
+                    return messageHost.SubscribeAddress;
+                }
+                else return null;
             }
             set
             {
-                throw new NotImplementedException();
+                if (messageHost != null)
+                {
+                    messageHost.SubscribeAddress = value;
+                }
             }
         }
     }

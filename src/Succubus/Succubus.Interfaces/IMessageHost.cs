@@ -2,9 +2,8 @@
 {
     public interface IMessageHost
     {
-        int PublishPort { get; set; }
-
-        int SubscribePort { get; set; }
+        string PublishAddress { get; set; }
+        string SubscribeAddress { get; set; }
 
         void Start();
         void Stop();

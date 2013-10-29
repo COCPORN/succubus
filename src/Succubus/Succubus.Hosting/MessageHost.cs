@@ -8,27 +8,10 @@ namespace Succubus.Hosting
 {
     public class MessageHost : IMessageHost
     {
-        public int PublishPort
-        {
-            get;
-            set;
-        }
-
-        public int SubscribePort
-        {
-            get;
-            set;
-        }
-     
         Thread serverThread;        
 
         ZmqSocket subscribeSocket;
         ZmqSocket publishSocket;
-
-        #region Metrics
-        int publishesForwarded = 0;
-        int subscribesForwarded = 0;
-        #endregion
 
         public void Start()
         {
@@ -41,17 +24,14 @@ namespace Succubus.Hosting
         {
             publishSocket.Close();
             publishSocket.Dispose();
-            subscribeSocket.Close();        
+            subscribeSocket.Close();
             subscribeSocket.Dispose();
         }
 
-        public string PublishAddress { get { return String.Format("tcp://*:{0}", PublishPort); } }
-        public string SubscribeAddress { get { return String.Format("tcp://*:{0}", SubscribePort); } }
-
         public MessageHost()
         {
-            PublishPort = 9001;
-            SubscribePort = 9000;
+            PublishAddress = "tcp://*:9001";
+            SubscribeAddress = "tcp://*:9000";
         }
 
         void ServerThread()
@@ -76,19 +56,22 @@ namespace Succubus.Hosting
         }
 
         void publishSocket_ReceiveReady(object sender, SocketEventArgs e)
-        {
-            publishesForwarded++;
+        {            
             var message = e.Socket.ReceiveMessage();
             subscribeSocket.SendMessage(message);
         }
 
         void subscribeSocket_ReceiveReady(object sender, SocketEventArgs e)
-        {
-            subscribesForwarded++;
+        {            
             var message = e.Socket.ReceiveMessage();
             publishSocket.SendMessage(message);
-        }        
+        }
 
+
+        public string PublishAddress { get; set; }
+        
+        public string SubscribeAddress { get; set; }
+        
     }
 }
 
