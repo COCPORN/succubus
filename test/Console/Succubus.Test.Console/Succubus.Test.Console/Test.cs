@@ -19,8 +19,7 @@ namespace SuccubusTest.Console
 
             bus.Initialize(succubus =>
             {
-                succubus.StartupMessageHost();
-                succubus.SetNetwork("NETWORK");
+                succubus.StartMessageHost = true;
             });
 
             Thread.Sleep(1000);

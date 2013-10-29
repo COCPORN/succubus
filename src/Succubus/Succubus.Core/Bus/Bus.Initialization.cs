@@ -53,6 +53,11 @@ namespace Succubus.Core
 
         #region Initialization
 
+        public Bus()
+        {
+            PublishAddress = "tcp://localhost:9000";
+            SubscribeAddress = "tcp://localhost:9001";
+        }
 
         private bool initialized = false;
 
@@ -77,19 +82,15 @@ namespace Succubus.Core
 
             ConnectPublisher();
 
-            subscriberThread = new Thread(new ThreadStart(Subscriber));
-            subscriberThread.IsBackground = true;
+            subscriberThread = new Thread(new ThreadStart(Subscriber)) { IsBackground = true };
             subscriberThread.Start();
 
-            timeoutThread = new Thread(TimeoutThread);
-            timeoutThread.IsBackground = true;
+            timeoutThread = new Thread(TimeoutThread) { IsBackground = true };
             timeoutThread.Start();
         }
 
         public void Initialize(Action<IBusConfigurator> initializationHandler)
-        {
-            PublishAddress = "tcp://localhost:9001";
-            SubscribeAddress = "tcp://localhost:9000";
+        { 
             initializationHandler(this);
             Initialize();
         }

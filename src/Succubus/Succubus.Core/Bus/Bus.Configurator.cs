@@ -18,9 +18,6 @@ namespace Succubus.Core
 
         public string SubscribeAddress { get; set; }
 
-        public string MessageNamespace { get; set; }
-       
-
         public void GetFromConfigurationFile()
         {
             PublishAddress = ConfigurationManager.AppSettings["Succubus.PublishAddress"];
