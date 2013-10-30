@@ -7,7 +7,7 @@ namespace SuccubusTest.Console
 {
     internal class Test
     {
-        public void Run()
+        public async void Run()
         {
             IBus bus = new Bus();
             IBus bus2 = new Bus();
@@ -91,10 +91,14 @@ namespace SuccubusTest.Console
 
             // Blocking transient route
 
+            
+            var asyncres = bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest {Message = "Async call to bus"});
             BasicResponse res =
-                bus.Call<BasicRequest, BasicResponse>(new BasicRequest {Message = "Blocking transient call"});
+                bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Blocking transient call" });
 
             System.Console.WriteLine("Got a response from a blocking transient call: {0}", res.Message);
+            System.Console.WriteLine("Got a response from an async transient call: {0}", (await asyncres).Message);
+
 
             // FIRE EVENTS
 

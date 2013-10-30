@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.Runtime.Remoting.Messaging;
+using System.Threading;
+using System.Threading.Tasks;
 using Succubus.Interfaces.ResponseContexts;
 using Succubus.Serialization;
 using System;
@@ -100,6 +102,14 @@ namespace Succubus.Core
 
             mre.WaitOne();
             return result;
+        }
+
+        public Task<TRes> CallAsync<TReq, TRes>(TReq request)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return Call<TReq, TRes>(request);
+            });
         }
 
         // TODO: Decide whether static routes are really necessary, as the tree

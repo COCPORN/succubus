@@ -6,7 +6,7 @@ namespace SuccubusTest.Console
     {
         static void Main(string[] args)
         {
-            Test t = new Test();
+            var t = new Test();
             t.Run();
             new AutoResetEvent(false).WaitOne();
         }

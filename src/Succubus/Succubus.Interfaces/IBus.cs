@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlTypes;
+using System.Threading.Tasks;
 using Succubus.Interfaces.ResponseContexts;
 using System;
 
@@ -18,6 +19,7 @@ namespace Succubus.Interfaces
         // Throw away calls
         void Call<TReq, TRes>(TReq request, Action<TRes> handler);
         TRes Call<TReq, TRes>(TReq request);
+        Task<TRes> CallAsync<TReq, TRes>(TReq request);
 
         // Calls to static routes
         Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, int timeout = 60000);
