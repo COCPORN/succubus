@@ -7,7 +7,7 @@
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>http://www.succubus.io</projectUrl>
-    <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
+    <iconUrl>https://dl.dropboxusercontent.com/u/5489626/Succubus/succubus128x128.jpg</iconUrl>
     <licenseUrl>https://github.com/COCPORN/succubus/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
