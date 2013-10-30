@@ -8,6 +8,7 @@
     <owners>$author$</owners>
     <projectUrl>http://www.succubus.io</projectUrl>
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
+    <licenseUrl>https://github.com/COCPORN/succubus/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>Initial public release.</releaseNotes>
