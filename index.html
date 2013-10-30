@@ -34,16 +34,14 @@
         <h1>
 <a name="succubus" class="anchor" href="#succubus"><span class="octicon octicon-link"></span></a>Succubus</h1>
 
-<p>A light .NET "service bus" implementation created on top of ZeroMQ.</p>
+<p>A light .NET distributed application framework created on top of ZeroMQ.</p>
 
 <h2>
 <a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About</h2>
 
-<p>Succubus is a simple (at this point) implementation of convenience functions for .NET on top of ZeroMQ, presenting an interface similar to that of MassTransit. It is similar to an Enterprise Service Bus, but lacks a lot of features at its current state.</p>
+<p>Succubus is a simple (at this point) implementation of convenience functions for .NET on top of ZeroMQ, presenting an interface similar to that of MassTransit.</p>
 
 <p>Because it uses ZeroMQ, all brokers live in the Succubus process space, and you do not install anything besides the dependencies in the library.</p>
-
-<p>For more in-depth documentation, check the <a href="https://github.com/COCPORN/succubus/wiki">wiki</a>.</p>
 
 <p>Succubus is currently in a pre-release but usable state. The repository will go public once it reaches a 0.2-release.</p>
 
@@ -66,14 +64,9 @@
 </ul>
 </li>
 </ul><h2>
-<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
-
-<p>A quickstart guide to getting started with Succubus.</p>
-
-<h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Get lastest version of Succubus from GitHub or NuGet.</p>
+<p>Get lastest version of Succubus from GitHub or NuGet (will be up soon).</p>
 
 <h2>
 <a name="instantiation" class="anchor" href="#instantiation"><span class="octicon octicon-link"></span></a>Instantiation</h2>
@@ -118,36 +111,28 @@
 
 <p>There are a number of methods that allow you to configure your bus instance before using it. These calls can be found in the <code>IBusConfigurator</code>-interface, but will be documented in detail in the future.</p>
 
-<div class="highlight highlight-C#"><pre><span class="k">public</span> <span class="k">interface</span> <span class="n">IBusConfigurator</span>
-<span class="p">{</span>        
-    <span class="k">void</span> <span class="nf">UseMessageHost</span><span class="p">(</span><span class="kt">int</span> <span class="n">publishPort</span> <span class="p">=</span> <span class="m">9000</span><span class="p">,</span> <span class="kt">int</span> <span class="n">subscribePort</span> <span class="p">=</span> <span class="m">9001</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">setupHost</span> <span class="p">=</span> <span class="k">true</span><span class="p">);</span>
-    <span class="k">void</span> <span class="nf">UseMessageHost</span><span class="p">(</span><span class="n">IMessageHost</span> <span class="n">messageHost</span><span class="p">);</span>
-    <span class="k">void</span> <span class="nf">SetNetwork</span><span class="p">(</span><span class="kt">string</span> <span class="n">networkName</span><span class="p">);</span>
-    <span class="k">void</span> <span class="nf">SetMessageHostname</span><span class="p">(</span><span class="kt">string</span> <span class="n">hostname</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight highlight-C#"><pre>        <span class="cp">#region Communication        </span>
+        <span class="kt">string</span> <span class="n">PublishAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="kt">string</span> <span class="n">SubscribeAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="cp">#endregion</span>
+
+        <span class="cp">#region Hosting</span>
+        <span class="kt">string</span> <span class="n">MessageHostPublishAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="kt">string</span> <span class="n">MessageHostSubscribeAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+        <span class="kt">bool</span> <span class="n">StartMessageHost</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="cp">#endregion</span>
+
+        <span class="cp">#region Filtering</span>
+        <span class="kt">string</span> <span class="n">Network</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span>  <span class="p">}</span>        
+        <span class="cp">#endregion</span>
+
+        <span class="cp">#region Configuration sources</span>
+        <span class="k">void</span> <span class="nf">GetFromConfigurationFile</span><span class="p">();</span>
+        <span class="cp">#endregion</span>
 </pre></div>
 
-<p>Most of these should be self explanatory.</p>
-
-<h3>
-<a name="usemessagehost" class="anchor" href="#usemessagehost"><span class="octicon octicon-link"></span></a>UseMessageHost</h3>
-
-<p>Where to find the message host. </p>
-
-<h3>
-<a name="setnetwork" class="anchor" href="#setnetwork"><span class="octicon octicon-link"></span></a>SetNetwork</h3>
-
-<p>This is the most coarse filter Succubus allows you to set. If you have multiple services running on the messagehost, you can set the network name to different strings, and the messages will not be published on other clients.</p>
-
-<h3>
-<a name="setmessagehostname" class="anchor" href="#setmessagehostname"><span class="octicon octicon-link"></span></a>SetMessageHostname</h3>
-
-<p>If you are running with a remote messagehost, you can set the hostname for the messagehost here.</p>
-
-<h3>
-<a name="startupmessagehost" class="anchor" href="#startupmessagehost"><span class="octicon octicon-link"></span></a>StartupMessageHost</h3>
-
-<p>If this configuration method is called, the bus will run a messagehost on localhost as part of this bus instance.</p>
+<p>Most of these should be self explanatory. Network is currently not implemented.</p>
 
 <h2>
 <a name="events" class="anchor" href="#events"><span class="octicon octicon-link"></span></a>Events</h2>
