@@ -1,12 +1,12 @@
 Succubus
 ========
 
-A light .NET "service bus" implementation created on top of ZeroMQ.
+A light .NET distributed application framework created on top of ZeroMQ.
 
 About
 -----
 
-Succubus is a simple (at this point) implementation of convenience functions for .NET on top of ZeroMQ, presenting an interface similar to that of MassTransit. It is similar to an Enterprise Service Bus, but lacks a lot of features at its current state.
+Succubus is a simple (at this point) implementation of convenience functions for .NET on top of ZeroMQ, presenting an interface similar to that of MassTransit.
 
 Because it uses ZeroMQ, all brokers live in the Succubus process space, and you do not install anything besides the dependencies in the library.
 
