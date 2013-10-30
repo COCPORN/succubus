@@ -113,10 +113,7 @@ namespace Succubus.Core
 
         public Task<TRes> CallAsync<TReq, TRes>(TReq request, int timeout = 10000)
         {
-            return Task.Factory.StartNew(() =>
-            {
-                return Call<TReq, TRes>(request, timeout);
-            });
+            return Task.Factory.StartNew(() => Call<TReq, TRes>(request, timeout));
         }
 
         // TODO: Decide whether static routes are really necessary, as the tree
