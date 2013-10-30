@@ -10,8 +10,6 @@ Succubus is a simple (at this point) implementation of convenience functions for
 
 Because it uses ZeroMQ, all brokers live in the Succubus process space, and you do not install anything besides the dependencies in the library.
 
-For more in-depth documentation, check the [wiki](https://github.com/COCPORN/succubus/wiki).
-
 Succubus is currently in a pre-release but usable state. The repository will go public once it reaches a 0.2-release.
 
 Features
@@ -28,16 +26,10 @@ These are the current and planned features of Succubus:
 	- Addressable commands
 	- Work-item fan out
 
-
-Getting started
----------------
-
-A quickstart guide to getting started with Succubus.
-
 Installation
 ------------
 
-Get lastest version of Succubus from GitHub or NuGet.
+Get lastest version of Succubus from GitHub or NuGet (will be up soon).
 
 Instantiation
 -------------
