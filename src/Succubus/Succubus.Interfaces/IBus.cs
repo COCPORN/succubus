@@ -18,8 +18,8 @@ namespace Succubus.Interfaces
 
         // Throw away calls
         void Call<TReq, TRes>(TReq request, Action<TRes> handler);
-        TRes Call<TReq, TRes>(TReq request);
-        Task<TRes> CallAsync<TReq, TRes>(TReq request);
+        TRes Call<TReq, TRes>(TReq request, int timeout = 10000);
+        Task<TRes> CallAsync<TReq, TRes>(TReq request, int timeout = 10000);
 
         // Calls to static routes
         Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, int timeout = 60000);

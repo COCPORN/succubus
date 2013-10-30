@@ -89,7 +89,7 @@ namespace Succubus.Core
             ObjectPublish(synchronizedRequest);
         }
 
-        public TRes Call<TReq, TRes>(TReq request)
+        public TRes Call<TReq, TRes>(TReq request, int timeout = 10000)
         {
             var mre = new ManualResetEvent(false);
             var result = default(TRes);
@@ -100,15 +100,22 @@ namespace Succubus.Core
                 mre.Set();
             });
 
-            mre.WaitOne();
-            return result;
+            if (mre.WaitOne(timeout))
+            {
+                return result;
+            }
+            else
+            {
+                throw new TimeoutException("Timeout waiting for synhronous call");
+            }
+            
         }
 
-        public Task<TRes> CallAsync<TReq, TRes>(TReq request)
+        public Task<TRes> CallAsync<TReq, TRes>(TReq request, int timeout = 10000)
         {
             return Task.Factory.StartNew(() =>
             {
-                return Call<TReq, TRes>(request);
+                return Call<TReq, TRes>(request, timeout);
             });
         }
 
