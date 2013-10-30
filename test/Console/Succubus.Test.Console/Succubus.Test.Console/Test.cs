@@ -89,6 +89,13 @@ namespace SuccubusTest.Console
                     System.Console.WriteLine(
                         "Call<TReq, TRes>: Got a response handled on transient route handler: {0}", response.Message));
 
+            // Blocking transient route
+
+            BasicResponse res =
+                bus.Call<BasicRequest, BasicResponse>(new BasicRequest {Message = "Blocking transient call"});
+
+            System.Console.WriteLine("Got a response from a blocking transient call: {0}", res.Message);
+
             // FIRE EVENTS
 
             bus.Publish(new BasicEvent { Message = "Hello, world!" });

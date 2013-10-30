@@ -1,4 +1,5 @@
-﻿using Succubus.Interfaces.ResponseContexts;
+﻿using System.Threading;
+using Succubus.Interfaces.ResponseContexts;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
@@ -84,6 +85,21 @@ namespace Succubus.Core
                 synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             }
             ObjectPublish(synchronizedRequest);
+        }
+
+        public TRes Call<TReq, TRes>(TReq request)
+        {
+            var mre = new ManualResetEvent(false);
+            var result = default(TRes);
+
+            Call<TReq, TRes>(request, res =>
+            {
+                result = res;
+                mre.Set();
+            });
+
+            mre.WaitOne();
+            return result;
         }
 
         // TODO: Decide whether static routes are really necessary, as the tree
