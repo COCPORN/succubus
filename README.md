@@ -78,32 +78,28 @@ Configuration
 There are a number of methods that allow you to configure your bus instance before using it. These calls can be found in the `IBusConfigurator`-interface, but will be documented in detail in the future.
 
 ```C#
-public interface IBusConfigurator
-{        
-    void UseMessageHost(int publishPort = 9000, int subscribePort = 9001, bool setupHost = true);
-    void UseMessageHost(IMessageHost messageHost);
-    void SetNetwork(string networkName);
-    void SetMessageHostname(string hostname);
-}
+        #region Communication        
+        string PublishAddress { get; set; }
+        string SubscribeAddress { get; set; }
+        #endregion
+
+        #region Hosting
+        string MessageHostPublishAddress { get; set; }
+        string MessageHostSubscribeAddress { get; set; }
+
+        bool StartMessageHost { get; set; }
+        #endregion
+
+        #region Filtering
+        string Network { get; set;  }        
+        #endregion
+
+        #region Configuration sources
+        void GetFromConfigurationFile();
+        #endregion
 ```
 
-Most of these should be self explanatory.
-
-### UseMessageHost
-
-Where to find the message host. 
-
-### SetNetwork
-
-This is the most coarse filter Succubus allows you to set. If you have multiple services running on the messagehost, you can set the network name to different strings, and the messages will not be published on other clients.
-
-### SetMessageHostname
-
-If you are running with a remote messagehost, you can set the hostname for the messagehost here.
-
-### StartupMessageHost
-
-If this configuration method is called, the bus will run a messagehost on localhost as part of this bus instance.
+Most of these should be self explanatory. Network is currently not implemented.
 
 Events
 ------
