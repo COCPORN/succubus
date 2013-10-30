@@ -7,8 +7,8 @@
     <ProjectGuid>{8D638ADD-D6B5-4C40-B43B-966D4DC2D7A7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Omnibus.Interfaces</RootNamespace>
-    <AssemblyName>Omnibus.Interfaces</AssemblyName>
+    <RootNamespace>Succubus.Interfaces</RootNamespace>
+    <AssemblyName>Succubus.Interfaces</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
