@@ -39,7 +39,7 @@ To instantiate a handle to the bus, create an instance of `Succubus.Core.Bus`:
 IBus bus = new Succubus.Core.Bus();
 ```
 
-Each handle will have a separate channel to the message host.
+Each handle will have a separate channel to the message host. Each handle will also have separate event handlers, and synchronous message responses need to be handled on the same bus as the request.
 
 Singleton instantiation
 -----------------------
@@ -48,7 +48,7 @@ Succubus allows you to get a singleton instance in addition to newing up objects
 
 ```C#
 Bus.Instance.Initialize(config => {
-    config.UseMessageHost();
+    config.StartMessageHost =  true;
 });
 ```
 
@@ -66,7 +66,7 @@ The `Initialize`-call to the bus alternatively returns a configuration handle.
 ```C#
 bus.Initialize(succubus =>
 {
-    succubus.UseMessageHost();               
+    succubus.StartMessageHost = true;
 });
 ```
 
