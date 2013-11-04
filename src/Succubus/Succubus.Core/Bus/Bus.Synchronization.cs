@@ -108,7 +108,7 @@ namespace Succubus.Core
             {
                 throw new TimeoutException("Timeout waiting for synhronous call");
             }
-            
+
         }
 
         public Task<TRes> CallAsync<TReq, TRes>(TReq request, int timeout = 10000)
@@ -135,23 +135,22 @@ namespace Succubus.Core
                 synchronizationContext.Request = request;
                 if (timeout != 0)
                 {
-                    foreach (var stack in synchronizationContext.Stacks)
+
+                    if (timeoutHandler != null) synchronizationContext.SetTimeoutHandler(timeoutHandler);
+                    synchronizationContext.CorrelationId = synchronizedRequest.CorrelationId;
+                    List<Int64> keys;
+                    if (timeoutContexts.TryGetValue(synchronizedRequest.CorrelationId, out keys) == false)
                     {
-                        if (timeoutHandler != null) stack.SetTimeoutHandler(timeoutHandler);
-                        stack.CorrelationId = synchronizedRequest.CorrelationId;
-                        List<Int64> keys;
-                        if (timeoutStacks.TryGetValue(synchronizedRequest.CorrelationId, out keys) == false)
-                        {
-                            keys = new List<long>();
-                            keys.Add(Timeout(stack, timeout));
-                            timeoutStacks.Add(synchronizedRequest.CorrelationId, keys);
-                        }
-                        else
-                        {
-                            keys.Add(Timeout(stack, timeout));
-                        }
-                        
+                        keys = new List<long>();
+                        keys.Add(Timeout(synchronizationContext, timeout));
+                        timeoutContexts.Add(synchronizedRequest.CorrelationId, keys);
                     }
+                    else
+                    {
+                        keys.Add(Timeout(synchronizationContext, timeout));
+                    }
+
+
 
                 }
                 // The static route implementation of timeouts needs to wait because
@@ -209,18 +208,18 @@ namespace Succubus.Core
         }
 
         public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler)
-            //, Action<TReq> timeoutHandler = null, int timeout = 0)
+        //, Action<TReq> timeoutHandler = null, int timeout = 0)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
-            var synchronizationFrame = new SynchronizationFrame<TReq, T> {StaticHandler = handler};
+            var synchronizationFrame = new SynchronizationFrame<TReq, T> { StaticHandler = handler };
 
             //if (timeout != 0 && timeoutHandler != null)
             //{
             //    synchronizationStack.SetTimeoutHandler(timeoutHandler);              
             //}
-          
+
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 

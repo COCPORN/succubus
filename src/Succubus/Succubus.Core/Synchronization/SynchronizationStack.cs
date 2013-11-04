@@ -17,20 +17,13 @@ namespace Succubus
         {
             Frames = new List<SynchronizationFrame>();
             this.ctx = ctx;
-        }        
-
-        internal Action TimeoutHandler;
-
-        public void SetTimeoutHandler<T>(Action<T> timeoutHandler)
-        {
-            this.TimeoutHandler = () => timeoutHandler((T)ctx.Request);
         }
 
-        public int TimeoutMilliseconds { get; set; }
+   
         
         public bool ResolveFor(object message)
         {
-            if (TimedOut || Frames == null || Frames.Count == 0) return false;
+            if (Frames == null || Frames.Count == 0) return false;
            
             bool unresolvedFrames = false;
             foreach (var frame in Frames)
@@ -86,8 +79,8 @@ namespace Succubus
 
         }
 
-        public bool TimedOut { get; set; }
+      
 
-        public Guid CorrelationId { get; set; }
+        
     }
 }

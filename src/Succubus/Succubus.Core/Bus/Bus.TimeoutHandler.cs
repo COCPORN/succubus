@@ -7,11 +7,11 @@ namespace Succubus.Core
 {
     public partial class Bus
     {
-        private readonly SortedDictionary<Int64, SynchronizationStack> sortedTimeoutSynchronizationStacks
-            = new SortedDictionary<long, SynchronizationStack>();
+        private readonly SortedDictionary<Int64, SynchronizationContext> sortedTimeoutSynchronizationContexts
+            = new SortedDictionary<long, SynchronizationContext>();
         readonly AutoResetEvent timeoutResetEvent = new AutoResetEvent(false);
 
-        Dictionary<Guid, List<Int64>> timeoutStacks = new Dictionary<Guid, List<Int64>>();
+        Dictionary<Guid, List<Int64>> timeoutContexts = new Dictionary<Guid, List<Int64>>();
 
         private Thread timeoutThread;
 
@@ -23,10 +23,10 @@ namespace Succubus.Core
                 //Console.WriteLine("Waiting {0} ms, {1}/{2} entries", waitmilliseconds, sortedTimeoutSynchronizationStacks.Count, timeoutStacks.Count);
                 if (waitmilliseconds != 0) timeoutResetEvent.WaitOne(waitmilliseconds);
                 var removeKeys = new List<Int64>();
-                lock (sortedTimeoutSynchronizationStacks)
+                lock (sortedTimeoutSynchronizationContexts)
                 {
                     waitmilliseconds = -1;
-                    foreach (var entry in sortedTimeoutSynchronizationStacks)
+                    foreach (var entry in sortedTimeoutSynchronizationContexts)
                     {                  
                         var timespan = TimeSpan.FromTicks(entry.Key - DateTime.Now.Ticks);
                         var comparison = timespan.CompareTo(new TimeSpan(0, 0, 0));
@@ -40,12 +40,12 @@ namespace Succubus.Core
                             if (entry.Value.TimeoutHandler != null) entry.Value.TimeoutHandler();
                         }
                         removeKeys.Add(entry.Key);
-                        timeoutStacks.Remove(entry.Value.CorrelationId);
+                        timeoutContexts.Remove(entry.Value.CorrelationId);
                     }
 
                     foreach (var key in removeKeys)
                     {
-                        sortedTimeoutSynchronizationStacks.Remove(key);
+                        sortedTimeoutSynchronizationContexts.Remove(key);
                     }
                 }
             }
@@ -53,30 +53,30 @@ namespace Succubus.Core
 
         public void DumpTimeoutTable()
         {
-            lock (sortedTimeoutSynchronizationStacks)
+            lock (sortedTimeoutSynchronizationContexts)
             {
-                foreach (var entry in sortedTimeoutSynchronizationStacks)
+                foreach (var entry in sortedTimeoutSynchronizationContexts)
                 {
                     Console.WriteLine("In {0}", TimeSpan.FromTicks((entry.Key - DateTime.Now.Ticks)));
                 }
             }
         }
 
-        internal Int64 Timeout(SynchronizationStack stack, int milliseconds)
+        internal Int64 Timeout(SynchronizationContext context, int milliseconds)
         {
             var timespan = TimeSpan.FromMilliseconds(milliseconds);
             var timeoutDateTime = DateTime.Now + timespan;
 
             Int64 timeoutTick = timeoutDateTime.Ticks;
 
-            lock (sortedTimeoutSynchronizationStacks)
+            lock (sortedTimeoutSynchronizationContexts)
             {
 
-                while (sortedTimeoutSynchronizationStacks.ContainsKey((timeoutTick)))
+                while (sortedTimeoutSynchronizationContexts.ContainsKey((timeoutTick)))
                 {
                     timeoutTick++;
                 }
-                sortedTimeoutSynchronizationStacks.Add(timeoutTick, stack);            
+                sortedTimeoutSynchronizationContexts.Add(timeoutTick, context);            
             }
             timeoutResetEvent.Set();
             return timeoutTick;
@@ -84,16 +84,16 @@ namespace Succubus.Core
 
         internal void RemoveTimeout(Guid correlationId)
         {
-            lock (sortedTimeoutSynchronizationStacks)
+            lock (sortedTimeoutSynchronizationContexts)
             {
                 List<Int64> keys;
-                if (timeoutStacks.TryGetValue(correlationId, out keys))
+                if (timeoutContexts.TryGetValue(correlationId, out keys))
                 {
                     foreach (var key in keys)
                     {
-                        sortedTimeoutSynchronizationStacks.Remove(key);    
+                        sortedTimeoutSynchronizationContexts.Remove(key);    
                     }                    
-                    timeoutStacks.Remove(correlationId);
+                    timeoutContexts.Remove(correlationId);
                 }
             }
         }

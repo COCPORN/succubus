@@ -10,6 +10,7 @@ namespace Succubus
     {
         public bool Static { get; set; }
 
+        public Guid CorrelationId { get; set; }
 
         public List<SynchronizationStack> Stacks;
 
@@ -24,8 +25,21 @@ namespace Succubus
             Stacks = new List<SynchronizationStack>();
         }
 
+
+        public bool TimedOut { get; set; }
+
+        internal Action TimeoutHandler;
+
+        public void SetTimeoutHandler<T>(Action<T> timeoutHandler)
+        {
+            this.TimeoutHandler = () => timeoutHandler((T)Request);
+        }
+
+        public int TimeoutMilliseconds { get; set; }
+
         public bool ResolveFor(object message)
         {
+            if (TimedOut == true) return false;
             bool unresolvedFrames = false;
 
             foreach (var synchronizationStack in Stacks)
@@ -44,9 +58,10 @@ namespace Succubus
         {
             get
             {
+                
                 foreach (var synchronizationStack in Stacks)
                 {
-                    if (synchronizationStack.TimedOut == true) continue;
+                    //if (synchronizationStack.TimedOut == true) continue;
                     foreach (var frame in synchronizationStack.Frames)
                     {
                         if (frame.Resolved == false)
