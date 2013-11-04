@@ -41,9 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseResponse.cs" />
     <Compile Include="BasicEvent.cs" />
     <Compile Include="BasicRequest.cs" />
     <Compile Include="BasicResponse.cs" />
+    <Compile Include="ChildRequest.cs" />
+    <Compile Include="ChildResponse1.cs" />
+    <Compile Include="ChildResponse2.cs" />
     <Compile Include="ComplexOrchestrationMessages.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

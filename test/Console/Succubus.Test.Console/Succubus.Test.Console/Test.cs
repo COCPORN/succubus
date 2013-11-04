@@ -36,10 +36,40 @@ namespace SuccubusTest.Console
                 };
             });
 
+            int child = 0;
+
+            bus.ReplyTo<ChildRequest, BaseResponse>(req =>
+                {
+                    child++;
+                    if (child % 2 == 0)
+                    {
+                        return new ChildResponse1 { Message = "Child 1" };
+                    }
+                    else if (child % 2 == 1)
+                    {
+                        return new ChildResponse2 { Message = "Child 2" };
+                    }
+                    else throw new InvalidOperationException("Unknown child");
+                });
+
             bus.ReplyTo<Request1, Response3>(req => new Response3 { Message = "RESPONSE 3 " + req.Message });
             bus.ReplyTo<Request1, Response2>(req => new Response2 { Message = "RESPONSE 2 " + req.Message });
             bus.ReplyTo<Request1, Response1>(req => new Response1 { Message = "RESPONSE 1" + req.Message });
 
+
+            bus.OnReply<ChildRequest, BaseResponse>((request, response) =>
+                {
+                    System.Console.WriteLine("OnReply<ChildRequest, BaseResponse>: WH000T!");
+                });
+
+            bus.OnReply<ChildRequest, ChildResponse1>((request, response) =>
+            {
+                System.Console.WriteLine("OnReply<ChildRequest, ChildResponse1>: The request {0} returned {1} and type {2}", request.Message, response.Message, response.GetType().ToString());
+            });
+            bus.OnReply<ChildRequest, ChildResponse2>((request, response) =>
+                {
+                    System.Console.WriteLine("OnReply<ChildRequest, ChildResponse2>: The request {0} returned {1} and type {2}", request.Message, response.Message, response.GetType().ToString());
+                });
             // SETUP STATIC ROUTES
 
             bus.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
@@ -69,6 +99,13 @@ namespace SuccubusTest.Console
             bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 4" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 50);
             bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 5" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1);
 
+            bus.Call(new ChildRequest { Message = "Requesting child" }, 
+                (req) => {
+                    System.Console.WriteLine("Timeout waiting for child 1"); 
+                }, 
+                1250);
+            bus.Call(new ChildRequest { Message = "Requesting child" }); //, (req) => System.Console.WriteLine("Timeout waiting for child 2"), 1250);
+
             //(bus as Bus).DumpTimeoutTable();
             //Thread.Sleep(50);
             //(bus as Bus).DumpTimeoutTable();
@@ -91,8 +128,8 @@ namespace SuccubusTest.Console
 
             // Blocking transient route
 
-            
-            var asyncres = bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest {Message = "Async call to bus"});
+
+            var asyncres = bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Async call to bus" });
             BasicResponse res =
                 bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Blocking transient call" });
 
@@ -113,7 +150,7 @@ namespace SuccubusTest.Console
             bus.Publish(new BasicEvent { Message = "We meet again, world!" });
             bus.Call(new BasicRequest { Message = "TimeoutReq" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1);
             bus.Call(new BasicRequest { Message = "STATIC BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1000);
-            
+
         }
     }
 }

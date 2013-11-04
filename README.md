@@ -26,6 +26,11 @@ These are the current and planned features of Succubus:
 	- Addressable commands
 	- Work-item fan out
 
+Why?
+----
+
+Succubus is implemented just for fun, don't expect to see any best-in-class implementations or super stable code, at least not at this point. It is intended to have few dependencies, be quick to develop with and accommodate some "special" use cases. Most of the things implemented by Succubus are fairly simple to implement directly on ZeroMQ, but the idea is to take some of the hassle out of it when working with C#.
+
 Installation
 ------------
 
