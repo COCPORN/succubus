@@ -76,7 +76,7 @@
 <div class="highlight highlight-C#"><pre><span class="n">IBus</span> <span class="n">bus</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Succubus</span><span class="p">.</span><span class="n">Core</span><span class="p">.</span><span class="n">Bus</span><span class="p">();</span>
 </pre></div>
 
-<p>Each handle will have a separate channel to the message host.</p>
+<p>Each handle will have a separate channel to the message host. Each handle will also have separate event handlers, and synchronous message responses need to be handled on the same bus as the request.</p>
 
 <h2>
 <a name="singleton-instantiation" class="anchor" href="#singleton-instantiation"><span class="octicon octicon-link"></span></a>Singleton instantiation</h2>
@@ -84,7 +84,7 @@
 <p>Succubus allows you to get a singleton instance in addition to newing up objects. Note that the singleton object will always (obviously) point to the same instance, while all newed objects will be different. These can co-exist and will use separate message channels:</p>
 
 <div class="highlight highlight-C#"><pre><span class="n">Bus</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">config</span> <span class="p">=&gt;</span> <span class="p">{</span>
-    <span class="n">config</span><span class="p">.</span><span class="n">UseMessageHost</span><span class="p">();</span>
+    <span class="n">config</span><span class="p">.</span><span class="n">StartMessageHost</span> <span class="p">=</span>  <span class="k">true</span><span class="p">;</span>
 <span class="p">});</span>
 </pre></div>
 
@@ -100,7 +100,7 @@
 
 <div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">succubus</span> <span class="p">=&gt;</span>
 <span class="p">{</span>
-    <span class="n">succubus</span><span class="p">.</span><span class="n">UseMessageHost</span><span class="p">();</span>               
+    <span class="n">succubus</span><span class="p">.</span><span class="n">StartMessageHost</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
 <span class="p">});</span>
 </pre></div>
 
