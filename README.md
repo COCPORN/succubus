@@ -184,6 +184,73 @@ bus.Call<BasicRequest>(new BasicRequest { Message = "Hello from client"} );
 
 Succubus will store the request until the response arrives, so both can be handled in the same context.
 
+### Response fanning
+
+You can setup response fanning through inheritance. Example:
+
+```C#
+public class BaseResponse 
+{
+    public string Message { get; set; }
+}
+
+public class SuccessResponse 
+{
+    public SuccessResponse() 
+    {
+        Message = "All went well";
+    }
+}
+
+public class FailureResponse 
+{
+    public FailureResponse() 
+    {
+        Message = "What a catastrophic failure.";
+    }
+}
+
+public class Request 
+{
+    public string Message { get; set; }
+}
+```
+
+With these classes we can setup the handling of the static routes.
+
+```C#
+bus.ReplyTo<Request,BaseResponse>((req) =>
+{
+    if (failure)
+    {
+        return new FailureResponse();
+    }
+    else 
+    {
+        return new SuccessResponse();
+    }
+});
+
+```
+
+Then, on the client side, we can handle both responses separately:
+
+```C#
+bus.OnReply<Request, FailureResponse>((req, res) =>
+{
+    Console.WriteLine("Shoot, something went wrong processing the request: {0}", res.Message);
+});
+
+bus.OnReply<Request, SuccessResponse>((req, res) =>
+{
+    Console.WriteLine("Everything processed without a hitch: {0}", res.Message);
+});
+
+```
+
+It is not possible at the current time to handle the base class and do fan out inside the handler.
+
+
 ### Timeouts
 
 Synchronized processing supports timeout handlers on a per-`Call` basis. Example:
