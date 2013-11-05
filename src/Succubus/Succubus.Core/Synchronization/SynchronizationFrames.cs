@@ -6,6 +6,12 @@ namespace Succubus
     [Serializable]
     abstract class SynchronizationFrame
     {
+        internal SynchronizationFrame Clone()
+        {
+            SynchronizationFrame frame = (SynchronizationFrame)this.MemberwiseClone();
+            return frame;
+        }
+
         public abstract bool Satisfies(HashSet<Type> responses);
 
         public Type GenericType { get; set; }

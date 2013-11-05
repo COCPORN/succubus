@@ -8,6 +8,26 @@ namespace Succubus
     [Serializable]
     class SynchronizationContext
     {
+
+        public static SynchronizationContext Clone(SynchronizationContext context)
+        {
+            var newContext = new SynchronizationContext();
+            newContext.CorrelationId = context.CorrelationId;      
+            newContext.Request = context.Request;
+            newContext.Static = context.Static;
+            newContext.TimedOut = context.TimedOut;
+            newContext.TimeoutMilliseconds = context.TimeoutMilliseconds;
+
+            foreach (var stack in context.Stacks)
+            {
+                newContext.Stacks.Add(stack.CloneFor(newContext));
+            }
+
+
+            return newContext;
+
+        }
+
         public bool Static { get; set; }
 
         public Guid CorrelationId { get; set; }

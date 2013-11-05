@@ -130,7 +130,8 @@ namespace Succubus.Core
             }
             if (prototype != null)
             {
-                var synchronizationContext = Serialization.ObjectCopier.Clone(prototype);
+                //var synchronizationContext = Serialization.ObjectCopier.Clone(prototype);
+                var synchronizationContext = SynchronizationContext.Clone(prototype);
                 synchronizationContext.Static = true;
                 synchronizationContext.Request = request;
                 if (timeout != 0)

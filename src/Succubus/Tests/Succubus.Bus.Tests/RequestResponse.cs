@@ -23,6 +23,8 @@ namespace Succubus.Bus.Tests
             {
                 Message = req.Message
             });
+
+
         }
 
 
@@ -39,5 +41,25 @@ namespace Succubus.Bus.Tests
             var reply = await bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Hello" });
             Assert.AreEqual("Hello", reply.Message);
         }
+
+        [Test]
+        public void SimpleReqResStaticRouteSynchronous()
+        {
+            ManualResetEvent mre = new ManualResetEvent(false);
+            string request = null;
+            string response = null;
+            bus.OnReply<BasicRequest, BasicResponse>((req, res) =>
+            {
+                Assert.AreEqual(req.Message, res.Message);   
+                mre.Set();
+            });
+            bus.Call<BasicRequest>(new BasicRequest { Message = "Hello" });
+            if (mre.WaitOne(500) == false)
+            {
+                Assert.Fail("Timeout waiting for response");
+            }
+
+        }
+
     }
 }

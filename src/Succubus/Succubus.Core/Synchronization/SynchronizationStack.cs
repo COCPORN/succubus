@@ -11,15 +11,21 @@ namespace Succubus
 
         SynchronizationContext ctx;
 
-        internal SynchronizationContext Context { get { return ctx; } }
-
         public SynchronizationStack(SynchronizationContext ctx)
         {
             Frames = new List<SynchronizationFrame>();
             this.ctx = ctx;
         }
 
-   
+        internal SynchronizationStack CloneFor(SynchronizationContext ctx)
+        {
+            SynchronizationStack stack = new SynchronizationStack(ctx);
+            foreach (var frame in Frames)
+            {
+                stack.Frames.Add(frame.Clone());
+            }
+            return stack;
+        }
         
         public bool ResolveFor(object message)
         {
