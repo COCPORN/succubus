@@ -64,6 +64,11 @@
 </ul>
 </li>
 </ul><h2>
+<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h2>
+
+<p>Succubus is implemented just for fun, don't expect to see any best-in-class implementations or super stable code, at least not at this point. It is intended to have few dependencies, be quick to develop with and accommodate some "special" use cases. Most of the things implemented by Succubus are fairly simple to implement directly on ZeroMQ, but the idea is to take some of the hassle out of it when working with C#.</p>
+
+<h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Get lastest version of Succubus from GitHub or NuGet (will be up soon).</p>
@@ -210,6 +215,70 @@
 </pre></div>
 
 <p>Succubus will store the request until the response arrives, so both can be handled in the same context.</p>
+
+<h3>
+<a name="response-filtering" class="anchor" href="#response-filtering"><span class="octicon octicon-link"></span></a>Response filtering</h3>
+
+<p>You can setup response filtering through inheritance. Example:</p>
+
+<div class="highlight highlight-C#"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">BaseResponse</span> 
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Message</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">SuccessResponse</span> 
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nf">SuccessResponse</span><span class="p">()</span> 
+    <span class="p">{</span>
+        <span class="n">Message</span> <span class="p">=</span> <span class="s">"All went well"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">FailureResponse</span> 
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nf">FailureResponse</span><span class="p">()</span> 
+    <span class="p">{</span>
+        <span class="n">Message</span> <span class="p">=</span> <span class="s">"What a catastrophic failure."</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Request</span> 
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Message</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>With these classes we can setup the handling of the static routes.</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">ReplyTo</span><span class="p">&lt;</span><span class="n">Request</span><span class="p">,</span><span class="n">BaseResponse</span><span class="p">&gt;((</span><span class="n">req</span><span class="p">)</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">failure</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">FailureResponse</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">else</span> 
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">SuccessResponse</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+</pre></div>
+
+<p>Then, on the client side, we can handle both responses separately:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">OnReply</span><span class="p">&lt;</span><span class="n">Request</span><span class="p">,</span> <span class="n">FailureResponse</span><span class="p">&gt;((</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Shoot, something went wrong processing the request: {0}"</span><span class="p">,</span> <span class="n">res</span><span class="p">.</span><span class="n">Message</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="n">bus</span><span class="p">.</span><span class="n">OnReply</span><span class="p">&lt;</span><span class="n">Request</span><span class="p">,</span> <span class="n">SuccessResponse</span><span class="p">&gt;((</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Everything processed without a hitch: {0}"</span><span class="p">,</span> <span class="n">res</span><span class="p">.</span><span class="n">Message</span><span class="p">);</span>
+<span class="p">});</span>
+
+</pre></div>
+
+<p>It is not possible at the current time to handle the base class and do filtering inside the handler.</p>
 
 <h3>
 <a name="timeouts" class="anchor" href="#timeouts"><span class="octicon octicon-link"></span></a>Timeouts</h3>
