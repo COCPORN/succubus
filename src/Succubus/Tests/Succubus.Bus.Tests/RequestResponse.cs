@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
@@ -24,36 +25,40 @@ namespace Succubus.Bus.Tests
                 Message = req.Message
             });
 
+            bus.ReplyTo<StaticRequest, StaticResponse>(req => new StaticResponse
+            {
+                Message = req.Message
+            });
+
 
         }
 
 
         [Test]
-        public void SimpleReqResTransientRouteSynchronous()
+        public async void SimpleReqResTransientRouteSynchronousAndAsynchronous()
         {
-            var reply = bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Hello" });
-            Assert.AreEqual("Hello", reply.Message);
+            for (int i = 0; i < 250; i++)
+            {
+                var reply2 = bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest {Message = "Hello"});
+                var reply = bus.Call<BasicRequest, BasicResponse>(new BasicRequest {Message = "Howdy"});
+                Assert.AreEqual("Howdy", reply.Message);
+                Assert.AreEqual("Hello", (await reply2).Message);
+            }
         }
 
-        [Test]
-        public async void SimpleReqResTransientRouteAsynchronous()
-        {
-            var reply = await bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Hello" });
-            Assert.AreEqual("Hello", reply.Message);
-        }
+     
 
         [Test]
         public void SimpleReqResStaticRouteSynchronous()
         {
-            ManualResetEvent mre = new ManualResetEvent(false);
-            string request = null;
-            string response = null;
-            bus.OnReply<BasicRequest, BasicResponse>((req, res) =>
+            var mre = new ManualResetEvent(false);
+
+            bus.OnReply<StaticRequest, StaticResponse>((req, res) =>
             {
-                Assert.AreEqual(req.Message, res.Message);   
+                Assert.AreEqual(req.Message, res.Message);
                 mre.Set();
             });
-            bus.Call<BasicRequest>(new BasicRequest { Message = "Hello" });
+            bus.Call<StaticRequest>(new StaticRequest { Message = "Hello" });
             if (mre.WaitOne(500) == false)
             {
                 Assert.Fail("Timeout waiting for response");
