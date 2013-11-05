@@ -29,8 +29,6 @@ namespace Succubus.Bus.Tests
             {
                 Message = req.Message
             });
-
-
         }
 
 
@@ -55,10 +53,11 @@ namespace Succubus.Bus.Tests
 
             bus.OnReply<StaticRequest, StaticResponse>((req, res) =>
             {
+                Assert.AreEqual("Hello", req.Message);
                 Assert.AreEqual(req.Message, res.Message);
                 mre.Set();
             });
-            bus.Call<StaticRequest>(new StaticRequest { Message = "Hello" });
+            bus.Call(new StaticRequest { Message = "Hello" });
             if (mre.WaitOne(500) == false)
             {
                 Assert.Fail("Timeout waiting for response");
