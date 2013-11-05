@@ -48,6 +48,8 @@
     <Compile Include="Messages\BasicEvent.cs" />
     <Compile Include="Messages\BasicRequest.cs" />
     <Compile Include="Messages\BasicResponse.cs" />
+    <Compile Include="Messages\ChildMessages.cs" />
+    <Compile Include="Messages\ComplexOrchestrationMessages.cs" />
     <Compile Include="Messages\StaticRequest.cs" />
     <Compile Include="Messages\StaticResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -29,6 +29,18 @@ namespace Succubus.Bus.Tests
             {
                 Message = req.Message
             });
+
+           bus.ReplyTo<ChildRequest, ChildBase>(req =>
+           {
+               if (req.Message == "Child1")
+               {
+                   return new ChildResponse1 { Message = req.Message };
+               }
+               else
+               {
+                   return new ChildResponse2 { Message = req.Message };
+               }
+           });
         }
 
 
@@ -65,5 +77,110 @@ namespace Succubus.Bus.Tests
 
         }
 
+        void OrchestrationSetup1()
+        {
+
+            bus.ReplyTo<Request1, Response2>(req => new Response2 { Message = "RESPONSE 2 " + req.Message });
+            bus.ReplyTo<Request1, Response1>(req => new Response1 { Message = "RESPONSE 1 " + req.Message });
+        }
+
+        private void OrchestrationSetup2()
+        {
+            bus.ReplyTo<Request1, Response3>(req => new Response3 { Message = "RESPONSE 3 " + req.Message });
+        }
+
+        [Test]
+        public void ComplexOrchestration1()
+        {
+            OrchestrationSetup1();
+
+            bool res1res2in = false;
+            bool res1res2res3in = false;
+            var mre1 = new ManualResetEvent(false);
+            var mre2 = new ManualResetEvent(false);
+
+            bus.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
+            {
+                res1res2in = true;
+                mre1.Set();
+            });
+
+            bus.OnReply<Request1, Response1, Response2, Response3>((request, response1, response2, response3) =>
+            {
+                res1res2res3in = true;
+                mre2.Set();
+            });
+
+            bus.Call(new Request1 { Message = "Hello!" });
+      
+            mre2.WaitOne(500);
+
+            Assert.AreEqual(true, res1res2in);
+            Assert.AreEqual(false, res1res2res3in);
+
+        }
+
+        [Test]
+        public void ComplexOrchestration2()
+        {
+            OrchestrationSetup1();
+            OrchestrationSetup2();
+
+            bool res1res2in = false;
+            bool res1res2res3in = false;
+            var mre1 = new ManualResetEvent(false);
+            var mre2 = new ManualResetEvent(false);
+
+            bus.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
+            {
+                res1res2in = true;
+                mre1.Set();
+            });
+
+            bus.OnReply<Request1, Response1, Response2, Response3>((request, response1, response2, response3) =>
+            {
+                res1res2res3in = true;
+                mre2.Set();
+            });
+
+            bus.Call(new Request1 { Message = "Hello!" });
+
+            mre2.WaitOne(500);
+
+            Assert.AreEqual(true, res1res2in);
+            Assert.AreEqual(true, res1res2res3in);
+
+        }
+
+        [Test]
+        public void ChildMessages1()
+        {
+            var response = bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child1" });
+            Assert.AreEqual("Child1", response.Message);
+            Assert.AreEqual(typeof(ChildResponse1), response.GetType());
+
+            var response2 = bus.Call<ChildRequest, ChildResponse2>(new ChildRequest { Message = "Child2" });
+            Assert.AreEqual("Child2", response2.Message);
+            Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
+        }
+
+        [Test]
+        [ExpectedException(typeof(TimeoutException))]
+        public void ChildMessages2()
+        {
+             bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child2" }, 1000);
+        }
+
+        [Test]
+        public void ChildMessages3()
+        {
+            var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, 1000);
+            Assert.AreEqual("Child1", response.Message);
+            Assert.AreEqual(typeof(ChildResponse1), response.GetType());
+
+            var response2 = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child2" }, 1000);
+            Assert.AreEqual("Child2", response2.Message);
+            Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
+        }
     }
 }
