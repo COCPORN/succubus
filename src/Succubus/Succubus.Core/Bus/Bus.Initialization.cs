@@ -57,7 +57,10 @@ namespace Succubus.Core
         {
             PublishAddress = "tcp://localhost:9000";
             SubscribeAddress = "tcp://localhost:9001";
+            context = ZmqContext.Create();
         }
+
+        public ZmqContext Context { get { return context; } set { context = value; } }
 
         private bool initialized = false;
 
@@ -72,17 +75,21 @@ namespace Succubus.Core
                 initialized = true;
             }
 
+        
+
             if (StartMessageHost == true)
             {
                 if (messageHost == null) messageHost = new MessageHost();
+                if (MessageHostPublishAddress != null) messageHost.PublishAddress = MessageHostPublishAddress;
+                if (MessageHostSubscribeAddress != null) messageHost.SubscribeAddress = MessageHostSubscribeAddress;
                 messageHost.Start();
             }
 
-            context = ZmqContext.Create();
+          
 
             ConnectPublisher();
 
-            subscriberThread = new Thread(new ThreadStart(Subscriber)) { IsBackground = true };
+            subscriberThread = new Thread(Subscriber) { IsBackground = true };
             subscriberThread.Start();
 
             timeoutThread = new Thread(TimeoutThread) { IsBackground = true };

@@ -34,9 +34,16 @@ namespace Succubus.Hosting
             SubscribeAddress = "tcp://*:9000";
         }
 
+        private ZmqContext context = null;
+        public ZmqContext Context
+        {
+            get { return context;  }
+            set { context = value; }
+        }
+
         void ServerThread()
         {
-            using (var context = ZmqContext.Create())
+            using (context ?? (context = ZmqContext.Create()))
             using (subscribeSocket = context.CreateSocket(SocketType.XSUB))
             using (publishSocket = context.CreateSocket(SocketType.XPUB))
             {

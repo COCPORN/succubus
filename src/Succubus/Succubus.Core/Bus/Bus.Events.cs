@@ -59,7 +59,7 @@ namespace Succubus.Core
             {
                 foreach (var eventHandler in handlers)
                 {
-                    Action<object> handler = eventHandler;
+                    var handler = eventHandler;
                     Task.Factory.StartNew(() => handler(message));
                 }
             }
