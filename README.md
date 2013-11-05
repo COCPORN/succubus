@@ -184,9 +184,9 @@ bus.Call<BasicRequest>(new BasicRequest { Message = "Hello from client"} );
 
 Succubus will store the request until the response arrives, so both can be handled in the same context.
 
-### Response fanning
+### Response filtering
 
-You can setup response fanning through inheritance. Example:
+You can setup response filtering through inheritance. Example:
 
 ```C#
 public class BaseResponse 
@@ -248,7 +248,7 @@ bus.OnReply<Request, SuccessResponse>((req, res) =>
 
 ```
 
-It is not possible at the current time to handle the base class and do fan out inside the handler.
+It is not possible at the current time to handle the base class and do filtering inside the handler.
 
 
 ### Timeouts
