@@ -259,6 +259,7 @@ bus.OnReply<Request, BaseResponse>((req, res) =>
         // ...
     }
 });
+```
 
 This means you can route incoming responses based on interface-definitions and abstract classes, in addition to obviously concrete classes.
 
