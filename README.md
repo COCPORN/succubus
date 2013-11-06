@@ -248,8 +248,19 @@ bus.OnReply<Request, SuccessResponse>((req, res) =>
 
 ```
 
-It is not possible at the current time to handle the base class and do filtering inside the handler.
+It is also possible to do:
 
+```C#
+bus.OnReply<Request, BaseResponse>((req, res) =>
+{
+    if (res is FailureResponse) {
+        // ...
+    } else if (res is SuccessResponse) {
+        // ...
+    }
+});
+
+This means you can route incoming responses based on interface-definitions and abstract classes, in addition to obviously concrete classes.
 
 ### Timeouts
 

@@ -5,26 +5,20 @@
         public string Message { get; set; }
     }
 
-    public interface ChildBase
+    public abstract class ChildBase
     {
-        string Message { get; set; }
+        public string Message { get; set; }
     }
 
     public class ChildResponse1 : ChildBase
     {
 
-        public string Message
-        {
-            get; set; 
-        }
+     
     }
 
     public class ChildResponse2 : ChildBase
     {
 
-        public string Message
-        {
-            get; set; 
-        }
+     
     }
 }
