@@ -32,9 +32,7 @@ namespace Succubus
 
         public Guid CorrelationId { get; set; }
 
-        public List<SynchronizationStack> Stacks;
-
-        internal HashSet<Type> types = new HashSet<Type>();
+        public List<SynchronizationStack> Stacks;     
 
         internal Dictionary<Type, object> responses = new Dictionary<Type, object>();        
 

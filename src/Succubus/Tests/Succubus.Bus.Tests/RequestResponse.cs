@@ -174,8 +174,7 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ChildMessages3()
         {
-            return;
-            var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, 10000);
+            var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, 100000);
             Assert.AreEqual("Child1", response.Message);
             Assert.AreEqual(typeof(ChildResponse1), response.GetType());
 

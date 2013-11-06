@@ -44,28 +44,25 @@ namespace Succubus
                     unresolvedFrames = true;
                     continue;
                 }
-                else
-                {
-                    ctx.types.Add(message.GetType());
-                }
+              
 
                 if (ctx.responses.ContainsKey(message.GetType()) == false)
                 {
                     ctx.responses.Add(message.GetType(), message);
                 }
-
-                if (frame.Satisfies(ctx.types))
+                Dictionary<Type, object> castMessages = null;
+                if (frame.Satisfies(ctx.responses, out castMessages))
                 {
                     SynchronizationFrame localFrame = frame;
                     Task.Factory.StartNew(() =>
                     {
                         if (ctx.Static == false)
                         {
-                            localFrame.CallHandler(ctx.responses);
+                            localFrame.CallHandler(castMessages);
                         }
                         else
                         {
-                            localFrame.CallStaticHandler(ctx.responses);
+                            localFrame.CallStaticHandler(castMessages);
                         }
                     });
                     frame.Resolved = true;
