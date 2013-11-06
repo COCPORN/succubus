@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
+using System.Runtime.Remoting;
 
 namespace Succubus
 {
@@ -35,7 +37,7 @@ namespace Succubus
         public bool Resolved { get; set; }
         
         
-        public abstract bool CanHandle(Type type);
+        public abstract bool CanHandle(object type);
     }
 
     [Serializable]
@@ -53,9 +55,9 @@ namespace Succubus
         public Action<TRes> Handler { get; set; }
         public Action<TReq, TRes> StaticHandler { get; set; }
 
-        public override bool CanHandle(Type type)
+        public override bool CanHandle(object type)
         {
-            if (type == typeof(TRes)) return true;
+            if (type is TRes) return true;
             else return false;
         } 
 
@@ -90,8 +92,9 @@ namespace Succubus
         public Action<TRes1, TRes2> Handler { get; set; }
         public Action<TReq, TRes1, TRes2> StaticHandler { get; set; }
 
-        public override bool CanHandle(Type type)
+        public override bool CanHandle(object type)
         {
+           // if (type.IsInstanceOfType(typeof (TRes1)) || type.IsInstanceOfType(typeof (TRes2))) return true;
             if (type == typeof(TRes1) || type == typeof(TRes2)) return true;
             else return false;
         }
@@ -128,7 +131,7 @@ namespace Succubus
         public Action<TRes1, TRes2, TRes3> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3> StaticHandler { get; set; }
 
-        public override bool CanHandle(Type type)
+        public override bool CanHandle(object type)
         {
             if (type == typeof(TRes1) || 
                 type == typeof(TRes2) || 
@@ -177,7 +180,7 @@ namespace Succubus
         public Action<TRes1, TRes2, TRes3, TRes4> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3, TRes4> StaticHandler { get; set; }
 
-        public override bool CanHandle(Type type)
+        public override bool CanHandle(object type)
         {
             if (type == typeof(TRes1) ||
                 type == typeof(TRes2) ||
@@ -230,7 +233,7 @@ namespace Succubus
         public Action<TRes1, TRes2, TRes3, TRes4, TRes5> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3, TRes4, TRes5> StaticHandler { get; set; }
 
-        public override bool CanHandle(Type type)
+        public override bool CanHandle(object type)
         {
             if (type == typeof(TRes1) ||
                 type == typeof(TRes2) ||
@@ -287,7 +290,7 @@ namespace Succubus
         public Action<TRes1, TRes2, TRes3, TRes4, TRes5, TRes6> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3, TRes4, TRes5, TRes6> StaticHandler { get; set; }
 
-        public override bool CanHandle(Type type)
+        public override bool CanHandle(object type)
         {
             if (type == typeof(TRes1) ||
                 type == typeof(TRes2) ||
@@ -348,7 +351,7 @@ namespace Succubus
         public Action<TRes1, TRes2, TRes3, TRes4, TRes5, TRes6, TRes7> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3, TRes4, TRes5, TRes6, TRes7> StaticHandler { get; set; }
 
-        public override bool CanHandle(Type type)
+        public override bool CanHandle(object type)
         {
             if (type == typeof(TRes1) ||
                 type == typeof(TRes2) ||

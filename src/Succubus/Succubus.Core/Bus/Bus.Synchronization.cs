@@ -106,7 +106,7 @@ namespace Succubus.Core
             }
             else
             {
-                throw new TimeoutException("Timeout waiting for synhronous call");
+                throw new TimeoutException("Timeout waiting for synchronous call");
             }
 
         }

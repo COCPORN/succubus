@@ -39,7 +39,7 @@ namespace Succubus
                     continue;
                 }
 
-                if (frame.CanHandle(message.GetType()) == false)
+                if (frame.CanHandle(message) == false)
                 {
                     unresolvedFrames = true;
                     continue;

@@ -53,10 +53,10 @@ namespace Succubus.Core
 
         private void ProcessSynchronousMessages(SynchronousMessageFrame synchronousFrame)
         {
-            Type type = Type.GetType(synchronousFrame.EmbeddedType);            
+            Type type = Type.GetType(synchronousFrame.EmbeddedType);
             object message = JsonFrame.Deserlialize(synchronousFrame.Message, type);
-
-            ProcessReplies(synchronousFrame, type, message);
+            
+            ProcessReplyHandlers(synchronousFrame, type, message);
 
             SynchronizationContext ctx = ProcessSynchronousHandlers(synchronousFrame, message);            
         }
@@ -90,7 +90,7 @@ namespace Succubus.Core
             return ctx;
         }
 
-        private void ProcessReplies(SynchronousMessageFrame synchronousFrame, Type type, object message)
+        private void ProcessReplyHandlers(SynchronousMessageFrame synchronousFrame, Type type, object message)
         {
             List<Func<object, object>> handlers = null;
 
