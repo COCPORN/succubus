@@ -278,7 +278,19 @@
 
 </pre></div>
 
-<p>It is not possible at the current time to handle the base class and do filtering inside the handler.</p>
+<p>It is also possible to do:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">OnReply</span><span class="p">&lt;</span><span class="n">Request</span><span class="p">,</span> <span class="n">BaseResponse</span><span class="p">&gt;((</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">res</span> <span class="k">is</span> <span class="n">FailureResponse</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// ...</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">res</span> <span class="k">is</span> <span class="n">SuccessResponse</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// ...</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>This means you can route incoming responses based on interface-definitions and abstract classes, in addition to obviously concrete classes.</p>
 
 <h3>
 <a name="timeouts" class="anchor" href="#timeouts"><span class="octicon octicon-link"></span></a>Timeouts</h3>
