@@ -5,13 +5,18 @@ using Succubus.Collections.Interfaces;
 
 namespace Succubus.Collections
 {
-    public class TimeoutHandler<Key, Value> where Value : IExpiring<Key>
+    class DefaultNow : INow
     {
-        private readonly SortedDictionary<Int64, Value> sortedTimeoutSynchronizationContexts
-            = new SortedDictionary<Int64, Value>();
+        public DateTime Now { get { return DateTime.Now; } }
+    }
+
+    public class TimeoutHandler<TKey, TValue> where TValue : IExpiring<TKey>
+    {
+        private readonly SortedDictionary<Int64, TValue> sortedTimeoutSynchronizationContexts
+            = new SortedDictionary<Int64, TValue>();
 
         private readonly AutoResetEvent timeoutResetEvent = new AutoResetEvent(false);
-        public Dictionary<Key, List<Int64>> timeoutContexts = new Dictionary<Key, List<Int64>>();
+        private Dictionary<TKey, List<Int64>> timeoutContexts = new Dictionary<TKey, List<Int64>>();
         Thread timeoutThread;
 
         public TimeoutHandler()
@@ -67,7 +72,7 @@ namespace Succubus.Collections
             }
         }
 
-        public Int64 Timeout(Value context, int milliseconds)
+        public Int64 Timeout(TValue context, int milliseconds)
         {
             var timespan = TimeSpan.FromMilliseconds(milliseconds);
             var timeoutDateTime = DateTime.Now + timespan;
@@ -87,7 +92,7 @@ namespace Succubus.Collections
             return timeoutTick;
         }
 
-        public void RemoveTimeout(Key correlationId)
+        public void RemoveTimeout(TKey correlationId)
         {
             lock (sortedTimeoutSynchronizationContexts)
             {
