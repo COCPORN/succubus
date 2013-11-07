@@ -142,17 +142,11 @@ namespace Succubus.Core
 
                     if (timeoutHandler != null) synchronizationContext.SetTimeoutHandler(timeoutHandler);
                     synchronizationContext.CorrelationId = synchronizedRequest.CorrelationId;
-                    List<Int64> keys;
-                    if (this.timeoutHandler.timeoutContexts.TryGetValue(synchronizedRequest.CorrelationId, out keys) == false)
-                    {
-                        keys = new List<long>();
-                        keys.Add(this.timeoutHandler.Timeout(synchronizationContext, timeout));
-                        this.timeoutHandler.timeoutContexts.Add(synchronizedRequest.CorrelationId, keys);
-                    }
-                    else
-                    {
-                        keys.Add(this.timeoutHandler.Timeout(synchronizationContext, timeout));
-                    }
+
+
+                    this.timeoutHandler.Timeout(synchronizationContext, timeout);
+
+                  
 
 
 

@@ -30,7 +30,6 @@ namespace Succubus.Collections
             int waitmilliseconds = 100;
             while (true)
             {
-                //Console.WriteLine("Waiting {0} ms, {1}/{2} entries", waitmilliseconds, sortedTimeoutSynchronizationStacks.Count, timeoutStacks.Count);
                 if (waitmilliseconds != 0) timeoutResetEvent.WaitOne(waitmilliseconds);
                 var removeKeys = new List<Int64>();
                 lock (sortedTimeoutSynchronizationContexts)
@@ -87,6 +86,17 @@ namespace Succubus.Collections
                     timeoutTick++;
                 }
                 sortedTimeoutSynchronizationContexts.Add(timeoutTick, context);
+                List<Int64> keys;
+                if (timeoutContexts.TryGetValue(context.Id, out keys) == false)
+                {
+                    keys = new List<long>();
+                    keys.Add(timeoutTick);
+                    timeoutContexts.Add(context.Id, keys);
+                }
+                else
+                {
+                    keys.Add(timeoutTick);
+                }
             }
             timeoutResetEvent.Set();
             return timeoutTick;
