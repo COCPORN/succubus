@@ -135,7 +135,6 @@ namespace Succubus.Core
             {
                 //var synchronizationContext = Serialization.ObjectCopier.Clone(prototype);
                 var synchronizationContext = SynchronizationContext.Clone(prototype);
-                synchronizationContext.Static = true;
                 synchronizationContext.Request = request;
                 if (timeout != 0)
                 {
@@ -143,13 +142,7 @@ namespace Succubus.Core
                     if (timeoutHandler != null) synchronizationContext.SetTimeoutHandler(timeoutHandler);
                     synchronizationContext.CorrelationId = synchronizedRequest.CorrelationId;
 
-
                     this.timeoutHandler.Timeout(synchronizationContext, timeout);
-
-                  
-
-
-
                 }
                 // The static route implementation of timeouts needs to wait because
                 // anonymous methods cannot be serialized. This will be implemented in the
@@ -168,6 +161,7 @@ namespace Succubus.Core
                 {
                     foreach (var frame in stack.Frames)
                     {
+                        frame.CorrelationId = synchronizedRequest.CorrelationId;
                         frame.Request = request;
                     }
                 }
@@ -186,16 +180,21 @@ namespace Succubus.Core
         #region OnReply<T, ...>
 
 
-        private void SetupContext<TReq>(out SynchronizationContext synchronizationContext, out SynchronizationStack synchronizationStack)
+        private void SetupContext<TReq>(out SynchronizationContext synchronizationContext, out SynchronizationStack synchronizationStack, ContextType type)
         {
             bool success = false;
             lock (staticSynchronizationPrototypes)
             {
                 success = staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out synchronizationContext);
+                if (success && synchronizationContext.ContextType != type)
+                {
+                    throw new InvalidOperationException("This response set is already handled with a different response type");
+                }
             }
             if (success == false)
             {
                 synchronizationContext = new SynchronizationContext();
+                synchronizationContext.ContextType = type;
                 lock (staticSynchronizationPrototypes)
                 {
                     staticSynchronizationPrototypes.Add(typeof(TReq), synchronizationContext);
@@ -206,17 +205,11 @@ namespace Succubus.Core
         }
 
         public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler)
-        //, Action<TReq> timeoutHandler = null, int timeout = 0)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
-            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             var synchronizationFrame = new SynchronizationFrame<TReq, T> { StaticHandler = handler };
-
-            //if (timeout != 0 && timeoutHandler != null)
-            //{
-            //    synchronizationStack.SetTimeoutHandler(timeoutHandler);              
-            //}
 
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
@@ -228,7 +221,7 @@ namespace Succubus.Core
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
-            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
@@ -241,7 +234,7 @@ namespace Succubus.Core
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
-            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
@@ -254,7 +247,7 @@ namespace Succubus.Core
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
-            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
@@ -265,7 +258,7 @@ namespace Succubus.Core
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
-            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
@@ -276,7 +269,7 @@ namespace Succubus.Core
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
-            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5, T6> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
@@ -287,7 +280,7 @@ namespace Succubus.Core
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
-            SetupContext<TReq>(out synchronizationContext, out synchronizationStack);
+            SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5, T6, T7> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 

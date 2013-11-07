@@ -56,14 +56,19 @@ namespace Succubus
                     SynchronizationFrame localFrame = frame;
                     Task.Factory.StartNew(() =>
                     {
-                        if (ctx.Static == false)
+                        switch (ctx.ContextType)
                         {
-                            localFrame.CallHandler(castMessages);
+                            case ContextType.Transient:
+                                localFrame.CallHandler(castMessages);
+                                break;
+                            case ContextType.Static:
+                                localFrame.CallStaticHandler(castMessages);
+                                break;
+                            case ContextType.Deferred:
+                                localFrame.CallDeferredHandler(castMessages);
+                                break;
                         }
-                        else
-                        {
-                            localFrame.CallStaticHandler(castMessages);
-                        }
+                    
                     });
                     frame.Resolved = true;
                 }

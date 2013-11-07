@@ -23,7 +23,7 @@ namespace Succubus.Collections
         {
             timeoutThread = new Thread(TimeoutThread) { IsBackground = true };
             timeoutThread.Start();
-        } 
+        }
 
         void TimeoutThread()
         {
@@ -45,9 +45,12 @@ namespace Succubus.Collections
                             break;
                         }
                         entry.Value.TimedOut = true;
+
+                        if (entry.Value.TimeoutHandler != null)
                         {
-                            if (entry.Value.TimeoutHandler != null) entry.Value.TimeoutHandler();
+                            entry.Value.TimeoutHandler();
                         }
+                   
                         removeKeys.Add(entry.Key);
                         timeoutContexts.Remove(entry.Value.Id);
                     }
@@ -71,7 +74,7 @@ namespace Succubus.Collections
             }
         }
 
-        public Int64 Timeout(TValue context, int milliseconds)
+        public Int64 Timeout(TValue value, int milliseconds)
         {
             var timespan = TimeSpan.FromMilliseconds(milliseconds);
             var timeoutDateTime = DateTime.Now + timespan;
@@ -85,13 +88,13 @@ namespace Succubus.Collections
                 {
                     timeoutTick++;
                 }
-                sortedTimeoutSynchronizationContexts.Add(timeoutTick, context);
+                sortedTimeoutSynchronizationContexts.Add(timeoutTick, value);
                 List<Int64> keys;
-                if (timeoutContexts.TryGetValue(context.Id, out keys) == false)
+                if (timeoutContexts.TryGetValue(value.Id, out keys) == false)
                 {
                     keys = new List<long>();
                     keys.Add(timeoutTick);
-                    timeoutContexts.Add(context.Id, keys);
+                    timeoutContexts.Add(value.Id, keys);
                 }
                 else
                 {
@@ -115,6 +118,49 @@ namespace Succubus.Collections
                     }
                     timeoutContexts.Remove(correlationId);
                 }
+            }
+        }
+
+        public IEnumerable<TValue> GetValues(TKey correlationId)
+        {
+            List<TValue> values = new List<TValue>();
+            lock (sortedTimeoutSynchronizationContexts)
+            {
+               List<Int64> keys;
+                if (timeoutContexts.TryGetValue(correlationId, out keys))
+                {
+                    foreach (var key in keys)
+                    {
+                        values.Add(sortedTimeoutSynchronizationContexts[key]);
+                    }
+                }
+              
+            }
+            foreach (var value in values)
+            {
+                yield return value;
+            }
+        }
+
+        public IEnumerable<TValue> GetAndRemoveValues(TKey correlationId)
+        {
+            List<TValue> values = new List<TValue>();
+            lock (sortedTimeoutSynchronizationContexts)
+            {
+                List<Int64> keys;
+                if (timeoutContexts.TryGetValue(correlationId, out keys))
+                {
+                    foreach (var key in keys)
+                    {
+                        values.Add(sortedTimeoutSynchronizationContexts[key]);
+                    }
+                }
+
+            }
+            RemoveTimeout(correlationId);
+            foreach (var value in values)
+            {
+                yield return value;
             }
         }
     }

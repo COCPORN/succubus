@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
@@ -77,10 +78,13 @@ namespace Succubus.Core
                 {
                     if (ctx.ResolveFor(message) == true)
                     {
-                        lock (synchronizationContexts)
+                        if (ctx.ContextType != ContextType.Deferred)
                         {
-                            synchronizationContexts.Remove(synchronousFrame.CorrelationId);
-                            timeoutHandler.RemoveTimeout(synchronousFrame.CorrelationId);
+                            lock (synchronizationContexts)
+                            {
+                                synchronizationContexts.Remove(synchronousFrame.CorrelationId);
+                                timeoutHandler.RemoveTimeout(synchronousFrame.CorrelationId);
+                            }
                         }
                     }
                 }                

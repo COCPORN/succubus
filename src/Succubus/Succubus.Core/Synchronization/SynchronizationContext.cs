@@ -2,20 +2,30 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
+using System.Threading;
 using Succubus.Collections.Interfaces;
 
 namespace Succubus
 {
+    enum ContextType
+    {
+        Transient,
+        Static,
+        Deferred
+    }
+
+
     [Serializable]
     class SynchronizationContext : IExpiring<Guid>
     {
 
+        
         public static SynchronizationContext Clone(SynchronizationContext context)
         {
             var newContext = new SynchronizationContext();
             newContext.CorrelationId = context.CorrelationId;      
             newContext.Request = context.Request;
-            newContext.Static = context.Static;
+            newContext.ContextType = context.ContextType;
             newContext.TimedOut = context.TimedOut;
             newContext.TimeoutMilliseconds = context.TimeoutMilliseconds;
 
@@ -29,7 +39,8 @@ namespace Succubus
 
         }
 
-        public bool Static { get; set; }
+        public ContextType ContextType { get; set; }
+        public ManualResetEvent DeferredResetEvent { get; set; }
 
         public Guid CorrelationId { get; set; }
         public Guid Id { get { return CorrelationId; } }
@@ -43,6 +54,7 @@ namespace Succubus
         public SynchronizationContext()
         {
             Stacks = new List<SynchronizationStack>();
+            DeferredResetEvent = new ManualResetEvent(false);
         }
 
         public bool TimedOut { get; set; }
