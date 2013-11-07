@@ -54,6 +54,7 @@
     <Compile Include="Messages\StaticResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestResponse.cs" />
+    <Compile Include="Timeout.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

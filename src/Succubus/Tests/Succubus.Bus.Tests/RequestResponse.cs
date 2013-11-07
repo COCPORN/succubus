@@ -153,7 +153,7 @@ namespace Succubus.Bus.Tests
         }
 
         [Test]
-        public void ChildMessages1()
+        public void ChildMessages1_SimpleMapping()
         {
             var response = bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child1" });
             Assert.AreEqual("Child1", response.Message);
@@ -166,13 +166,13 @@ namespace Succubus.Bus.Tests
 
         [Test]
         [ExpectedException(typeof(TimeoutException))]
-        public void ChildMessages2()
+        public void ChildMessages2_TimeoutOfMissingType()
         {
              bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child2" }, 1000);
         }
 
         [Test]
-        public void ChildMessages3()
+        public void ChildMessages3_HandlingOfBaseClassResponse()
         {
             var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, 100000);
             Assert.AreEqual("Child1", response.Message);
@@ -181,6 +181,25 @@ namespace Succubus.Bus.Tests
             var response2 = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child2" }, 1000);
             Assert.AreEqual("Child2", response2.Message);
             Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
+        }
+
+        [Test]
+        public void ChildMessages4_BaseClassOrchestration()
+        {
+            var are = new AutoResetEvent(false);
+            bus.OnReply<ChildRequest, ChildBase, ChildResponse2>((req, cb, cr2) =>
+            {
+                Console.WriteLine("Got a reply");
+                are.Set();
+            });
+
+            bus.Call(new ChildRequest { Message = "Child1" }, (req) =>
+            {
+                return;
+            }, 1000);
+
+            are.WaitOne(5000);
+            Assert.Fail("Call did not time out as expected");
         }
     }
 }
