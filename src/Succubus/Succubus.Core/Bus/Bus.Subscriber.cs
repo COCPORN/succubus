@@ -80,7 +80,7 @@ namespace Succubus.Core
                         lock (synchronizationContexts)
                         {
                             synchronizationContexts.Remove(synchronousFrame.CorrelationId);
-                            RemoveTimeout(synchronousFrame.CorrelationId);
+                            timeoutHandler.RemoveTimeout(synchronousFrame.CorrelationId);
                         }
                     }
                 }                

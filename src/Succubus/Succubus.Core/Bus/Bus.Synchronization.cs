@@ -36,6 +36,8 @@ namespace Succubus.Core
         /// </summary>
         Dictionary<Type, List<Func<object, object>>> replyHandlers = new Dictionary<Type, List<Func<object, object>>>();
 
+        private readonly TimeoutHandler<Guid, SynchronizationContext> timeoutHandler = new TimeoutHandler<Guid, SynchronizationContext>();
+
         #endregion
 
 
@@ -140,15 +142,15 @@ namespace Succubus.Core
                     if (timeoutHandler != null) synchronizationContext.SetTimeoutHandler(timeoutHandler);
                     synchronizationContext.CorrelationId = synchronizedRequest.CorrelationId;
                     List<Int64> keys;
-                    if (timeoutContexts.TryGetValue(synchronizedRequest.CorrelationId, out keys) == false)
+                    if (this.timeoutHandler.timeoutContexts.TryGetValue(synchronizedRequest.CorrelationId, out keys) == false)
                     {
                         keys = new List<long>();
-                        keys.Add(Timeout(synchronizationContext, timeout));
-                        timeoutContexts.Add(synchronizedRequest.CorrelationId, keys);
+                        keys.Add(this.timeoutHandler.Timeout(synchronizationContext, timeout));
+                        this.timeoutHandler.timeoutContexts.Add(synchronizedRequest.CorrelationId, keys);
                     }
                     else
                     {
-                        keys.Add(Timeout(synchronizationContext, timeout));
+                        keys.Add(this.timeoutHandler.Timeout(synchronizationContext, timeout));
                     }
 
 
@@ -224,7 +226,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler)
@@ -235,7 +237,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
 
@@ -248,7 +250,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
 
@@ -261,7 +263,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5>(Action<TReq, T1, T2, T3, T4, T5> handler)
@@ -272,7 +274,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6>(Action<TReq, T1, T2, T3, T4, T5, T6> handler)
@@ -283,7 +285,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5, T6> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
         public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6, T7>(Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler)
@@ -294,7 +296,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5, T6, T7> { StaticHandler = handler });
             synchronizationContext.Stacks.Add(synchronizationStack);
 
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
         #endregion

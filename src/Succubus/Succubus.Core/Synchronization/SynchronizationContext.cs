@@ -2,11 +2,12 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
+using Succubus.Collections.Interfaces;
 
 namespace Succubus
 {
     [Serializable]
-    class SynchronizationContext
+    class SynchronizationContext : IExpiring<Guid>
     {
 
         public static SynchronizationContext Clone(SynchronizationContext context)
@@ -31,6 +32,7 @@ namespace Succubus
         public bool Static { get; set; }
 
         public Guid CorrelationId { get; set; }
+        public Guid Id { get { return CorrelationId; } }
 
         public List<SynchronizationStack> Stacks;     
 
@@ -43,10 +45,9 @@ namespace Succubus
             Stacks = new List<SynchronizationStack>();
         }
 
-
         public bool TimedOut { get; set; }
 
-        internal Action TimeoutHandler;
+        public Action TimeoutHandler { get; set; }
 
         public void SetTimeoutHandler<T>(Action<T> timeoutHandler)
         {

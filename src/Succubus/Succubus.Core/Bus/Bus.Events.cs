@@ -35,7 +35,7 @@ namespace Succubus.Core
 
                 handlers.Add(myHandler);
             }
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
         private void ProcessEvents(EventMessageFrame eventFrame)

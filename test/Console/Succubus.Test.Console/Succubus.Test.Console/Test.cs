@@ -11,7 +11,10 @@ namespace SuccubusTest.Console
         {
             IBus bus = new Bus();
             IBus bus2 = new Bus();
-            bus2.Initialize();
+            bus2.Initialize(succubus =>
+            {
+             
+            });
 
             bus2.On<BasicEvent>(e => System.Console.WriteLine("Bus2::On<BasicEvent>: {0}", e.Message));
 
