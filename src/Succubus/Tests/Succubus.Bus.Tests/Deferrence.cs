@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Threading;
 using NUnit.Framework;
 using Succubus.Bus.Tests.Messages;
@@ -20,22 +21,7 @@ namespace Succubus.Bus.Tests
             bus.Initialize(succubus => succubus.ConfigureForTesting());
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse { Message = req.Message });
-        }
-
-        [Test]
-        public void ManualDeferrence()
-        {
-            var deferredContexts = new TimeoutHandler<Guid, DeferredContext<BasicResponse>>();
-
-            // Callsite: Defer the request
-            bus.OnReply<BasicRequest, BasicResponse>((req, res) =>
-            {
-                deferredContexts.Timeout(new DeferredContext<BasicResponse>{ Response = res }, 60000);
-            });
-
-
-            // Pickupsite
-            var id = bus.Call(new BasicRequest { Message = "WOHEY!" });
+            bus.ReplyTo<ChildRequest, ChildBase>(req => new ChildResponse1 { Message = req.Message });
         }
 
 
@@ -46,20 +32,24 @@ namespace Succubus.Bus.Tests
 
             var id = bus.Call(new BasicRequest { Message = "Testing deferrence" });
 
-            Thread.Sleep(1000);
-
             bus.Pickup<BasicRequest, BasicResponse>(id, (req, res) =>
             {
                 Assert.AreEqual(req.Message, res.Message);
             });
         }
+
+        [Test]
+        public void BaseClassDeferrence()
+        {
+            bus.Defer<ChildRequest, ChildBase>();
+
+            var id = bus.Call(new ChildRequest() { Message = "wh00t" });
+
+            bus.Pickup<ChildRequest, ChildBase>(id, (req, res) =>
+            {
+                Assert.AreEqual(typeof(ChildResponse1), res.GetType());
+            });
+        }
     }
 
-    public class DeferredContext<T> : IExpiring<Guid>
-    {
-        public T Response { get; set; }
-        public bool TimedOut { get; set; }
-        public Action TimeoutHandler { get; private set; }
-        public Guid Id { get; private set; }
-    }
 }
