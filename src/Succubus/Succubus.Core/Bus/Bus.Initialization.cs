@@ -92,8 +92,7 @@ namespace Succubus.Core
             subscriberThread = new Thread(Subscriber) { IsBackground = true };
             subscriberThread.Start();
 
-            timeoutHandler.timeoutThread = new Thread(timeoutHandler.TimeoutThread) { IsBackground = true };
-            timeoutHandler.timeoutThread.Start();
+  
         }
 
         public void Initialize(Action<IBusConfigurator> initializationHandler)

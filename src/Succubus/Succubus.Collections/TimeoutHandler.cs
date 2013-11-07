@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Succubus.Collections.Interfaces;
 
-namespace Succubus.Core
+namespace Succubus.Collections
 {
     public class TimeoutHandler<Key, Value> where Value : IExpiring<Key>
     {
@@ -12,9 +12,15 @@ namespace Succubus.Core
 
         private readonly AutoResetEvent timeoutResetEvent = new AutoResetEvent(false);
         public Dictionary<Key, List<Int64>> timeoutContexts = new Dictionary<Key, List<Int64>>();
-        public Thread timeoutThread;
+        Thread timeoutThread;
 
-        public void TimeoutThread()
+        public TimeoutHandler()
+        {
+            timeoutThread = new Thread(TimeoutThread) { IsBackground = true };
+            timeoutThread.Start();
+        } 
+
+        void TimeoutThread()
         {
             int waitmilliseconds = 100;
             while (true)
@@ -26,7 +32,7 @@ namespace Succubus.Core
                 {
                     waitmilliseconds = -1;
                     foreach (var entry in sortedTimeoutSynchronizationContexts)
-                    {                  
+                    {
                         var timespan = TimeSpan.FromTicks(entry.Key - DateTime.Now.Ticks);
                         var comparison = timespan.CompareTo(new TimeSpan(0, 0, 0));
                         if (comparison == 1)
@@ -61,7 +67,7 @@ namespace Succubus.Core
             }
         }
 
-        internal Int64 Timeout(Value context, int milliseconds)
+        public Int64 Timeout(Value context, int milliseconds)
         {
             var timespan = TimeSpan.FromMilliseconds(milliseconds);
             var timeoutDateTime = DateTime.Now + timespan;
@@ -75,7 +81,7 @@ namespace Succubus.Core
                 {
                     timeoutTick++;
                 }
-                sortedTimeoutSynchronizationContexts.Add(timeoutTick, context);            
+                sortedTimeoutSynchronizationContexts.Add(timeoutTick, context);
             }
             timeoutResetEvent.Set();
             return timeoutTick;
@@ -90,8 +96,8 @@ namespace Succubus.Core
                 {
                     foreach (var key in keys)
                     {
-                        sortedTimeoutSynchronizationContexts.Remove(key);    
-                    }                    
+                        sortedTimeoutSynchronizationContexts.Remove(key);
+                    }
                     timeoutContexts.Remove(correlationId);
                 }
             }

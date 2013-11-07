@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
+using Succubus.Collections;
 using Succubus.Interfaces.ResponseContexts;
 using Succubus.Serialization;
 using System;

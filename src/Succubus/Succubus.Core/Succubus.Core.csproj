@@ -55,7 +55,6 @@
     <Compile Include="Bus\Bus.Subscriber.cs" />
     <Compile Include="Bus\Bus.Synchronization.cs" />
     <Compile Include="Bus\Bus.TimeoutHandler.cs" />
-    <Compile Include="Bus\TimeoutHandler.cs" />
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\JsonFrame.cs" />
