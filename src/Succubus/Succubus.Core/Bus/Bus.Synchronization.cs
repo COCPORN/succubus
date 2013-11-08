@@ -127,7 +127,7 @@ namespace Succubus.Core
             var synchronizedRequest = FrameSynchronously(request);
 
             SynchronizationContext ctx = InstantiatePrototype(request, timeoutHandler, timeout, synchronizedRequest.CorrelationId);
-            ctx.Request = request;
+            if (ctx != null) ctx.Request = request;
 
             ObjectPublish(synchronizedRequest);
             return synchronizedRequest.CorrelationId;

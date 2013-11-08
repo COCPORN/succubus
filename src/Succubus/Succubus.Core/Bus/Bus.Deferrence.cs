@@ -266,14 +266,30 @@ namespace Succubus.Core
         {
 
             SynchronizationContext ctx = null;
+            bool setupWaithandle = false;
             lock (synchronizationContexts)
             {
                 if (synchronizationContexts.TryGetValue(correlationId, out ctx) == false)
                 {
-                    throw new InvalidOperationException("Unknown context");
+                    setupWaithandle = true;
                 }
             }
-            ctx.DeferredResetEvent.WaitOne(6000);
+            if (setupWaithandle)
+            {
+                lock (deferredWaitHandles)
+                {
+                    var mre = new ManualResetEvent(false);
+                    deferredWaitHandles.Add(correlationId, mre);
+                    if (mre.WaitOne(6000) == false)
+                    {
+                        throw new InvalidOperationException("Unable to find context");
+                    }
+                }
+            }
+            if (ctx.DeferredResetEvent.WaitOne(6000) == false)
+            {
+                throw new InvalidOperationException("Context unsatisfied");
+            }
             return ctx;
         }
 
@@ -289,9 +305,8 @@ namespace Succubus.Core
         public IResponseContext Pickup<TReq, T>(Guid correlationId, Action<TReq, T> handler) where TReq : class
         {
             if (handler == null) throw new ArgumentException("Pickup needs a handler");
-            Type t = typeof (TReq);
             var ctx = GetSynchronizationContext<TReq>(correlationId);
-            handler((TReq)ctx.Request, (T)ctx.responses[typeof(T)]);
+            handler((TReq)ctx.Request, (T)ctx.castMessages[typeof(T)]);
             RemoveContext(correlationId);
             return new ResponseContext(this);
         }

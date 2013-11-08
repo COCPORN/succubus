@@ -81,7 +81,18 @@ namespace Succubus.Core
                         {
                             ctx = InstantiatePrototype(message, null, 60000, synchronousFrame.CorrelationId);
                             if (ctx != null)
-                            ctx.Request = message;
+                            {
+                                ctx.Request = message;
+                                
+                                lock (deferredWaitHandles)
+                                {
+                                    ManualResetEvent handle = null;
+                                    if (deferredWaitHandles.TryGetValue(synchronousFrame.CorrelationId, out handle))
+                                    {
+                                        handle.Set();
+                                    }
+                                }
+                            }
                             else throw new InvalidOperationException("Unable to instantiate context from prototype");
                         }
                     }

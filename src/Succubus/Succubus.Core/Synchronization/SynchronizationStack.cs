@@ -50,22 +50,23 @@ namespace Succubus
                 {
                     ctx.responses.Add(message.GetType(), message);
                 }
-                Dictionary<Type, object> castMessages = null;
-                if (frame.Satisfies(ctx.responses, out castMessages))
+           
+                if (frame.Satisfies(ctx.responses, out ctx.castMessages))
                 {
+                 
                     SynchronizationFrame localFrame = frame;
                     Task.Factory.StartNew(() =>
                     {
                         switch (ctx.ContextType)
                         {
                             case ContextType.Transient:
-                                localFrame.CallHandler(castMessages);
+                                localFrame.CallHandler(ctx.castMessages);
                                 break;
                             case ContextType.Static:
-                                localFrame.CallStaticHandler(castMessages);
+                                localFrame.CallStaticHandler(ctx.castMessages);
                                 break;
                             case ContextType.Deferred:
-                                localFrame.CallDeferredHandler(castMessages);
+                                localFrame.CallDeferredHandler(ctx.castMessages);
                                 break;
                         }
                     

@@ -26,6 +26,7 @@ namespace Succubus.Bus.Tests
             bus.ReplyTo<ChildRequest, ChildBase>(req => new ChildResponse1 { Message = "FROM SERVER: " + req.Message });
 
             bus.Defer<BasicRequest, BasicResponse>();
+            bus.Defer<ChildRequest, ChildBase>();
         }
 
 
@@ -52,6 +53,7 @@ namespace Succubus.Bus.Tests
 
             bus2.Defer<BasicRequest, BasicResponse>();
 
+   
             var id = bus.Call(new BasicRequest() { Message = "Double deferrence" });
 
             bus.Pickup<BasicRequest, BasicResponse>(id, (req, res) =>
@@ -63,17 +65,21 @@ namespace Succubus.Bus.Tests
             {
                 Assert.AreEqual("FROM SERVER: " + request.Message, response.Message);
             });
+
+    
         }
 
         [Test]
-        public void REENABLE_BaseClassDeferrence()
+        public void BaseClassDeferrence()
         {
 
-            return;
             var id = bus.Call(new ChildRequest() { Message = "wh00t" });
 
             bus.Pickup<ChildRequest, ChildBase>(id, (req, res) =>
             {
+                Assert.AreEqual("wh00t", req.Message);
+                Assert.AreEqual(typeof(ChildRequest), req.GetType());
+                Assert.AreEqual("FROM SERVER: wh00t", res.Message);
                 Assert.AreEqual(typeof(ChildResponse1), res.GetType());
             });
         }

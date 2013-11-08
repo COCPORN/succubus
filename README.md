@@ -292,7 +292,7 @@ bus.OnReply<UpdateRequest,
 	
 ```
 
-### Deferrence (0.3)
+### Deferrence 
 
 Succubus supports deferring message handling. This is convenient when you are doing synchronous processing, but the response set needs to be handled in another context than where the request was posted.
 
@@ -314,6 +314,8 @@ bus.Pickup<BasicRequest, BasicResponse>(cId, (req, res) =>
 ```
 
 The call to `Pickup` will _block_. Also, deferred calls will by default be held for one minute, or be removed from the bus as soon as they are picked up.
+
+Not that you can defer calls _across bus instances_ and it will still work correctly.
 
 
 Workload management

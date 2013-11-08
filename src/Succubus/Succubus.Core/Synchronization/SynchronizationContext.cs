@@ -47,7 +47,8 @@ namespace Succubus
 
         public List<SynchronizationStack> Stacks;     
 
-        internal Dictionary<Type, object> responses = new Dictionary<Type, object>();        
+        internal Dictionary<Type, object> responses = new Dictionary<Type, object>();
+        internal Dictionary<Type, object> castMessages = null;
 
         public object Request { get; set; }
 

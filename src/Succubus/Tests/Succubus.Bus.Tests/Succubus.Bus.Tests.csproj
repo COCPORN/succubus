@@ -51,10 +51,12 @@
     <Compile Include="Messages\BasicResponse.cs" />
     <Compile Include="Messages\ChildMessages.cs" />
     <Compile Include="Messages\ComplexOrchestrationMessages.cs" />
+    <Compile Include="Messages\Routing.cs" />
     <Compile Include="Messages\StaticRequest.cs" />
     <Compile Include="Messages\StaticResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestResponse.cs" />
+    <Compile Include="Routing.cs" />
     <Compile Include="Timeout.cs" />
   </ItemGroup>
   <ItemGroup>
