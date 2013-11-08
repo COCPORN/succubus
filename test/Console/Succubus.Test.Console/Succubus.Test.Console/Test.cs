@@ -7,6 +7,9 @@ namespace SuccubusTest.Console
 {
     internal class Test
     {
+
+     
+
         public async void Run()
         {
             IBus bus = new Bus();
@@ -24,17 +27,13 @@ namespace SuccubusTest.Console
 
             Thread.Sleep(1000);
 
-            // SETUP ReplyTo-HANDLERS
+            // SETUP ReplyTo-HANDLERS            
 
-            bus.ReplyTo<BasicRequest, BasicResponse>(req =>
+            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
-                Thread.Sleep(100);
-                return new BasicResponse
-                {
-
-                    Message = "Reply from server: " + req.Message
-                };
+                Message = "Reply from server: " + req.Message
             });
+
 
             int child = 0;
 
@@ -129,7 +128,7 @@ namespace SuccubusTest.Console
             // Blocking transient route
 
 
-            var asyncres = bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Async call to bus" });
+            var asyncres =  bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Async call to bus" });
             BasicResponse res =
                 bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Blocking transient call" });
 
