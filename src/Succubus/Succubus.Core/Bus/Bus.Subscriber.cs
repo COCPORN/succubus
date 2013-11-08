@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Succubus.Hosting;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,9 @@ namespace Succubus.Core
     {
         ManualResetEvent subscriberOnline = new ManualResetEvent(false);
         bool run = true;
+        private HashSet<Type> deferredResponseTypes = new HashSet<Type>();
+        private HashSet<Type> deferredRequestTypes = new HashSet<Type>(); 
+
         void Subscriber()
         {
             try
@@ -56,13 +60,13 @@ namespace Succubus.Core
         {
             Type type = Type.GetType(synchronousFrame.EmbeddedType);
             object message = JsonFrame.Deserlialize(synchronousFrame.Message, type);
-            
+
             ProcessReplyHandlers(synchronousFrame, type, message);
 
-            SynchronizationContext ctx = ProcessSynchronousHandlers(synchronousFrame, message);            
+            SynchronizationContext ctx = ProcessSynchronousHandlers(synchronousFrame, message);
         }
 
-      
+
 
         private SynchronizationContext ProcessSynchronousHandlers(SynchronousMessageFrame synchronousFrame, object message)
         {
@@ -71,6 +75,17 @@ namespace Succubus.Core
             lock (synchronizationContexts)
             {
                 synchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx);
+                if (ctx == null)
+                {
+                    lock (deferredRequestTypes)
+                    {
+                        if (deferredRequestTypes.Contains(message.GetType()))
+                        {
+                            ctx = InstantiatePrototype(message, null, 60000, synchronousFrame.CorrelationId);
+                            ctx.Request = message;
+                        }
+                    }
+                }
             }
             if (ctx != null)
             {
@@ -87,10 +102,14 @@ namespace Succubus.Core
                             }
                         }
                     }
-                }                
-                catch { }
 
+                }
+                catch
+                {
+                }
             }
+
+
             return ctx;
         }
 
@@ -113,7 +132,7 @@ namespace Succubus.Core
                         {
                             var response = handler(message);
                             var framedResponse = FrameResponseSynchronously(synchronousFrame, response, synchronousFrame.CorrelationId);
-                            ObjectPublish(framedResponse);                            
+                            ObjectPublish(framedResponse);
                         });
                     }
                 }

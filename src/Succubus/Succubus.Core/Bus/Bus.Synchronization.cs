@@ -71,7 +71,8 @@ namespace Succubus.Core
                 Message = JsonFrame.Serialize(o),
                 CorrelationId = guid ?? Guid.NewGuid(),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-                RequestType = request.RequestType
+                RequestType = request.RequestType,
+                Request = o
             };
         }
 
@@ -125,22 +126,32 @@ namespace Succubus.Core
         {
             var synchronizedRequest = FrameSynchronously(request);
 
-            SynchronizationContext prototype;
+            SynchronizationContext ctx = InstantiatePrototype(request, timeoutHandler, timeout, synchronizedRequest.CorrelationId);
+            ctx.Request = request;
 
+            ObjectPublish(synchronizedRequest);
+            return synchronizedRequest.CorrelationId;
+        }
+
+        private SynchronizationContext InstantiatePrototype<TReq>(TReq request, Action<TReq> timeoutHandler, int timeout,
+            Guid correlationId)
+        {
+            SynchronizationContext prototype;
+            Console.WriteLine("Typeof: {0}/{1}", typeof (TReq), request != null ? request.GetType().ToString() : "request is null");
             lock (staticSynchronizationPrototypes)
             {
-                staticSynchronizationPrototypes.TryGetValue(typeof(TReq), out prototype);
+                staticSynchronizationPrototypes.TryGetValue(request.GetType(), out prototype);
+                Console.WriteLine("Found prototype");
             }
             if (prototype != null)
             {
                 //var synchronizationContext = Serialization.ObjectCopier.Clone(prototype);
                 var synchronizationContext = SynchronizationContext.Clone(prototype);
-                synchronizationContext.Request = request;
+       
                 if (timeout != 0)
                 {
-
                     if (timeoutHandler != null) synchronizationContext.SetTimeoutHandler(timeoutHandler);
-                    synchronizationContext.CorrelationId = synchronizedRequest.CorrelationId;
+                    synchronizationContext.CorrelationId = correlationId;
 
                     this.timeoutHandler.Timeout(synchronizationContext, timeout);
                 }
@@ -161,18 +172,17 @@ namespace Succubus.Core
                 {
                     foreach (var frame in stack.Frames)
                     {
-                        frame.CorrelationId = synchronizedRequest.CorrelationId;
+                        frame.CorrelationId = correlationId;
                         frame.Request = request;
                     }
                 }
                 lock (synchronizationContexts)
                 {
-                    synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+                    synchronizationContexts.Add(correlationId, synchronizationContext);
                 }
+                return synchronizationContext;
             }
-
-            ObjectPublish(synchronizedRequest);
-            return synchronizedRequest.CorrelationId;
+            return null;
         }
 
         #endregion

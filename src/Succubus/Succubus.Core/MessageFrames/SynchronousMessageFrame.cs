@@ -10,6 +10,8 @@ namespace Succubus.Core
 
         public string RequestType { get; set; }
 
+        public object Request { get; set; }
+
         public string ParentType { get; set; }
 
         public string Message { get; set; }
