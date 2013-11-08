@@ -11,15 +11,21 @@ namespace Succubus
 
         SynchronizationContext ctx;
 
-        internal SynchronizationContext Context { get { return ctx; } }
-
         public SynchronizationStack(SynchronizationContext ctx)
         {
             Frames = new List<SynchronizationFrame>();
             this.ctx = ctx;
         }
 
-   
+        internal SynchronizationStack CloneFor(SynchronizationContext ctx)
+        {
+            SynchronizationStack stack = new SynchronizationStack(ctx);
+            foreach (var frame in Frames)
+            {
+                stack.Frames.Add(frame.Clone());
+            }
+            return stack;
+        }
         
         public bool ResolveFor(object message)
         {
@@ -33,34 +39,36 @@ namespace Succubus
                     continue;
                 }
 
-                if (frame.CanHandle(message.GetType()) == false)
+                if (frame.CanHandle(message) == false)
                 {
                     unresolvedFrames = true;
                     continue;
                 }
-                else
-                {
-                    ctx.types.Add(message.GetType());
-                }
+              
 
                 if (ctx.responses.ContainsKey(message.GetType()) == false)
                 {
                     ctx.responses.Add(message.GetType(), message);
                 }
-
-                if (frame.Satisfies(ctx.types))
+                Dictionary<Type, object> castMessages = null;
+                if (frame.Satisfies(ctx.responses, out castMessages))
                 {
                     SynchronizationFrame localFrame = frame;
                     Task.Factory.StartNew(() =>
                     {
-                        if (ctx.Static == false)
+                        switch (ctx.ContextType)
                         {
-                            localFrame.CallHandler(ctx.responses);
+                            case ContextType.Transient:
+                                localFrame.CallHandler(castMessages);
+                                break;
+                            case ContextType.Static:
+                                localFrame.CallStaticHandler(castMessages);
+                                break;
+                            case ContextType.Deferred:
+                                localFrame.CallDeferredHandler(castMessages);
+                                break;
                         }
-                        else
-                        {
-                            localFrame.CallStaticHandler(ctx.responses);
-                        }
+                    
                     });
                     frame.Resolved = true;
                 }

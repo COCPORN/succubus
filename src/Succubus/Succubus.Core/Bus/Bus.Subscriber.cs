@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
@@ -53,10 +54,10 @@ namespace Succubus.Core
 
         private void ProcessSynchronousMessages(SynchronousMessageFrame synchronousFrame)
         {
-            Type type = Type.GetType(synchronousFrame.EmbeddedType);            
+            Type type = Type.GetType(synchronousFrame.EmbeddedType);
             object message = JsonFrame.Deserlialize(synchronousFrame.Message, type);
-
-            ProcessReplies(synchronousFrame, type, message);
+            
+            ProcessReplyHandlers(synchronousFrame, type, message);
 
             SynchronizationContext ctx = ProcessSynchronousHandlers(synchronousFrame, message);            
         }
@@ -77,10 +78,13 @@ namespace Succubus.Core
                 {
                     if (ctx.ResolveFor(message) == true)
                     {
-                        lock (synchronizationContexts)
+                        if (ctx.ContextType != ContextType.Deferred)
                         {
-                            synchronizationContexts.Remove(synchronousFrame.CorrelationId);
-                            RemoveTimeout(synchronousFrame.CorrelationId);
+                            lock (synchronizationContexts)
+                            {
+                                synchronizationContexts.Remove(synchronousFrame.CorrelationId);
+                                timeoutHandler.RemoveTimeout(synchronousFrame.CorrelationId);
+                            }
                         }
                     }
                 }                
@@ -90,7 +94,7 @@ namespace Succubus.Core
             return ctx;
         }
 
-        private void ProcessReplies(SynchronousMessageFrame synchronousFrame, Type type, object message)
+        private void ProcessReplyHandlers(SynchronousMessageFrame synchronousFrame, Type type, object message)
         {
             List<Func<object, object>> handlers = null;
 

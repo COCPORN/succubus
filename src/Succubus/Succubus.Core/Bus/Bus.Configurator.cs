@@ -38,40 +38,24 @@ namespace Succubus.Core
 
         public string MessageHostPublishAddress
         {
-            get
-            {
-                if (messageHost != null)
-                {
-                    return messageHost.PublishAddress;
-                }
-                else return null;
-            }
-            set
-            {
-                if (messageHost != null)
-                {
-                    messageHost.PublishAddress = value;
-                }
-            }
+            get; set; 
         }
 
         public string MessageHostSubscribeAddress
         {
-            get
-            {
-                if (messageHost != null)
-                {
-                    return messageHost.SubscribeAddress;
-                }
-                else return null;
-            }
-            set
-            {
-                if (messageHost != null)
-                {
-                    messageHost.SubscribeAddress = value;
-                }
-            }
+            get; set;
+        }
+
+
+        public void ConfigureForTesting()
+        {
+            StartMessageHost = true;
+            //MessageHostPublishAddress = "inproc://mh-pub";
+            //MessageHostSubscribeAddress = "inproc://mh-sub";
+            //PublishAddress = MessageHostSubscribeAddress;
+            //SubscribeAddress =  MessageHostPublishAddress;
+            //messageHost = new MessageHost();
+            //(messageHost as MessageHost).Context = this.Context;
         }
     }
 }

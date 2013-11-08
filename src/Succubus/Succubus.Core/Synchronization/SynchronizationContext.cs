@@ -2,19 +2,50 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
+using System.Threading;
+using Succubus.Collections.Interfaces;
 
 namespace Succubus
 {
-    [Serializable]
-    class SynchronizationContext
+    enum ContextType
     {
-        public bool Static { get; set; }
+        Transient,
+        Static,
+        Deferred
+    }
+
+
+    [Serializable]
+    class SynchronizationContext : IExpiring<Guid>
+    {
+
+        
+        public static SynchronizationContext Clone(SynchronizationContext context)
+        {
+            var newContext = new SynchronizationContext();
+            newContext.CorrelationId = context.CorrelationId;      
+            newContext.Request = context.Request;
+            newContext.ContextType = context.ContextType;
+            newContext.TimedOut = context.TimedOut;
+            newContext.TimeoutMilliseconds = context.TimeoutMilliseconds;
+
+            foreach (var stack in context.Stacks)
+            {
+                newContext.Stacks.Add(stack.CloneFor(newContext));
+            }
+
+
+            return newContext;
+
+        }
+
+        public ContextType ContextType { get; set; }
+        public ManualResetEvent DeferredResetEvent { get; set; }
 
         public Guid CorrelationId { get; set; }
+        public Guid Id { get { return CorrelationId; } }
 
-        public List<SynchronizationStack> Stacks;
-
-        internal HashSet<Type> types = new HashSet<Type>();
+        public List<SynchronizationStack> Stacks;     
 
         internal Dictionary<Type, object> responses = new Dictionary<Type, object>();        
 
@@ -23,12 +54,12 @@ namespace Succubus
         public SynchronizationContext()
         {
             Stacks = new List<SynchronizationStack>();
+            DeferredResetEvent = new ManualResetEvent(false);
         }
-
 
         public bool TimedOut { get; set; }
 
-        internal Action TimeoutHandler;
+        public Action TimeoutHandler { get; set; }
 
         public void SetTimeoutHandler<T>(Action<T> timeoutHandler)
         {

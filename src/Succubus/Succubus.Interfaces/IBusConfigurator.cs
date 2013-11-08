@@ -23,6 +23,12 @@ namespace Succubus.Interfaces
         #region Configuration sources
         void GetFromConfigurationFile();
         #endregion
-        
+
+        #region Testing
+
+        void ConfigureForTesting();
+
+        #endregion
+
     }
 }

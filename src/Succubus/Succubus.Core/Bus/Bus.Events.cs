@@ -35,7 +35,7 @@ namespace Succubus.Core
 
                 handlers.Add(myHandler);
             }
-            return new ResponseContext(this);
+            return new Bus.ResponseContext(this);
         }
 
         private void ProcessEvents(EventMessageFrame eventFrame)
@@ -59,7 +59,7 @@ namespace Succubus.Core
             {
                 foreach (var eventHandler in handlers)
                 {
-                    Action<object> handler = eventHandler;
+                    var handler = eventHandler;
                     Task.Factory.StartNew(() => handler(message));
                 }
             }

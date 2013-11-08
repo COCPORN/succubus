@@ -14,7 +14,10 @@ namespace SuccubusTest.Console
         {
             IBus bus = new Bus();
             IBus bus2 = new Bus();
-            bus2.Initialize();
+            bus2.Initialize(succubus =>
+            {
+             
+            });
 
             bus2.On<BasicEvent>(e => System.Console.WriteLine("Bus2::On<BasicEvent>: {0}", e.Message));
 
@@ -27,7 +30,23 @@ namespace SuccubusTest.Console
 
             Thread.Sleep(1000);
 
+<<<<<<< HEAD
             // SETUP ReplyTo-HANDLERS            
+=======
+
+            //ManualResetEvent mre = new ManualResetEvent(false);
+            //bus.OnReply<BasicRequest, BasicResponse>((req, res) =>
+            //{
+            //    ;
+            //    mre.Set();
+            //});
+            //bus.Call(new BasicRequest { Message = "Hello" });
+            //mre.WaitOne(1500);
+
+
+            //return;
+            // SETUP ReplyTo-HANDLERS
+>>>>>>> 81900b4ba56bd9a3e60b0a0bb4bc6539b6d10b81
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
@@ -88,10 +107,11 @@ namespace SuccubusTest.Console
                 response.Message));
 
 
-            // MAKE CALLS
+            //// MAKE CALLS
 
-            bus.Call(new Request1 { Message = "STATIC Request1" });
+            //bus.Call(new Request1 { Message = "STATIC Request1" });
 
+            bus.Call(new BasicRequest {Message = "MAKE SPECIAL NOTE OF ME!"});
             bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 1" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 10);
             bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 2" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 145);
             bus.Call(new BasicRequest { Message = "TIMEOUTTEST BasicRequest 3" }, (req) => System.Console.WriteLine("Call timed out! {0}", req.Message), 1000);
@@ -128,11 +148,16 @@ namespace SuccubusTest.Console
             // Blocking transient route
 
 
+<<<<<<< HEAD
             var asyncres =  bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Async call to bus" });
             BasicResponse res =
+=======
+            var asyncres = bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Async call to bus" });
+            BasicResponse result =
+>>>>>>> 81900b4ba56bd9a3e60b0a0bb4bc6539b6d10b81
                 bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Blocking transient call" });
 
-            System.Console.WriteLine("Got a response from a blocking transient call: {0}", res.Message);
+            System.Console.WriteLine("Got a response from a blocking transient call: {0}", result.Message);
             System.Console.WriteLine("Got a response from an async transient call: {0}", (await asyncres).Message);
 
 
