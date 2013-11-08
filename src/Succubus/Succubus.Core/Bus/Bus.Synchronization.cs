@@ -137,11 +137,10 @@ namespace Succubus.Core
             Guid correlationId)
         {
             SynchronizationContext prototype;
-            Console.WriteLine("Typeof: {0}/{1}", typeof (TReq), request != null ? request.GetType().ToString() : "request is null");
+            
             lock (staticSynchronizationPrototypes)
             {
                 staticSynchronizationPrototypes.TryGetValue(request.GetType(), out prototype);
-                Console.WriteLine("Found prototype");
             }
             if (prototype != null)
             {

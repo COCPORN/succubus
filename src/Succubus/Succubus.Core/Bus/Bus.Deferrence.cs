@@ -9,6 +9,9 @@ namespace Succubus.Core
 {
     public partial class Bus
     {
+        private readonly HashSet<Type> deferredResponseTypes = new HashSet<Type>();
+        private readonly HashSet<Type> deferredRequestTypes = new HashSet<Type>(); 
+
         void AddToDeferredResponseTypes(params Type[] types)
         {
             lock (deferredResponseTypes)
@@ -95,6 +98,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
+            AddToDeferredRequestTypes(typeof(TReq));
             AddToDeferredResponseTypes(typeof(T1), typeof(T2));
 
             return new Bus.ResponseContext(this);
@@ -125,6 +129,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
+            AddToDeferredRequestTypes(typeof(TReq));
             AddToDeferredResponseTypes(typeof(T1), typeof(T2), typeof(T3));
 
             return new Bus.ResponseContext(this);
@@ -155,6 +160,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
+            AddToDeferredRequestTypes(typeof(TReq));
             AddToDeferredResponseTypes(typeof(T1), typeof(T2), typeof(T3), typeof(T4));
 
             return new Bus.ResponseContext(this);
@@ -185,6 +191,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
+            AddToDeferredRequestTypes(typeof(TReq));
             AddToDeferredResponseTypes(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
 
             return new Bus.ResponseContext(this);
@@ -215,6 +222,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
+            AddToDeferredRequestTypes(typeof(TReq));
             AddToDeferredResponseTypes(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
 
             return new Bus.ResponseContext(this);
@@ -246,6 +254,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
+            AddToDeferredRequestTypes(typeof(TReq));
             AddToDeferredResponseTypes(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
 
             return new Bus.ResponseContext(this);

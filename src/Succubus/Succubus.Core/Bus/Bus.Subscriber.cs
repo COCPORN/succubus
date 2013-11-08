@@ -14,8 +14,7 @@ namespace Succubus.Core
     {
         ManualResetEvent subscriberOnline = new ManualResetEvent(false);
         bool run = true;
-        private HashSet<Type> deferredResponseTypes = new HashSet<Type>();
-        private HashSet<Type> deferredRequestTypes = new HashSet<Type>(); 
+
 
         void Subscriber()
         {
@@ -49,8 +48,7 @@ namespace Succubus.Core
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Subscriber caught exception: {0}", ex.ToString());
-                Console.ReadLine();
+
             }
         }
 
@@ -82,7 +80,9 @@ namespace Succubus.Core
                         if (deferredRequestTypes.Contains(message.GetType()))
                         {
                             ctx = InstantiatePrototype(message, null, 60000, synchronousFrame.CorrelationId);
+                            if (ctx != null)
                             ctx.Request = message;
+                            else throw new InvalidOperationException("Unable to instantiate context from prototype");
                         }
                     }
                 }
