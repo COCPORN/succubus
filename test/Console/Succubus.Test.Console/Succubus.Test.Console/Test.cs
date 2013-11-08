@@ -30,6 +30,22 @@ namespace SuccubusTest.Console
 
             Thread.Sleep(1000);
 
+<<<<<<< HEAD
+=======
+
+            //ManualResetEvent mre = new ManualResetEvent(false);
+            //bus.OnReply<BasicRequest, BasicResponse>((req, res) =>
+            //{
+            //    ;
+            //    mre.Set();
+            //});
+            //bus.Call(new BasicRequest { Message = "Hello" });
+            //mre.WaitOne(1500);
+
+
+            //return;
+            // SETUP ReplyTo-HANDLERS
+>>>>>>> 81900b4ba56bd9a3e60b0a0bb4bc6539b6d10b81
 
             //ManualResetEvent mre = new ManualResetEvent(false);
             //bus.OnReply<BasicRequest, BasicResponse>((req, res) =>
@@ -146,7 +162,10 @@ namespace SuccubusTest.Console
 
             var asyncres = bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Async call to bus" });
             BasicResponse result =
+<<<<<<< HEAD
 
+=======
+>>>>>>> 81900b4ba56bd9a3e60b0a0bb4bc6539b6d10b81
                 bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Blocking transient call" });
 
             System.Console.WriteLine("Got a response from a blocking transient call: {0}", result.Message);
