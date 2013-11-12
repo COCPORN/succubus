@@ -11,7 +11,7 @@ using Succubus.Interfaces;
 namespace Succubus.Bus.Tests
 {
     [TestFixture]
-    public class Deferrence
+    public class Deferral
     {
         private Core.Bus bus;
 
@@ -25,8 +25,8 @@ namespace Succubus.Bus.Tests
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse { Message = "FROM SERVER: " + req.Message });
             bus.ReplyTo<ChildRequest, ChildBase>(req => new ChildResponse1 { Message = "FROM SERVER: " + req.Message });
 
-            bus.Defer<BasicRequest, BasicResponse>();
-            bus.Defer<ChildRequest, ChildBase>();
+           // bus.Defer<BasicRequest, BasicResponse>();
+           // bus.Defer<ChildRequest, ChildBase>();
         }
 
 
@@ -68,6 +68,46 @@ namespace Succubus.Bus.Tests
 
     
         }
+
+        [Test]
+        public void UnknownId()
+        {
+            try
+            {
+                bus.Pickup<BasicRequest, BasicResponse>(Guid.NewGuid(), (req, res) =>
+                {
+                    Assert.Fail("This shouldn't happen");
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.AreEqual("Unable to find context", ex.Message);
+            }    
+        }
+
+    
+
+        [Test]
+        public void UnresolvedDeferral()
+        {
+
+            try
+            {
+                bus.Defer<BasicRequest, BasicResponse>();
+                var id = bus.Call(new BasicRequest { Message = "You will never be satisfied, context" });
+                bus.Pickup<BasicRequest, ChildResponse1>(id, (req, res) =>
+                {
+                    Assert.Fail("This shouldn't happen");
+                });
+               
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.AreEqual("Context unsatisfied", ex.Message);             
+            }
+        }
+
+           
 
         [Test]
         public void BaseClassDeferrence()

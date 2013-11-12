@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Deferrence.cs" />
+    <Compile Include="Deferral.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="Messages\BasicEvent.cs" />
     <Compile Include="Messages\BasicRequest.cs" />

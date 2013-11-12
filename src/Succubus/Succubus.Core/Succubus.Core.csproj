@@ -80,7 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bus\Bus.Singleton.cs" />
-    <Compile Include="Bus\Bus.Deferrence.cs" />
+    <Compile Include="Bus\Bus.Deferral.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

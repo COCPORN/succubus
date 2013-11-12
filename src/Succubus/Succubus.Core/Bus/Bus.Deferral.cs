@@ -10,7 +10,9 @@ namespace Succubus.Core
     public partial class Bus
     {
         private readonly HashSet<Type> deferredResponseTypes = new HashSet<Type>();
-        private readonly HashSet<Type> deferredRequestTypes = new HashSet<Type>(); 
+
+        private readonly HashSet<Type> deferredRequestTypes =
+            new HashSet<Type>(); 
 
         void AddToDeferredResponseTypes(params Type[] types)
         {
@@ -26,17 +28,16 @@ namespace Succubus.Core
             }
         }
 
-        void AddToDeferredRequestTypes(params Type[] types)
+        void AddToDeferredRequestTypes(Type type)
         {
             lock (deferredRequestTypes)
             {
-                foreach (var type in types)
-                {
+              
                     if (deferredRequestTypes.Contains(type) == false)
                     {
                         deferredRequestTypes.Add(type);
                     }
-                }
+               
             }
         }
 
@@ -50,6 +51,10 @@ namespace Succubus.Core
                     if (synchronizationContexts.TryGetValue(guid, out ctx))
                     {
                         ctx.DeferredResetEvent.Set();
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Unable to get synchronization context");
                     }
                 }
             };
@@ -65,7 +70,7 @@ namespace Succubus.Core
             synchronizationStack.Frames.Add(synchronizationFrame);
             synchronizationContext.Stacks.Add(synchronizationStack);
 
-            AddToDeferredRequestTypes(typeof (TReq));
+            AddToDeferredRequestTypes(typeof(TReq));
             AddToDeferredResponseTypes(typeof(TRes));
 
             return new Bus.ResponseContext(this);
@@ -260,9 +265,9 @@ namespace Succubus.Core
             return new Bus.ResponseContext(this);
         }
 
-        Dictionary<Guid, ManualResetEvent> deferredWaitHandles = new Dictionary<Guid, ManualResetEvent>(); 
+        Dictionary<Guid, ManualResetEvent> deferredWaitHandles = new Dictionary<Guid, ManualResetEvent>();
 
-        private SynchronizationContext GetSynchronizationContext<TReq>(Guid correlationId) where TReq: class
+        private SynchronizationContext GetSynchronizationContext<TReq>(Guid correlationId) where TReq : class
         {
 
             SynchronizationContext ctx = null;
@@ -283,6 +288,13 @@ namespace Succubus.Core
                     if (mre.WaitOne(6000) == false)
                     {
                         throw new InvalidOperationException("Unable to find context");
+                    }
+                    lock (synchronizationContexts)
+                    {
+                        if (synchronizationContexts.TryGetValue(correlationId, out ctx) == false)
+                        {
+                            throw new InvalidOperationException("Unable to find context after signal");
+                        }
                     }
                 }
             }
