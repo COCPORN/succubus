@@ -49,8 +49,15 @@ namespace Succubus.Core
             List<Action<object>> handlers = null;
 
             lock (eventHandlers)
-            {
-                eventHandlers.TryGetValue(eventType, out handlers);
+            {         
+                while (eventType != null)
+                {
+                    if (eventHandlers.TryGetValue(eventType, out handlers))
+                    {
+                        break;
+                    }
+                    eventType = eventType.BaseType;                  
+                }
             }
 
             // TODO: This has a potential race condition in where

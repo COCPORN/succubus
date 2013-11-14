@@ -16,6 +16,7 @@ namespace Succubus.Bus.Tests
             bus = new Core.Bus();
 
             bus.Initialize(succubus => succubus.ConfigureForTesting());
+            Thread.Sleep(1500);
         }
 
         [Test]
@@ -41,6 +42,24 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual(1, counter);
         }
 
+ 
+        [Test]      
+        public void InheritedEvent()
+        {
+            ManualResetEvent mre = new ManualResetEvent(false);
+
+            bus.On<ParentEvent>(ev =>
+            {
+                mre.Set();
+            });
+            bus.Publish(new ChildEvent() { Message = "Child calling" });
+            if (mre.WaitOne(500) == false)
+            {
+                Assert.Fail("Timeout waiting for event");
+
+            }
+            
+        }
 
     }
 }
