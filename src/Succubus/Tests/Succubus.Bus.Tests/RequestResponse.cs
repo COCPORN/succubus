@@ -20,6 +20,8 @@ namespace Succubus.Bus.Tests
 
             bus.Initialize(succubus => succubus.ConfigureForTesting());
 
+            Thread.Sleep(1500);
+
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
                 Message = req.Message
@@ -179,11 +181,11 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ChildMessages3_HandlingOfBaseClassResponse()
         {
-            var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, 1000);
+            var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, 10000);
             Assert.AreEqual("Child1", response.Message);
             Assert.AreEqual(typeof(ChildResponse1), response.GetType());
 
-            var response2 = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child2" }, 1000);
+            var response2 = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child2" }, 10000);
             Assert.AreEqual("Child2", response2.Message);
             Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
         }
