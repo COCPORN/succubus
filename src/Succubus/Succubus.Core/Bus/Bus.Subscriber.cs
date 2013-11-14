@@ -37,6 +37,7 @@ namespace Succubus.Core
                         if (synchronousFrame != null)
                         {
                             ProcessSynchronousMessages(synchronousFrame);
+                            ProcessCatchAllEvents(synchronousFrame);
                         }
                         else if (eventFrame != null)
                         {

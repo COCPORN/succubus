@@ -49,16 +49,48 @@ namespace Succubus.Core
             List<Action<object>> handlers = null;
 
             lock (eventHandlers)
-            {         
+            {
                 while (eventType != null)
                 {
                     if (eventHandlers.TryGetValue(eventType, out handlers))
                     {
                         break;
                     }
-                    eventType = eventType.BaseType;                  
+                    eventType = eventType.BaseType;
                 }
             }
+
+            // TODO: This has a potential race condition in where
+            // handlers are added to/subtracted from while iterating on it
+            if (handlers != null)
+            {
+                foreach (var eventHandler in handlers)
+                {
+                    var handler = eventHandler;
+                    Task.Factory.StartNew(() => handler(message));
+                }
+            }
+        }
+
+        private void ProcessCatchAllEvents(SynchronousMessageFrame eventFrame)
+        {
+            List<Action<object>> handlers = null;
+
+            lock (eventHandlers)
+            {
+
+                if (eventHandlers.TryGetValue(typeof(object), out handlers) == false)
+                {
+                    return;
+                }
+
+            }
+
+            Type type = Type.GetType(eventFrame.EmbeddedType);
+            Type messageType = Type.GetType(eventFrame.EmbeddedType);
+            object message = JsonFrame.Deserlialize(eventFrame.Message, type);
+
+            if (type == null || messageType == null || message == null) return;
 
             // TODO: This has a potential race condition in where
             // handlers are added to/subtracted from while iterating on it

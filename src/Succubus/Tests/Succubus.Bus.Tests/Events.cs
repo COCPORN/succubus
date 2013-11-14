@@ -61,5 +61,41 @@ namespace Succubus.Bus.Tests
             
         }
 
+        [Test]
+        public void ReqResAsEvents()
+        {
+            int counter = 0;
+            ManualResetEvent mre = new ManualResetEvent(false);
+            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+            {
+                Message = req.Message
+            });
+            bus.On<object>(ev =>
+            {
+                if (ev is BasicRequest 
+                    || ev is BasicResponse)
+                {
+                    counter++;
+                    
+                }
+                if (counter == 2)
+                {
+                    mre.Set();
+                }
+            });
+
+            var response = bus.Call<BasicRequest, BasicResponse>(new BasicRequest() { Message = "Testing eventing of synchronous messages" });
+            if (mre.WaitOne(500) == false)
+            {
+                Assert.Fail("Timeout waiting for event");
+            }
+            else
+            {
+                Assert.AreEqual(2, counter);
+                Assert.AreEqual(response.Message, "Testing eventing of synchronous messages");
+            }
+        }
+
+
     }
 }
