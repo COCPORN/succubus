@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>0.1.4-pre</version>
+    <version>0.1.5-pre</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
@@ -11,7 +11,7 @@
     <licenseUrl>https://github.com/COCPORN/succubus/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Added timeout to blocking synchronous calls and async/await-support.</releaseNotes>
+    <releaseNotes>Added support for event inheritance.</releaseNotes>
     <copyright>Copyright 2013 Succubus.io</copyright>
     <tags>esb zeromq</tags>
   </metadata>
