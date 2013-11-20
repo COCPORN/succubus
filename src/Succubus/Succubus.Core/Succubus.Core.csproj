@@ -55,6 +55,9 @@
     <Compile Include="Bus\Bus.Subscriber.cs" />
     <Compile Include="Bus\Bus.Synchronization.cs" />
     <Compile Include="Bus\Bus.TimeoutHandler.cs" />
+    <Compile Include="Diagnostics\Ping.cs" />
+    <Compile Include="Diagnostics\Pong.cs" />
+    <Compile Include="MessageFrames\Diagnostic.cs" />
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\JsonFrame.cs" />

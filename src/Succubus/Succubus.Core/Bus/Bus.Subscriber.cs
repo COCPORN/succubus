@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Succubus.Hosting;
+﻿using System.Threading.Tasks;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
@@ -32,8 +30,8 @@ namespace Succubus.Core
 
                         object coreMessage = JsonFrame.Deserlialize(serialized, coreType);
 
-                        var synchronousFrame = coreMessage as SynchronousMessageFrame;
-                        var eventFrame = coreMessage as EventMessageFrame;
+                        var synchronousFrame = coreMessage as MessageFrames.Synchronous;
+                        var eventFrame = coreMessage as MessageFrames.Event;
                         if (synchronousFrame != null)
                         {
                             ProcessSynchronousMessages(synchronousFrame);
@@ -49,13 +47,13 @@ namespace Succubus.Core
             }
             catch (Exception ex)
             {
-
+                // TODO: Create diagnostic messages
             }
         }
 
 
 
-        private void ProcessSynchronousMessages(SynchronousMessageFrame synchronousFrame)
+        private void ProcessSynchronousMessages(MessageFrames.Synchronous synchronousFrame)
         {
             Type type = Type.GetType(synchronousFrame.EmbeddedType);
             object message = JsonFrame.Deserlialize(synchronousFrame.Message, type);
@@ -67,7 +65,7 @@ namespace Succubus.Core
 
 
 
-        private SynchronizationContext ProcessSynchronousHandlers(SynchronousMessageFrame synchronousFrame, object message)
+        private SynchronizationContext ProcessSynchronousHandlers(MessageFrames.Synchronous synchronousFrame, object message)
         {
             SynchronizationContext ctx;
 
@@ -125,7 +123,7 @@ namespace Succubus.Core
             return ctx;
         }
 
-        private void ProcessReplyHandlers(SynchronousMessageFrame synchronousFrame, Type type, object message)
+        private void ProcessReplyHandlers(MessageFrames.Synchronous synchronousFrame, Type type, object message)
         {
             List<Func<object, object>> handlers = null;
 

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Succubus.Core
+namespace Succubus.Core.MessageFrames
 {
-    public class SynchronousMessageFrame 
+    public class Synchronous
     {
         public Guid CorrelationId { get; set; }
 

@@ -44,9 +44,9 @@ namespace Succubus.Core
 
         #region Synchronous messaging
 
-        SynchronousMessageFrame FrameSynchronously(object o, Guid? guid = null)
+        MessageFrames.Synchronous FrameSynchronously(object o, Guid? guid = null)
         {
-            return new SynchronousMessageFrame
+            return new MessageFrames.Synchronous
             {
                 Message = JsonFrame.Serialize(o),
                 CorrelationId = guid ?? Guid.NewGuid(),
@@ -55,18 +55,18 @@ namespace Succubus.Core
             };
         }
 
-        EventMessageFrame FrameEvent(object o)
+        MessageFrames.Event FrameEvent(object o)
         {
-            return new EventMessageFrame
+            return new MessageFrames.Event
             {
                 Message = JsonFrame.Serialize(o),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0]
             };
         }
 
-        SynchronousMessageFrame FrameResponseSynchronously(SynchronousMessageFrame request, object o, Guid? guid = null)
+        MessageFrames.Synchronous FrameResponseSynchronously(MessageFrames.Synchronous request, object o, Guid? guid = null)
         {
-            return new SynchronousMessageFrame
+            return new MessageFrames.Synchronous
             {
                 Message = JsonFrame.Serialize(o),
                 CorrelationId = guid ?? Guid.NewGuid(),

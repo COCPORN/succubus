@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using Succubus.Bus.Tests.Messages;
@@ -17,6 +18,11 @@ namespace Succubus.Bus.Tests
 
             bus.Initialize(succubus => succubus.ConfigureForTesting());
             Thread.Sleep(1500);
+
+            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+            {
+                Message = req.Message
+            });
         }
 
         [Test]
@@ -42,8 +48,8 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual(1, counter);
         }
 
- 
-        [Test]      
+
+        [Test]
         public void InheritedEvent()
         {
             ManualResetEvent mre = new ManualResetEvent(false);
@@ -58,7 +64,7 @@ namespace Succubus.Bus.Tests
                 Assert.Fail("Timeout waiting for event");
 
             }
-            
+
         }
 
         [Test]
@@ -66,17 +72,14 @@ namespace Succubus.Bus.Tests
         {
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
-            {
-                Message = req.Message
-            });
+         
             bus.On<object>(ev =>
             {
-                if (ev is BasicRequest 
-                    || ev is BasicResponse)
+                Console.WriteLine("Got event: {0}", ev.ToString());
+                if (ev is BasicRequest || ev is BasicResponse)
                 {
                     counter++;
-                    
+
                 }
                 if (counter == 2)
                 {
@@ -84,7 +87,11 @@ namespace Succubus.Bus.Tests
                 }
             });
 
-            var response = bus.Call<BasicRequest, BasicResponse>(new BasicRequest() { Message = "Testing eventing of synchronous messages" });
+            var response =
+                bus.Call<BasicRequest, BasicResponse>(new BasicRequest()
+                {
+                    Message = "Testing eventing of synchronous messages"
+                });
             if (mre.WaitOne(500) == false)
             {
                 Assert.Fail("Timeout waiting for event");
@@ -96,6 +103,45 @@ namespace Succubus.Bus.Tests
             }
         }
 
+        [Test]
+        public void ReqResAsEventsSecondBusInstance()
+        {
+            var bus2 = new Core.Bus();
+            bus2.Initialize();
+            Thread.Sleep(1500);
 
+            int counter = 0;
+            ManualResetEvent mre = new ManualResetEvent(false);
+      
+            bus2.On<object>(ev =>
+            {
+                Console.WriteLine("Got event: {0}", ev.ToString());
+                if (ev is BasicRequest || ev is BasicResponse)
+                {
+                    counter++;
+
+                }
+                if (counter == 2)
+                {
+                    mre.Set();
+                }
+            });
+
+            var response =
+                bus.Call<BasicRequest, BasicResponse>(new BasicRequest()
+                {
+                    Message = "Testing eventing of synchronous messages"
+                });
+            if (mre.WaitOne(500) == false)
+            {
+                Assert.Fail("Timeout waiting for event");
+            }
+            else
+            {
+                Assert.AreEqual(2, counter);
+                Assert.AreEqual(response.Message, "Testing eventing of synchronous messages");
+            }
+        }
     }
+
 }

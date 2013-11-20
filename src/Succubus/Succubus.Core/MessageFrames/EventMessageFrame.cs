@@ -1,6 +1,6 @@
-﻿namespace Succubus.Core
+﻿namespace Succubus.Core.MessageFrames
 {
-    class EventMessageFrame
+    class Event
     {        
         public string EmbeddedType { get; set; }
 

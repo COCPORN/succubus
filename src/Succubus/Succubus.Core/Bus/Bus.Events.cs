@@ -38,7 +38,7 @@ namespace Succubus.Core
             return new Bus.ResponseContext(this);
         }
 
-        private void ProcessEvents(EventMessageFrame eventFrame)
+        private void ProcessEvents(MessageFrames.Event eventFrame)
         {
             Type type = Type.GetType(eventFrame.EmbeddedType);
             Type eventType = Type.GetType(eventFrame.EmbeddedType);
@@ -46,15 +46,16 @@ namespace Succubus.Core
 
             if (type == null || eventType == null || message == null) return;
 
-            List<Action<object>> handlers = null;
+            List<Action<object>> handlers = new List<Action<object>>();
 
             lock (eventHandlers)
             {
                 while (eventType != null)
                 {
-                    if (eventHandlers.TryGetValue(eventType, out handlers))
+                    List<Action<object>> localHandlers = new List<Action<object>>();
+                    if (eventHandlers.TryGetValue(eventType, out localHandlers))
                     {
-                        break;
+                        handlers.AddRange(localHandlers);
                     }
                     eventType = eventType.BaseType;
                 }
@@ -72,7 +73,7 @@ namespace Succubus.Core
             }
         }
 
-        private void ProcessCatchAllEvents(SynchronousMessageFrame eventFrame)
+        private void ProcessCatchAllEvents(MessageFrames.Synchronous eventFrame)
         {
             List<Action<object>> handlers = null;
 
