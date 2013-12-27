@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Succubus.Hosting;
 
 namespace Succubus.Bus.Tests
 {
@@ -12,7 +13,7 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.ConfigureForTesting());
+            bus.Initialize(succubus => succubus.StartMessageHost());
         }
 
     }

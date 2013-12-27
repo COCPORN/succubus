@@ -22,19 +22,19 @@ namespace Succubus.Serialization
         public static T DeSerialize<T>(Frame frame)
         {
             var messageObject =
-                      JsonConvert.DeserializeObject<T>(System.Text.Encoding.UTF8.GetString(frame.Buffer), settings);
+                      JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(frame.Buffer), settings);
             return messageObject;
         }
 
         public static object Deserlialize(Frame frame)
         {
-            object messageObject = JsonConvert.DeserializeObject(System.Text.Encoding.UTF8.GetString(frame.Buffer), settings);
+            var messageObject = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(frame.Buffer), settings);
             return messageObject;
         }
 
         public static object Deserlialize(string serialized, Type type)
         {
-            object messageObject = JsonConvert.DeserializeObject(serialized, type, settings);
+            var messageObject = JsonConvert.DeserializeObject(serialized, type, settings);
             return messageObject;
         }
 

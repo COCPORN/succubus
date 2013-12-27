@@ -1,4 +1,4 @@
-﻿using Succubus.Hosting;
+﻿using System.ComponentModel.Composition;
 using Succubus.Interfaces;
 using Succubus.Interfaces.ResponseContexts;
 using System;
@@ -7,6 +7,7 @@ using ZeroMQ;
 
 namespace Succubus.Core
 {
+    [Export(typeof(IBus))]
     public partial class Bus : IBus
     {
 
@@ -74,19 +75,7 @@ namespace Succubus.Core
                 }
                 initialized = true;
             }
-
-        
-
-            if (StartMessageHost == true)
-            {
-                if (messageHost == null) messageHost = new MessageHost();
-                if (MessageHostPublishAddress != null) messageHost.PublishAddress = MessageHostPublishAddress;
-                if (MessageHostSubscribeAddress != null) messageHost.SubscribeAddress = MessageHostSubscribeAddress;
-                messageHost.Start();
-            }
-
-          
-
+                  
             ConnectPublisher();
 
             subscriberThread = new Thread(Subscriber) { IsBackground = true };

@@ -1,4 +1,5 @@
-﻿using Succubus.Interfaces;
+﻿using System.ComponentModel.Composition;
+using Succubus.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,7 +7,8 @@ using ZeroMQ;
 
 namespace Succubus.Hosting
 {
-    public class MessageHost : IMessageHost
+    [Export(typeof(IMessageHost))]
+    public class MessageHost : IMessageHost, IHostConfigurator
     {
         Thread serverThread;        
 
@@ -78,7 +80,19 @@ namespace Succubus.Hosting
         public string PublishAddress { get; set; }
         
         public string SubscribeAddress { get; set; }
-        
+
+
+        public void Initialize()
+        {
+          
+        }
+
+        public void Initialize(Action<IHostConfigurator> initializationHandler)
+        {
+            initializationHandler(this);
+        }
+
+        public event EventHandler<ProcessedMessageEventArgs> ProcessedMessage;
     }
 }
 

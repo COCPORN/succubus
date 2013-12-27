@@ -9,12 +9,6 @@ namespace Succubus.Interfaces
         string SubscribeAddress { get; set; }
         #endregion
 
-        #region Hosting
-        string MessageHostPublishAddress { get; set; }
-        string MessageHostSubscribeAddress { get; set; }
-
-        bool StartMessageHost { get; set; }
-        #endregion
 
         #region Filtering
         string Network { get; set;  }        
@@ -24,11 +18,6 @@ namespace Succubus.Interfaces
         void GetFromConfigurationFile();
         #endregion
 
-        #region Testing
-
-        void ConfigureForTesting();
-
-        #endregion
 
     }
 }

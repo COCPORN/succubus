@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Collections;
 using Succubus.Collections.Interfaces;
+using Succubus.Hosting;
 using Succubus.Interfaces;
 
 namespace Succubus.Bus.Tests
@@ -20,7 +21,7 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.ConfigureForTesting());
+            bus.Initialize(succubus => succubus.StartMessageHost());
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse { Message = "FROM SERVER: " + req.Message });
             bus.ReplyTo<ChildRequest, ChildBase>(req => new ChildResponse1 { Message = "FROM SERVER: " + req.Message });

@@ -1,9 +1,15 @@
-﻿namespace Succubus.Interfaces
+﻿using System;
+
+namespace Succubus.Interfaces
 {
     public interface IMessageHost
     {
-        string PublishAddress { get; set; }
-        string SubscribeAddress { get; set; }
+        #region Initialization
+        void Initialize();
+        void Initialize(Action<IHostConfigurator> initializationHandler);
+        #endregion
+
+        event EventHandler<ProcessedMessageEventArgs> ProcessedMessage;
 
         void Start();
         void Stop();

@@ -3,6 +3,7 @@ using System.Threading;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using Succubus.Bus.Tests.Messages;
+using Succubus.Hosting;
 
 namespace Succubus.Bus.Tests
 {
@@ -16,7 +17,7 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.ConfigureForTesting());
+            bus.Initialize(succubus => succubus.StartMessageHost());
             Thread.Sleep(1500);
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
