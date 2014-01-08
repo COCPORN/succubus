@@ -34,7 +34,7 @@ Succubus is implemented just for fun, don't expect to see any best-in-class impl
 Installation
 ------------
 
-Get lastest version of Succubus from GitHub or NuGet (will be up soon).
+Get lastest version of Succubus from GitHub or NuGet.
 
 Instantiation
 -------------

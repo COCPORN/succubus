@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Succubus.Bus.Tests.Messages
 {
-    public class ChildEvent : ParentEvent, Marker
+    /// <summary>
+    /// This is just a marker interface to see that routing
+    /// on interfaces works as expected
+    /// </summary>
+    interface Marker
     {
     }
 }

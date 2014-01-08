@@ -69,6 +69,22 @@ namespace Succubus.Bus.Tests
         }
 
         [Test]
+        public void InterfaceDispatch()
+        {
+            ManualResetEvent mre = new ManualResetEvent(false);
+
+            bus.On<Marker>(ev =>
+            {
+                mre.Set();
+            });
+            bus.Publish(new ChildEvent() { Message = "Child calling" });
+            if (mre.WaitOne(500) == false)
+            {
+                Assert.Fail("Timeout waiting for event");
+            }
+        }
+
+        [Test]
         public void ReqResAsEvents()
         {
             int counter = 0;

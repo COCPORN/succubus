@@ -52,6 +52,7 @@
     <Compile Include="Messages\ChildEvent.cs" />
     <Compile Include="Messages\ChildMessages.cs" />
     <Compile Include="Messages\ComplexOrchestrationMessages.cs" />
+    <Compile Include="Messages\Marker.cs" />
     <Compile Include="Messages\ParentEvent.cs" />
     <Compile Include="Messages\Routing.cs" />
     <Compile Include="Messages\StaticRequest.cs" />

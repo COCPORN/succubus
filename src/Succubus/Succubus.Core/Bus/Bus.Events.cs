@@ -42,6 +42,7 @@ namespace Succubus.Core
         {
             Type type = Type.GetType(eventFrame.EmbeddedType);
             Type eventType = Type.GetType(eventFrame.EmbeddedType);
+            IEnumerable<Type> interfaces = eventType.GetInterfaces();
             object message = JsonFrame.Deserlialize(eventFrame.Message, type);
 
             if (type == null || eventType == null || message == null) return;
@@ -59,17 +60,23 @@ namespace Succubus.Core
                     }
                     eventType = eventType.BaseType;
                 }
+                foreach (var @interface in interfaces)
+                {
+                    List<Action<object>> localHandlers = new List<Action<object>>();
+                    if (eventHandlers.TryGetValue(@interface, out localHandlers))
+                    {
+                        handlers.AddRange(localHandlers);
+                    }
+                }
             }
 
             // TODO: This has a potential race condition in where
             // handlers are added to/subtracted from while iterating on it
-            if (handlers != null)
+            // TODO: DOES IT REALLY? I don't see that now, but I might in the future
+            foreach (var eventHandler in handlers)
             {
-                foreach (var eventHandler in handlers)
-                {
-                    var handler = eventHandler;
-                    Task.Factory.StartNew(() => handler(message));
-                }
+                var handler = eventHandler;
+                Task.Factory.StartNew(() => handler(message));
             }
         }
 
