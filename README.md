@@ -71,11 +71,11 @@ The `Initialize`-call to the bus alternatively returns a configuration handle.
 ```C#
 bus.Initialize(succubus =>
 {
-    succubus.StartMessageHost = true;
+    succubus.StartMessageHost();
 });
 ```
 
-When using the parameterless Initialize call, the bus will be initialized with default values.
+When using the parameterless Initialize call, the bus will be initialized with default values. To actually start the message host, the Succubus.Hosting-assembly must be referenced.
 
 Configuration
 -------------
