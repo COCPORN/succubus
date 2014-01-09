@@ -6,7 +6,7 @@ using System.Text;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Common.Utils;
 using Newtonsoft.Json;
-using Succubus.Interfaces;
+using Succubus.Hosting.Interfaces;
 
 namespace Succubus.Stores.EventStore
 {

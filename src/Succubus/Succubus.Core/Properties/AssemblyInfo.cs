@@ -9,10 +9,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Succubus.io")]
 [assembly: AssemblyProduct("Succubus")]
-[assembly: AssemblyCopyright("Copyright © Succubus.io 2013")]
+[assembly: AssemblyCopyright("Copyright © Succubus.io 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyInformationalVersion("0.1.4-pre")]
+[assembly: AssemblyInformationalVersion("0.1.14-pre")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

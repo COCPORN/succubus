@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using Succubus.Collections;
-using Succubus.Interfaces.ResponseContexts;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Core
 {

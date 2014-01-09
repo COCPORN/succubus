@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Succubus.Interfaces;
+using Succubus.Core.Interfaces;
+using Succubus.Hosting.Interfaces;
 
 namespace Succubus.Hosting
 {

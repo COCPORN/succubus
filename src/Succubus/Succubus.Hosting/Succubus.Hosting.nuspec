@@ -4,15 +4,15 @@
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
-    <licenseUrl>https://github.com/COCPORN/succubus/blob/master/LICENSE</licenseUrl>
+    <authors>Succubus.io</authors>
+    <owners>Succubus.io</owners>
     <projectUrl>http://www.succubus.io</projectUrl>
     <iconUrl>https://dl.dropboxusercontent.com/u/5489626/Succubus/succubus128x128.jpg</iconUrl>
+    <licenseUrl>https://github.com/COCPORN/succubus/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Added MEF exports, interface dispatch, screwing around with NuGet dependencies</releaseNotes>
-    <copyright>Copyright Succubus.io 2014</copyright>
-    <tags>zeromq esb</tags>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright 2013 Succubus.io</copyright>
+    <tags>esb zeromq</tags>
   </metadata>
 </package>

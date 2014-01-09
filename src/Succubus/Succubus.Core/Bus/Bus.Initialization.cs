@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.Composition;
-using Succubus.Interfaces;
-using Succubus.Interfaces.ResponseContexts;
+using Succubus.Core.Interfaces;
 using System;
 using System.Threading;
 using ZeroMQ;

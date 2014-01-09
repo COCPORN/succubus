@@ -1,5 +1,5 @@
 ﻿using System.Security.AccessControl;
-using Succubus.Interfaces.ResponseContexts;
+using Succubus.Core.Interfaces;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;

@@ -7,7 +7,6 @@ using Succubus.Bus.Tests.Messages;
 using Succubus.Collections;
 using Succubus.Collections.Interfaces;
 using Succubus.Hosting;
-using Succubus.Interfaces;
 
 namespace Succubus.Bus.Tests
 {

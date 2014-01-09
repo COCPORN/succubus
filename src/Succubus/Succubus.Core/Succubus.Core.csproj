@@ -58,6 +58,9 @@
     <Compile Include="Bus\Bus.TimeoutHandler.cs" />
     <Compile Include="Diagnostics\Ping.cs" />
     <Compile Include="Diagnostics\Pong.cs" />
+    <Compile Include="Interfaces\IBus.cs" />
+    <Compile Include="Interfaces\IBusConfigurator.cs" />
+    <Compile Include="Interfaces\IResponseContext.cs" />
     <Compile Include="MessageFrames\Diagnostic.cs" />
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -72,10 +75,6 @@
     <ProjectReference Include="..\Succubus.Collections\Succubus.Collections.csproj">
       <Project>{41f9dd77-1c6b-4268-8623-4f73acb3edca}</Project>
       <Name>Succubus.Collections</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Succubus.Interfaces\Succubus.Interfaces.csproj">
-      <Project>{8d638add-d6b5-4c40-b43b-966d4dc2d7a7}</Project>
-      <Name>Succubus.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

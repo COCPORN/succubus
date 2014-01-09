@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.Composition;
-using Succubus.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Succubus.Core.Interfaces;
+using Succubus.Hosting.Interfaces;
 using ZeroMQ;
 
 namespace Succubus.Hosting

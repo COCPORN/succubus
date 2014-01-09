@@ -55,13 +55,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Succubus.Core\Succubus.Core.csproj">
+      <Project>{F7EFB776-3BF5-41F6-9ED2-0F92E38DA4AC}</Project>
+      <Name>Succubus.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Succubus.Hosting\Succubus.Hosting.csproj">
       <Project>{2d20bcb6-5201-4ed4-8848-d1ae2faee2c0}</Project>
       <Name>Succubus.Hosting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Succubus.Interfaces\Succubus.Interfaces.csproj">
-      <Project>{8D638ADD-D6B5-4C40-B43B-966D4DC2D7A7}</Project>
-      <Name>Succubus.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

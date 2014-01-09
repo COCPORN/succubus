@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Succubus.Collections;
-using Succubus.Interfaces.ResponseContexts;
+using Succubus.Core.Interfaces;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;

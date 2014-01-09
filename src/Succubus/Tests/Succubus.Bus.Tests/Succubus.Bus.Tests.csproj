@@ -78,10 +78,6 @@
       <Project>{2d20bcb6-5201-4ed4-8848-d1ae2faee2c0}</Project>
       <Name>Succubus.Hosting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Succubus.Interfaces\Succubus.Interfaces.csproj">
-      <Project>{8d638add-d6b5-4c40-b43b-966d4dc2d7a7}</Project>
-      <Name>Succubus.Interfaces</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,4 @@
-﻿using Succubus.Interfaces;
+﻿using Succubus.Core.Interfaces;
 using System.Configuration;
 
 namespace Succubus.Core
