@@ -23,7 +23,14 @@ namespace Succubus.Core
 
         public IResponseContext On<T>(Action<T> handler, string address = null)
         {
-            SetupSubscriber(address);
+            if (typeof(T).BaseType == null)
+            {
+                subscribeSocket.SubscribeAll();
+            }
+            else
+            {
+                SetupSubscriber(address);
+            }
 
             var myHandler = new Action<object>(response => handler((T)response));
             lock (eventHandlers)
@@ -35,7 +42,7 @@ namespace Succubus.Core
                     eventHandlers.Add(typeof(T), handlers);
                 }
 
-                handlers.Add(new EventBlock() { Handler = myHandler, Address = address ?? "__BROADCAST" });
+                handlers.Add(new EventBlock() { Handler = myHandler, Address = address });
             }
             return new Bus.ResponseContext(this);
         }
@@ -108,7 +115,7 @@ namespace Succubus.Core
             foreach (var eventHandler in handlers)
             {
                 var handler = eventHandler;
-                if (handler.Address == address)
+                if (handler.Address == null || handler.Address == address)
                 {
                     Task.Factory.StartNew(() => handler.Handler(message));
                 }
@@ -143,7 +150,7 @@ namespace Succubus.Core
                 foreach (var eventHandler in handlers)
                 {
                     var handler = eventHandler;
-                    if (handler.Address == address)
+                    if (handler.Address == null || handler.Address == address)
                     {
                         Task.Factory.StartNew(() => handler.Handler(message));
                     }
