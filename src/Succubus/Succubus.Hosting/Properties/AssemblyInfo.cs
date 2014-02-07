@@ -4,15 +4,15 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Succubus")]
+[assembly: AssemblyTitle("Succubus Hosting")]
 [assembly: AssemblyDescription("Succubus Distributed Application Framework Hosting")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Succubus.io")]
 [assembly: AssemblyProduct("Succubus")]
-[assembly: AssemblyCopyright("Copyright © Succubus.io 2013")]
+[assembly: AssemblyCopyright("Copyright © Succubus.io 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyInformationalVersion("0.1.1-pre")]
+[assembly: AssemblyInformationalVersion("0.1.2-pre")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

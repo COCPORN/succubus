@@ -54,7 +54,7 @@ namespace Succubus.Core
         #region Initialization
 
         public Bus()
-        {
+        {          
             PublishAddress = "tcp://localhost:9000";
             SubscribeAddress = "tcp://localhost:9001";
             context = ZmqContext.Create();
@@ -100,7 +100,6 @@ namespace Succubus.Core
         private void ConnectSubscriber()
         {
             subscribeSocket.Connect(SubscribeAddress);
-            subscribeSocket.SubscribeAll();
         }
 
 

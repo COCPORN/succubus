@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addressing.cs" />
     <Compile Include="Deferral.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="Messages\BasicEvent.cs" />
@@ -66,10 +67,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Succubus.Collections\Succubus.Collections.csproj">
-      <Project>{41f9dd77-1c6b-4268-8623-4f73acb3edca}</Project>
-      <Name>Succubus.Collections</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Succubus.Core\Succubus.Core.csproj">
       <Project>{f7efb776-3bf5-41f6-9ed2-0f92e38da4ac}</Project>
       <Name>Succubus.Core</Name>

@@ -35,7 +35,7 @@ namespace Succubus.Core
         /// <summary>
         /// This is used to create "server" logic to respond to synchronous messages.
         /// </summary>
-        Dictionary<Type, List<Func<object, object>>> replyHandlers = new Dictionary<Type, List<Func<object, object>>>();
+        Dictionary<Type, List<SynchronousBlock>> replyHandlers = new Dictionary<Type, List<SynchronousBlock>>();
 
         private readonly TimeoutHandler<Guid, SynchronizationContext> timeoutHandler = new TimeoutHandler<Guid, SynchronizationContext>();
 
@@ -44,23 +44,25 @@ namespace Succubus.Core
 
         #region Synchronous messaging
 
-        MessageFrames.Synchronous FrameSynchronously(object o, Guid? guid = null)
+        MessageFrames.Synchronous FrameSynchronously(object o, string address, Guid? guid = null)
         {
             return new MessageFrames.Synchronous
             {
                 Message = JsonFrame.Serialize(o),
                 CorrelationId = guid ?? Guid.NewGuid(),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-                RequestType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0]
+                RequestType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
+          
             };
         }
 
-        MessageFrames.Event FrameEvent(object o)
+        MessageFrames.Event FrameEvent(object o, string address)
         {
             return new MessageFrames.Event
             {
                 Message = JsonFrame.Serialize(o),
-                EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0]
+                EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
+            
             };
         }
 
@@ -76,8 +78,9 @@ namespace Succubus.Core
             };
         }
 
-        public void Call<TReq, TRes>(TReq request, Action<TRes> handler)
+        public void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null)
         {
+            SetupReplySubscription();
             var synchronizationContext = new SynchronizationContext();
 
 
@@ -85,16 +88,17 @@ namespace Succubus.Core
             stack.Frames.Add(new SynchronizationFrame<TReq, TRes> { Handler = handler });
             synchronizationContext.Stacks.Add(stack);
 
-            var synchronizedRequest = FrameSynchronously(request);
+            var synchronizedRequest = FrameSynchronously(request, address);
             lock (synchronizationContexts)
             {
                 synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             }
-            ObjectPublish(synchronizedRequest);
+            ObjectPublish(synchronizedRequest, address ?? "__BROADCAST");
         }
 
-        public TRes Call<TReq, TRes>(TReq request, int timeout = 10000)
+        public TRes Call<TReq, TRes>(TReq request, string address = null, int timeout = 10000)
         {
+            SetupReplySubscription();
             var mre = new ManualResetEvent(false);
             var result = default(TRes);
 
@@ -102,7 +106,7 @@ namespace Succubus.Core
             {
                 result = res;
                 mre.Set();
-            });
+            }, address);
 
             if (mre.WaitOne(timeout))
             {
@@ -115,21 +119,22 @@ namespace Succubus.Core
 
         }
 
-        public Task<TRes> CallAsync<TReq, TRes>(TReq request, int timeout = 10000)
+        public Task<TRes> CallAsync<TReq, TRes>(TReq request, string address = null, int timeout = 10000)
         {
-            return Task.Factory.StartNew(() => Call<TReq, TRes>(request, timeout));
+            return Task.Factory.StartNew(() => Call<TReq, TRes>(request, address, timeout));
         }
 
         // TODO: Decide whether static routes are really necessary, as the tree
         // needs to be built on a per call basis anyway.
-        public Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, int timeout = 0)
+        public Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 0)
         {
-            var synchronizedRequest = FrameSynchronously(request);
+            SetupReplySubscription();
+            var synchronizedRequest = FrameSynchronously(request, address);
 
             SynchronizationContext ctx = InstantiatePrototype(request, timeoutHandler, timeout, synchronizedRequest.CorrelationId);
             if (ctx != null) ctx.Request = request;
 
-            ObjectPublish(synchronizedRequest);
+            ObjectPublish(synchronizedRequest, address ?? "__BROADCAST");
             return synchronizedRequest.CorrelationId;
         }
 
@@ -298,14 +303,15 @@ namespace Succubus.Core
 
         #endregion
 
-        public void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler)
+        public void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler, string address = null)
         {
-            Func<object, object> objectHandler = new Func<object, object>((req) => (TRes)handler((TReq)req));
+            SetupSubscriber(address);
+            SynchronousBlock objectHandler = new SynchronousBlock { Handler = (req) => (TRes)handler((TReq)req), Address = address ?? "__BROADCAST" };
             lock (replyHandlers)
             {
                 if (replyHandlers.ContainsKey(typeof(TReq)) == false)
                 {
-                    var handlers = new List<Func<object, object>>();
+                    var handlers = new List<SynchronousBlock>();
                     handlers.Add(objectHandler);
                     replyHandlers.Add(typeof(TReq), handlers);
                 }
@@ -321,5 +327,11 @@ namespace Succubus.Core
 
 
 
+    }
+
+    internal class SynchronousBlock
+    {
+        internal Func<object, object> Handler;
+        internal string Address;
     }
 }

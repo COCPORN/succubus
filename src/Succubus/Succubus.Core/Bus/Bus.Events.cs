@@ -14,32 +14,64 @@ namespace Succubus.Core
         /// <summary>
         /// These are used with On to handle events.
         /// </summary>
-        readonly Dictionary<Type, List<Action<object>>> eventHandlers = new Dictionary<Type, List<Action<object>>>();
+        readonly Dictionary<Type, List<EventBlock>> eventHandlers = new Dictionary<Type, List<EventBlock>>();
 
-        public void Publish<T>(T request)
+        public void Publish<T>(T request, string address = null)
         {
-            ObjectPublish(FrameEvent(request));
+            ObjectPublish(FrameEvent(request, address ?? "__BROADCAST"), address ?? "__BROADCAST");
         }
 
-        public IResponseContext On<T>(Action<T> handler)
+        public IResponseContext On<T>(Action<T> handler, string address = null)
         {
+            SetupSubscriber(address);
+
             var myHandler = new Action<object>(response => handler((T)response));
             lock (eventHandlers)
             {
-                List<Action<object>> handlers;
+                List<EventBlock> handlers;
                 if (eventHandlers.TryGetValue(typeof(T), out handlers) == false)
                 {
-                    handlers = new List<Action<object>>();
+                    handlers = new List<EventBlock>();
                     eventHandlers.Add(typeof(T), handlers);
                 }
 
-                handlers.Add(myHandler);
+                handlers.Add(new EventBlock() { Handler = myHandler, Address = address ?? "__BROADCAST" });
             }
             return new Bus.ResponseContext(this);
         }
 
-        private void ProcessEvents(MessageFrames.Event eventFrame)
+        private void SetupSubscriber(string address)
         {
+            if (address == null)
+            {
+                subscribeSocket.SubscribeAll();
+            }
+            else
+            {
+                subscribeSocket.Subscribe(Encoding.ASCII.GetBytes(address));
+            }
+        }
+
+        private bool replySubscriptionSetup = false;
+        object replySubscriptionLock = new object();
+        void SetupReplySubscription()
+        {
+            lock (replySubscriptionLock)
+            {
+                if (replySubscriptionSetup == true) return;
+                else
+                {
+                    SetupSubscriber("__REPLY");
+                    replySubscriptionSetup = true;
+                }
+            }
+            
+        }
+
+        private void ProcessEvents(MessageFrames.Event eventFrame, string address)
+        {
+          
+
             Type type = Type.GetType(eventFrame.EmbeddedType);
             Type eventType = Type.GetType(eventFrame.EmbeddedType);
             IEnumerable<Type> interfaces = eventType.GetInterfaces();
@@ -47,13 +79,13 @@ namespace Succubus.Core
 
             if (type == null || eventType == null || message == null) return;
 
-            List<Action<object>> handlers = new List<Action<object>>();
+            List<EventBlock> handlers = new List<EventBlock>();
 
             lock (eventHandlers)
             {
                 while (eventType != null)
                 {
-                    List<Action<object>> localHandlers = new List<Action<object>>();
+                    List<EventBlock> localHandlers = new List<EventBlock>();
                     if (eventHandlers.TryGetValue(eventType, out localHandlers))
                     {
                         handlers.AddRange(localHandlers);
@@ -62,7 +94,7 @@ namespace Succubus.Core
                 }
                 foreach (var @interface in interfaces)
                 {
-                    List<Action<object>> localHandlers = new List<Action<object>>();
+                    List<EventBlock> localHandlers = new List<EventBlock>();
                     if (eventHandlers.TryGetValue(@interface, out localHandlers))
                     {
                         handlers.AddRange(localHandlers);
@@ -76,13 +108,17 @@ namespace Succubus.Core
             foreach (var eventHandler in handlers)
             {
                 var handler = eventHandler;
-                Task.Factory.StartNew(() => handler(message));
+                if (handler.Address == address)
+                {
+                    Task.Factory.StartNew(() => handler.Handler(message));
+                }
             }
         }
 
-        private void ProcessCatchAllEvents(MessageFrames.Synchronous eventFrame)
+        private void ProcessCatchAllEvents(MessageFrames.Synchronous eventFrame, string address)
         {
-            List<Action<object>> handlers = null;
+         
+            List<EventBlock> handlers = null;
 
             lock (eventHandlers)
             {
@@ -107,9 +143,18 @@ namespace Succubus.Core
                 foreach (var eventHandler in handlers)
                 {
                     var handler = eventHandler;
-                    Task.Factory.StartNew(() => handler(message));
+                    if (handler.Address == address)
+                    {
+                        Task.Factory.StartNew(() => handler.Handler(message));
+                    }
                 }
             }
         }
+    }
+
+    internal class EventBlock
+    {
+        internal string Address;
+        internal Action<object> Handler;
     }
 }

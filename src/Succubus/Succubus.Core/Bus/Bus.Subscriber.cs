@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Succubus.Core.MessageFrames;
 using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Succubus.Core
                     subscriberOnline.Set();
                     while (run)
                     {
+                        string address = subscribeSocket.Receive(Encoding.ASCII);
                         string typename = subscribeSocket.Receive(Encoding.Unicode);
                         string serialized = subscribeSocket.Receive(Encoding.Unicode);
                         Type coreType = Type.GetType(typename + ", Succubus.Core");
@@ -34,12 +36,12 @@ namespace Succubus.Core
                         var eventFrame = coreMessage as MessageFrames.Event;
                         if (synchronousFrame != null)
                         {
-                            ProcessSynchronousMessages(synchronousFrame);
-                            ProcessCatchAllEvents(synchronousFrame);
+                            ProcessSynchronousMessages(synchronousFrame, address);
+                            ProcessCatchAllEvents(synchronousFrame, address);
                         }
                         else if (eventFrame != null)
                         {
-                            ProcessEvents(eventFrame);
+                            ProcessEvents(eventFrame, address);
                         }
 
                     }
@@ -53,20 +55,24 @@ namespace Succubus.Core
 
 
 
-        private void ProcessSynchronousMessages(MessageFrames.Synchronous synchronousFrame)
+        private void ProcessSynchronousMessages(MessageFrames.Synchronous synchronousFrame, string address)
         {
+     
+
             Type type = Type.GetType(synchronousFrame.EmbeddedType);
             object message = JsonFrame.Deserlialize(synchronousFrame.Message, type);
 
-            ProcessReplyHandlers(synchronousFrame, type, message);
+            ProcessReplyHandlers(synchronousFrame, type, message, address);
 
-            SynchronizationContext ctx = ProcessSynchronousHandlers(synchronousFrame, message);
+            SynchronizationContext ctx = ProcessSynchronousHandlers(synchronousFrame, message, address);
         }
 
 
 
-        private SynchronizationContext ProcessSynchronousHandlers(MessageFrames.Synchronous synchronousFrame, object message)
+        private SynchronizationContext ProcessSynchronousHandlers(MessageFrames.Synchronous synchronousFrame, object message, string address)
         {
+         
+
             SynchronizationContext ctx;
 
             lock (synchronizationContexts)
@@ -123,9 +129,10 @@ namespace Succubus.Core
             return ctx;
         }
 
-        private void ProcessReplyHandlers(MessageFrames.Synchronous synchronousFrame, Type type, object message)
+        private void ProcessReplyHandlers(MessageFrames.Synchronous synchronousFrame, Type type, object message, string address)
         {
-            List<Func<object, object>> handlers = null;
+        
+            List<SynchronousBlock> handlers = null;
 
             lock (replyHandlers)
             {
@@ -137,13 +144,17 @@ namespace Succubus.Core
                 {
                     foreach (var replyHandler in handlers)
                     {
-                        Func<object, object> handler = replyHandler;
-                        Task.Factory.StartNew(() =>
+                        SynchronousBlock handler = replyHandler;
+                        if (handler.Address == address)
                         {
-                            var response = handler(message);
-                            var framedResponse = FrameResponseSynchronously(synchronousFrame, response, synchronousFrame.CorrelationId);
-                            ObjectPublish(framedResponse);
-                        });
+                            Task.Factory.StartNew(() =>
+                            {
+                                var response = handler.Handler(message);
+                                var framedResponse = FrameResponseSynchronously(synchronousFrame, response,
+                                    synchronousFrame.CorrelationId);
+                                ObjectPublish(framedResponse, "__REPLY");
+                            });
+                        }
                     }
                 }
                 catch { }

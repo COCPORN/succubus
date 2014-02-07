@@ -15,12 +15,12 @@ namespace Succubus.Core.Interfaces
         // Make a "synchronous" call
 
         // Throw away calls
-        void Call<TReq, TRes>(TReq request, Action<TRes> handler);
-        TRes Call<TReq, TRes>(TReq request, int timeout = 10000);
-        Task<TRes> CallAsync<TReq, TRes>(TReq request, int timeout = 10000);
+        void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null);
+        TRes Call<TReq, TRes>(TReq request, string address = null, int timeout = 10000);
+        Task<TRes> CallAsync<TReq, TRes>(TReq request, string address = null, int timeout = 10000);
 
         // Calls to static routes
-        Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, int timeout = 60000);
+        Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 60000);
 
         
 
@@ -35,7 +35,7 @@ namespace Succubus.Core.Interfaces
         IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6, T7>(Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler);
 
         // Handle incoming message with a reply, "server side" logic
-        void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler);
+        void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler, string address = null);
 
         #endregion
 
@@ -62,10 +62,10 @@ namespace Succubus.Core.Interfaces
         #region Publish/subscribe
 
         // Post an event on the bus
-        void Publish<T>(T request);        
+        void Publish<T>(T request, string address = null);        
 
         // Act on events
-        IResponseContext On<T>(Action<T> handler);
+        IResponseContext On<T>(Action<T> handler, string address = null);
         
         #endregion
 

@@ -49,6 +49,7 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual(1, counter);
         }
 
+     
 
         [Test]
         public void InheritedEvent()
@@ -133,12 +134,12 @@ namespace Succubus.Bus.Tests
             bus2.On<object>(ev =>
             {
                 Console.WriteLine("Got event: {0}", ev.ToString());
-                if (ev is BasicRequest || ev is BasicResponse)
+                if (ev is BasicRequest || ev is BasicResponse || ev is BasicEvent)
                 {
                     counter++;
 
                 }
-                if (counter == 2)
+                if (counter == 3)
                 {
                     mre.Set();
                 }
@@ -149,13 +150,14 @@ namespace Succubus.Bus.Tests
                 {
                     Message = "Testing eventing of synchronous messages"
                 });
+            bus.Publish(new BasicEvent() { Message = "Testing catchall of events"});
             if (mre.WaitOne(500) == false)
             {
                 Assert.Fail("Timeout waiting for event");
             }
             else
             {
-                Assert.AreEqual(2, counter);
+                Assert.AreEqual(3, counter);
                 Assert.AreEqual(response.Message, "Testing eventing of synchronous messages");
             }
         }

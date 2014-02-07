@@ -56,10 +56,13 @@
     <Compile Include="Bus\Bus.Subscriber.cs" />
     <Compile Include="Bus\Bus.Synchronization.cs" />
     <Compile Include="Bus\Bus.TimeoutHandler.cs" />
+    <Compile Include="Collections\TimeoutHandler.cs" />
     <Compile Include="Diagnostics\Ping.cs" />
     <Compile Include="Diagnostics\Pong.cs" />
     <Compile Include="Interfaces\IBus.cs" />
     <Compile Include="Interfaces\IBusConfigurator.cs" />
+    <Compile Include="Interfaces\IExpiring.cs" />
+    <Compile Include="Interfaces\INow.cs" />
     <Compile Include="Interfaces\IResponseContext.cs" />
     <Compile Include="MessageFrames\Diagnostic.cs" />
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
@@ -70,12 +73,6 @@
     <Compile Include="Synchronization\SynchronizationContext.cs" />
     <Compile Include="MessageFrames\SynchronousMessageFrame.cs" />
     <Compile Include="Synchronization\SynchronizationStack.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Succubus.Collections\Succubus.Collections.csproj">
-      <Project>{41f9dd77-1c6b-4268-8623-4f73acb3edca}</Project>
-      <Name>Succubus.Collections</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bus\Bus.Singleton.cs" />

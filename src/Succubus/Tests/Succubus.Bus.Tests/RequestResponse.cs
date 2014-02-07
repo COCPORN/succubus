@@ -176,17 +176,17 @@ namespace Succubus.Bus.Tests
         [ExpectedException(typeof(TimeoutException))]
         public void ChildMessages2_TimeoutOfMissingType()
         {
-            bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child2" }, 1000);
+            bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child2" }, timeout: 1000);
         }
 
         [Test]
         public void ChildMessages3_HandlingOfBaseClassResponse()
         {
-            var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, 10000);
+            var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, timeout: 10000);
             Assert.AreEqual("Child1", response.Message);
             Assert.AreEqual(typeof(ChildResponse1), response.GetType());
 
-            var response2 = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child2" }, 10000);
+            var response2 = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child2" }, timeout: 10000);
             Assert.AreEqual("Child2", response2.Message);
             Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
         }
@@ -204,7 +204,7 @@ namespace Succubus.Bus.Tests
             {
                 Console.WriteLine("Got timeout");
                 return;
-            }, 1000);
+            }, timeout: 1000);
 
 
         }
