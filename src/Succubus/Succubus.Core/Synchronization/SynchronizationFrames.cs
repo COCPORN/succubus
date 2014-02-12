@@ -22,7 +22,7 @@ namespace Succubus
 
         protected Action<object, Dictionary<Type, object>> staticHandler;
 
-        protected Action<Guid, object, Dictionary<Type, object>> correlationHandler;
+        protected Action<string, object, Dictionary<Type, object>> correlationHandler;
 
         public void CallHandler(Dictionary<Type, object> messages)
         {
@@ -39,7 +39,7 @@ namespace Succubus
             if (correlationHandler != null) correlationHandler(CorrelationId, Request, messages);
         }
 
-        public Guid CorrelationId { get; set; }
+        public string CorrelationId { get; set; }
 
         public object Request { get; set; }
 
@@ -59,14 +59,14 @@ namespace Succubus
             );
             staticHandler = new Action<object, Dictionary<Type, object>>(
                 (request, responses) => StaticHandler((TReq)request, (TRes)responses[typeof(TRes)]));
-            correlationHandler = new Action<Guid, object, Dictionary<Type, object>>(
+            correlationHandler = new Action<string, object, Dictionary<Type, object>>(
                  (id, request, responses) => CorrelationHandler(id, (TReq)request, (TRes)responses[typeof(TRes)]));
 
         }
 
         public Action<TRes> Handler { get; set; }
         public Action<TReq, TRes> StaticHandler { get; set; }
-        public Action<Guid, TReq, TRes> CorrelationHandler { get; set; }
+        public Action<string, TReq, TRes> CorrelationHandler { get; set; }
 
         public override bool CanHandle(object type)
         {
@@ -102,7 +102,7 @@ namespace Succubus
                 (request, responses) =>
                     StaticHandler((TReq)request, (TRes1)responses[typeof(TRes1)],
                         (TRes2)responses[typeof(TRes2)]));
-            correlationHandler = new Action<Guid, object, Dictionary<Type, object>>(
+            correlationHandler = new Action<string, object, Dictionary<Type, object>>(
                  (id, request, responses) => CorrelationHandler(id, (TReq)request,
                      (TRes1)responses[typeof(TRes1)],
                      (TRes2)responses[typeof(TRes2)]));
@@ -110,7 +110,7 @@ namespace Succubus
 
         public Action<TRes1, TRes2> Handler { get; set; }
         public Action<TReq, TRes1, TRes2> StaticHandler { get; set; }
-        public Action<Guid, TReq, TRes1, TRes2> CorrelationHandler { get; set; }
+        public Action<string, TReq, TRes1, TRes2> CorrelationHandler { get; set; }
 
         public override bool CanHandle(object type)
         {
@@ -152,7 +152,7 @@ namespace Succubus
                     StaticHandler((TReq)request, (TRes1)responses[typeof(TRes1)],
                         (TRes2)responses[typeof(TRes2)],
                         (TRes3)responses[typeof(TRes3)]));
-            correlationHandler = new Action<Guid, object, Dictionary<Type, object>>(
+            correlationHandler = new Action<string, object, Dictionary<Type, object>>(
                  (id, request, responses) => CorrelationHandler(id, (TReq)request,
                      (TRes1)responses[typeof(TRes1)],
                      (TRes2)responses[typeof(TRes2)],
@@ -161,7 +161,7 @@ namespace Succubus
 
         public Action<TRes1, TRes2, TRes3> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3> StaticHandler { get; set; }
-        public Action<Guid, TReq, TRes1, TRes2, TRes3> CorrelationHandler { get; set; }
+        public Action<string, TReq, TRes1, TRes2, TRes3> CorrelationHandler { get; set; }
 
 
         public override bool CanHandle(object type)
@@ -214,7 +214,7 @@ namespace Succubus
                         (TRes2)responses[typeof(TRes2)],
                         (TRes3)responses[typeof(TRes3)],
                         (TRes4)responses[typeof(TRes4)]));
-            correlationHandler = new Action<Guid, object, Dictionary<Type, object>>(
+            correlationHandler = new Action<string, object, Dictionary<Type, object>>(
                 (id, request, responses) => CorrelationHandler(id, (TReq)request,
                     (TRes1)responses[typeof(TRes1)],
                     (TRes2)responses[typeof(TRes2)],
@@ -224,7 +224,7 @@ namespace Succubus
 
         public Action<TRes1, TRes2, TRes3, TRes4> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3, TRes4> StaticHandler { get; set; }
-        public Action<Guid, TReq, TRes1, TRes2, TRes3, TRes4> CorrelationHandler { get; set; }
+        public Action<string, TReq, TRes1, TRes2, TRes3, TRes4> CorrelationHandler { get; set; }
 
         public override bool CanHandle(object type)
         {
@@ -284,7 +284,7 @@ namespace Succubus
                         (TRes4)responses[typeof(TRes4)],
                         (TRes5)responses[typeof(TRes5)]));
 
-            correlationHandler = new Action<Guid, object, Dictionary<Type, object>>(
+            correlationHandler = new Action<string, object, Dictionary<Type, object>>(
                (id, request, responses) => CorrelationHandler(id, (TReq)request,
                    (TRes1)responses[typeof(TRes1)],
                    (TRes2)responses[typeof(TRes2)],
@@ -295,7 +295,7 @@ namespace Succubus
 
         public Action<TRes1, TRes2, TRes3, TRes4, TRes5> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3, TRes4, TRes5> StaticHandler { get; set; }
-        public Action<Guid, TReq, TRes1, TRes2, TRes3, TRes4, TRes5> CorrelationHandler { get; set; }
+        public Action<string, TReq, TRes1, TRes2, TRes3, TRes4, TRes5> CorrelationHandler { get; set; }
 
         public override bool CanHandle(object type)
         {
@@ -361,7 +361,7 @@ namespace Succubus
                         (TRes4)responses[typeof(TRes4)],
                         (TRes5)responses[typeof(TRes5)],
                         (TRes6)responses[typeof(TRes6)]));
-            correlationHandler = new Action<Guid, object, Dictionary<Type, object>>(
+            correlationHandler = new Action<string, object, Dictionary<Type, object>>(
                (id, request, responses) => CorrelationHandler(id, (TReq)request,
                    (TRes1)responses[typeof(TRes1)],
                    (TRes2)responses[typeof(TRes2)],
@@ -373,7 +373,7 @@ namespace Succubus
 
         public Action<TRes1, TRes2, TRes3, TRes4, TRes5, TRes6> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3, TRes4, TRes5, TRes6> StaticHandler { get; set; }
-        public Action<Guid, TReq, TRes1, TRes2, TRes3, TRes4, TRes5, TRes6> CorrelationHandler { get; set; }
+        public Action<string, TReq, TRes1, TRes2, TRes3, TRes4, TRes5, TRes6> CorrelationHandler { get; set; }
 
         public override bool CanHandle(object type)
         {
@@ -446,7 +446,7 @@ namespace Succubus
                         (TRes5)responses[typeof(TRes5)],
                         (TRes6)responses[typeof(TRes6)],
                         (TRes7)responses[typeof(TRes7)]));
-            correlationHandler = new Action<Guid, object, Dictionary<Type, object>>(
+            correlationHandler = new Action<string, object, Dictionary<Type, object>>(
                 (id, request, responses) => CorrelationHandler(id, (TReq)request,
                     (TRes1)responses[typeof(TRes1)],
                     (TRes2)responses[typeof(TRes2)],
@@ -460,7 +460,7 @@ namespace Succubus
 
         public Action<TRes1, TRes2, TRes3, TRes4, TRes5, TRes6, TRes7> Handler { get; set; }
         public Action<TReq, TRes1, TRes2, TRes3, TRes4, TRes5, TRes6, TRes7> StaticHandler { get; set; }
-        public Action<Guid, TReq, TRes1, TRes2, TRes3, TRes4, TRes5, TRes6, TRes7> CorrelationHandler { get; set; }
+        public Action<string, TReq, TRes1, TRes2, TRes3, TRes4, TRes5, TRes6, TRes7> CorrelationHandler { get; set; }
 
         public override bool CanHandle(object type)
         {

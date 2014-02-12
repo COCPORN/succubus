@@ -10,6 +10,7 @@ namespace Succubus.Backend.Loopback
             transport.Bridge = configurator.Bridge;
             transport.Initialize(clear);
             configurator.Transport = transport;
+            configurator.CorrelationIdProvider = transport;
             configurator.SubscriptionManager = transport;
 
         }

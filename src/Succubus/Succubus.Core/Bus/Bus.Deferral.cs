@@ -43,7 +43,7 @@ namespace Succubus.Core
 
         public IResponseContext Defer<TReq, TRes>()
         {
-            Action<Guid, TReq, TRes> handler = (guid, req, res) =>
+            Action<string, TReq, TRes> handler = (guid, req, res) =>
             {
                 SynchronizationContext ctx = null;
                 lock (synchronizationContexts)
@@ -80,7 +80,7 @@ namespace Succubus.Core
 
         public IResponseContext Defer<TReq, T1, T2>()
         {
-            Action<Guid, TReq, T1, T2> handler = (guid, req, res1, res2) =>
+            Action<string, TReq, T1, T2> handler = (guid, req, res1, res2) =>
             {
                 SynchronizationContext ctx = null;
                 lock (synchronizationContexts)
@@ -111,7 +111,7 @@ namespace Succubus.Core
 
         public IResponseContext Defer<TReq, T1, T2, T3>()
         {
-            Action<Guid, TReq, T1, T2, T3> handler = (guid, req, res1, res2, res3) =>
+            Action<string, TReq, T1, T2, T3> handler = (guid, req, res1, res2, res3) =>
             {
                 SynchronizationContext ctx = null;
                 lock (synchronizationContexts)
@@ -142,7 +142,7 @@ namespace Succubus.Core
 
         public IResponseContext Defer<TReq, T1, T2, T3, T4>()
         {
-            Action<Guid, TReq, T1, T2, T3, T4> handler = (guid, req, res1, res2, res3, res4) =>
+            Action<string, TReq, T1, T2, T3, T4> handler = (guid, req, res1, res2, res3, res4) =>
             {
                 SynchronizationContext ctx = null;
                 lock (synchronizationContexts)
@@ -173,7 +173,7 @@ namespace Succubus.Core
 
         public IResponseContext Defer<TReq, T1, T2, T3, T4, T5>()
         {
-            Action<Guid, TReq, T1, T2, T3, T4, T5> handler = (guid, req, res1, res2, res3, res4, res5) =>
+            Action<string, TReq, T1, T2, T3, T4, T5> handler = (guid, req, res1, res2, res3, res4, res5) =>
             {
                 SynchronizationContext ctx = null;
                 lock (synchronizationContexts)
@@ -204,7 +204,7 @@ namespace Succubus.Core
 
         public IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6>()
         {
-            Action<Guid, TReq, T1, T2, T3, T4, T5, T6> handler = (guid, req, res1, res2, res3, res4, res5, res6) =>
+            Action<string, TReq, T1, T2, T3, T4, T5, T6> handler = (guid, req, res1, res2, res3, res4, res5, res6) =>
             {
                 SynchronizationContext ctx = null;
                 lock (synchronizationContexts)
@@ -235,7 +235,7 @@ namespace Succubus.Core
 
         public IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6, T7>()
         {
-            Action<Guid, TReq, T1, T2, T3, T4, T5, T6, T7> handler =
+            Action<string, TReq, T1, T2, T3, T4, T5, T6, T7> handler =
                 (guid, req, res1, res2, res3, res4, res5, res6, res7) =>
                 {
                     SynchronizationContext ctx = null;
@@ -265,9 +265,9 @@ namespace Succubus.Core
             return new Bus.ResponseContext(this);
         }
 
-        Dictionary<Guid, ManualResetEvent> deferredWaitHandles = new Dictionary<Guid, ManualResetEvent>();
+        Dictionary<string, ManualResetEvent> deferredWaitHandles = new Dictionary<string, ManualResetEvent>();
 
-        private SynchronizationContext GetSynchronizationContext<TReq>(Guid correlationId) where TReq : class
+        private SynchronizationContext GetSynchronizationContext<TReq>(string correlationId) where TReq : class
         {
 
             SynchronizationContext ctx = null;
@@ -305,7 +305,7 @@ namespace Succubus.Core
             return ctx;
         }
 
-        private void RemoveContext(Guid correlationId)
+        private void RemoveContext(string correlationId)
         {
             lock (synchronizationContexts)
             {
@@ -314,7 +314,7 @@ namespace Succubus.Core
             }
         }
 
-        public IResponseContext Pickup<TReq, T>(Guid correlationId, Action<TReq, T> handler) where TReq : class
+        public IResponseContext Pickup<TReq, T>(string correlationId, Action<TReq, T> handler) where TReq : class
         {
             if (handler == null) throw new ArgumentException("Pickup needs a handler");
             var ctx = GetSynchronizationContext<TReq>(correlationId);
@@ -326,7 +326,7 @@ namespace Succubus.Core
 
 
 
-        public IResponseContext Pickup<TReq, T1, T2>(Guid correlationId, Action<TReq, T1, T2> handler) where TReq : class
+        public IResponseContext Pickup<TReq, T1, T2>(string correlationId, Action<TReq, T1, T2> handler) where TReq : class
         {
             if (handler == null) throw new ArgumentException("Pickup needs a handler");
             var ctx = GetSynchronizationContext<TReq>(correlationId);
@@ -335,7 +335,7 @@ namespace Succubus.Core
             return new ResponseContext(this);
         }
 
-        public IResponseContext Pickup<TReq, T1, T2, T3>(Guid correlationId, Action<TReq, T1, T2, T3> handler) where TReq : class
+        public IResponseContext Pickup<TReq, T1, T2, T3>(string correlationId, Action<TReq, T1, T2, T3> handler) where TReq : class
         {
             if (handler == null) throw new ArgumentException("Pickup needs a handler");
             var ctx = GetSynchronizationContext<TReq>(correlationId);
@@ -346,7 +346,7 @@ namespace Succubus.Core
             return new ResponseContext(this);
         }
 
-        public IResponseContext Pickup<TReq, T1, T2, T3, T4>(Guid correlationId, Action<TReq, T1, T2, T3, T4> handler) where TReq : class
+        public IResponseContext Pickup<TReq, T1, T2, T3, T4>(string correlationId, Action<TReq, T1, T2, T3, T4> handler) where TReq : class
         {
             if (handler == null) throw new ArgumentException("Pickup needs a handler");
             var ctx = GetSynchronizationContext<TReq>(correlationId);
@@ -358,7 +358,7 @@ namespace Succubus.Core
             return new ResponseContext(this);
         }
 
-        public IResponseContext Pickup<TReq, T1, T2, T3, T4, T5>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5> handler) where TReq : class
+        public IResponseContext Pickup<TReq, T1, T2, T3, T4, T5>(string correlationId, Action<TReq, T1, T2, T3, T4, T5> handler) where TReq : class
         {
             if (handler == null) throw new ArgumentException("Pickup needs a handler");
             var ctx = GetSynchronizationContext<TReq>(correlationId);
@@ -371,7 +371,7 @@ namespace Succubus.Core
             return new ResponseContext(this);
         }
 
-        public IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler) where TReq : class
+        public IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler) where TReq : class
         {
             if (handler == null) throw new ArgumentException("Pickup needs a handler");
             var ctx = GetSynchronizationContext<TReq>(correlationId);
@@ -385,7 +385,7 @@ namespace Succubus.Core
             return new ResponseContext(this);
         }
 
-        public IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class
+        public IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class
         {
             if (handler == null) throw new ArgumentException("Pickup needs a handler");
             var ctx = GetSynchronizationContext<TReq>(correlationId);

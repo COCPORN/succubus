@@ -7,7 +7,7 @@ using Succubus.Core.Interfaces;
 
 namespace Succubus.Backend.Loopback
 {
-    public class Transport : ITransport, ISubscriptionManager
+    public class Transport : ITransport, ISubscriptionManager, ICorrelationIdProvider
     {
         static List<Transport> transports = new List<Transport>();
 
@@ -64,6 +64,11 @@ namespace Succubus.Backend.Loopback
                 transports.Add(this);
             }
 
+        }
+
+        public string CreateCorrelationId(object o)
+        {
+            return Guid.NewGuid().ToString();
         }
     }
 }

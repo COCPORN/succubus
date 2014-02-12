@@ -4,7 +4,7 @@ namespace Succubus.Core.MessageFrames
 {
     public class Synchronous
     {
-        public Guid CorrelationId { get; set; }
+        public string CorrelationId { get; set; }
 
         public string EmbeddedType { get; set; }
 

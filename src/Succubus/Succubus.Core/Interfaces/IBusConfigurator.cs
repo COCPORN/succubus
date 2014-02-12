@@ -7,7 +7,7 @@ namespace Succubus.Core.Interfaces
      
         ITransport Transport { get; set; }
         ISubscriptionManager SubscriptionManager { get; set; }
-
+        ICorrelationIdProvider CorrelationIdProvider { get; set; }
         ITransportBridge Bridge { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace Succubus.Core.Interfaces
         Task<TRes> CallAsync<TReq, TRes>(TReq request, string address = null, int timeout = 10000);
 
         // Calls to static routes
-        Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 60000);
+        string Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 60000);
 
         
 
@@ -48,13 +48,13 @@ namespace Succubus.Core.Interfaces
         IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6>();
         IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6, T7>();
 
-        IResponseContext Pickup<TReq, T>(Guid correlationId, Action<TReq, T> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2>(Guid correlationId, Action<TReq, T1, T2> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3>(Guid correlationId, Action<TReq, T1, T2, T3> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4>(Guid correlationId, Action<TReq, T1, T2, T3, T4> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(Guid correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class;
+        IResponseContext Pickup<TReq, T>(string correlationId, Action<TReq, T> handler) where TReq : class;
+        IResponseContext Pickup<TReq, T1, T2>(string correlationId, Action<TReq, T1, T2> handler) where TReq : class;
+        IResponseContext Pickup<TReq, T1, T2, T3>(string correlationId, Action<TReq, T1, T2, T3> handler) where TReq : class;
+        IResponseContext Pickup<TReq, T1, T2, T3, T4>(string correlationId, Action<TReq, T1, T2, T3, T4> handler) where TReq : class;
+        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5>(string correlationId, Action<TReq, T1, T2, T3, T4, T5> handler) where TReq : class;
+        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler) where TReq : class;
+        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class;
 
         #endregion
 

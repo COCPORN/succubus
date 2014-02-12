@@ -16,7 +16,7 @@ namespace Succubus
 
 
     [Serializable]
-    class SynchronizationContext : IExpiring<Guid>
+    class SynchronizationContext : IExpiring<string>
     {
 
         
@@ -42,8 +42,8 @@ namespace Succubus
         public ContextType ContextType { get; set; }
         public ManualResetEvent DeferredResetEvent { get; set; }
 
-        public Guid CorrelationId { get; set; }
-        public Guid Id { get { return CorrelationId; } }
+        public string CorrelationId { get; set; }
+        public string Id { get { return CorrelationId; } }
 
         public List<SynchronizationStack> Stacks;     
 

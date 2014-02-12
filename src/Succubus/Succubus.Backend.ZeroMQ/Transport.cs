@@ -11,7 +11,7 @@ using ZeroMQ;
 
 namespace Succubus.Backend.ZeroMQ
 {
-    public class Transport : ITransport, IZeroMQConfigurator, ISubscriptionManager
+    public class Transport : ITransport, IZeroMQConfigurator, ISubscriptionManager, ICorrelationIdProvider
     {
         public void SetupSubscriber(string address)
         {
@@ -173,5 +173,9 @@ namespace Succubus.Backend.ZeroMQ
         }
 
 
+        public string CreateCorrelationId(object o)
+        {
+            return Guid.NewGuid().ToString();
+        }
     }
 }

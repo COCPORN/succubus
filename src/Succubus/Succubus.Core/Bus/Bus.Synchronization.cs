@@ -17,9 +17,9 @@ namespace Succubus.Core
         /// a synchronization context has been fulfilled, it should be removed
         /// from this dictionary.
         /// </summary>
-        Dictionary<Guid,
+        Dictionary<string,
             SynchronizationContext> synchronizationContexts =
-            new Dictionary<Guid, SynchronizationContext>();
+            new Dictionary<string, SynchronizationContext>();
 
         /// <summary>
         /// This is used to populate synchronizationcontexts with static
@@ -35,26 +35,26 @@ namespace Succubus.Core
         /// </summary>
         Dictionary<Type, List<SynchronousBlock>> replyHandlers = new Dictionary<Type, List<SynchronousBlock>>();
 
-        private readonly TimeoutHandler<Guid, SynchronizationContext> timeoutHandler = new TimeoutHandler<Guid, SynchronizationContext>();
+        private readonly TimeoutHandler<string, SynchronizationContext> timeoutHandler = new TimeoutHandler<string, SynchronizationContext>();
 
         #endregion
 
 
         #region Synchronous messaging
 
-        MessageFrames.Synchronous FrameSynchronously(object o, string address, Guid? guid = null)
+        MessageFrames.Synchronous FrameSynchronously(object o)
         {
             return new MessageFrames.Synchronous
             {
                 Message = o,
-                CorrelationId = guid ?? Guid.NewGuid(),
+                CorrelationId = CorrelationIdProvider.CreateCorrelationId(o),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
           
             };
         }
 
-        MessageFrames.Event FrameEvent(object o, string address)
+        MessageFrames.Event FrameEvent(object o)
         {
             return new MessageFrames.Event
             {
@@ -64,12 +64,12 @@ namespace Succubus.Core
             };
         }
 
-        MessageFrames.Synchronous FrameResponseSynchronously(MessageFrames.Synchronous request, object o, Guid? guid = null)
+        MessageFrames.Synchronous FrameResponseSynchronously(MessageFrames.Synchronous request, object o, string guid)
         {
             return new MessageFrames.Synchronous
             {
                 Message = o,
-                CorrelationId = guid ?? Guid.NewGuid(),
+                CorrelationId = guid ?? CorrelationIdProvider.CreateCorrelationId(o),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = request.RequestType,
                 Request = o
@@ -86,7 +86,7 @@ namespace Succubus.Core
             stack.Frames.Add(new SynchronizationFrame<TReq, TRes> { Handler = handler });
             synchronizationContext.Stacks.Add(stack);
 
-            var synchronizedRequest = FrameSynchronously(request, address);
+            var synchronizedRequest = FrameSynchronously(request);
             lock (synchronizationContexts)
             {
                 synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
@@ -124,10 +124,10 @@ namespace Succubus.Core
 
         // TODO: Decide whether static routes are really necessary, as the tree
         // needs to be built on a per call basis anyway.
-        public Guid Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 0)
+        public string Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 0)
         {
             SetupReplySubscription();
-            var synchronizedRequest = FrameSynchronously(request, address);
+            var synchronizedRequest = FrameSynchronously(request);
 
             SynchronizationContext ctx = InstantiatePrototype(request, timeoutHandler, timeout, synchronizedRequest.CorrelationId);
             if (ctx != null) ctx.Request = request;
@@ -137,7 +137,7 @@ namespace Succubus.Core
         }
 
         private SynchronizationContext InstantiatePrototype<TReq>(TReq request, Action<TReq> timeoutHandler, int timeout,
-            Guid correlationId)
+            string correlationId)
         {
             SynchronizationContext prototype;
             

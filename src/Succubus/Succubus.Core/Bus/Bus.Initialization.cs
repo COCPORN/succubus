@@ -44,7 +44,7 @@ namespace Succubus.Core
         void Initialize()
         {
             if (Transport == null) throw new TypeInitializationException(this.GetType().FullName, new ArgumentException("Missing transport"));
-            //if (Serializer == null) throw new TypeInitializationException(this.GetType().FullName, new ArgumentException("Missing serializer"));
+            if (CorrelationIdProvider == null) throw new TypeInitializationException(this.GetType().FullName, new ArgumentException("Missing correlation id provider"));
             if (SubscriptionManager == null) throw new TypeInitializationException(this.GetType().FullName, new ArgumentException("Missing subscription manager"));
         }
 

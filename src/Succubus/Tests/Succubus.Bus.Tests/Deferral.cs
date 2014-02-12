@@ -77,7 +77,7 @@ namespace Succubus.Bus.Tests
         {
             try
             {
-                bus.Pickup<BasicRequest, BasicResponse>(Guid.NewGuid(), (req, res) =>
+                bus.Pickup<BasicRequest, BasicResponse>("", (req, res) =>
                 {
                     Assert.Fail("This shouldn't happen");
                 });

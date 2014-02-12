@@ -11,5 +11,6 @@ namespace Succubus.Core
     {
         public ITransport Transport { get; set; }
         public ISubscriptionManager SubscriptionManager { get; set; }
+        public ICorrelationIdProvider CorrelationIdProvider { get; set; }
     }
 }

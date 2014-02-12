@@ -16,7 +16,7 @@ namespace Succubus.Core
 
         public void Publish<T>(T request, string address = null)
         {
-            Transport.ObjectPublish(FrameEvent(request, address ?? "__BROADCAST"), address ?? "__BROADCAST");
+            Transport.ObjectPublish(FrameEvent(request), address ?? "__BROADCAST");
         }
 
         public IResponseContext On<T>(Action<T> handler, string address = null)
