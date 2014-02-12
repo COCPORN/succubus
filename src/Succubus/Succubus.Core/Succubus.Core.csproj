@@ -61,9 +61,13 @@
     <Compile Include="Diagnostics\Pong.cs" />
     <Compile Include="Interfaces\IBus.cs" />
     <Compile Include="Interfaces\IBusConfigurator.cs" />
+    <Compile Include="Interfaces\ICorrelationIdProvider.cs" />
     <Compile Include="Interfaces\IExpiring.cs" />
     <Compile Include="Interfaces\INow.cs" />
     <Compile Include="Interfaces\IResponseContext.cs" />
+    <Compile Include="Interfaces\ISerializer.cs" />
+    <Compile Include="Interfaces\ISubscriptionManager.cs" />
+    <Compile Include="Interfaces\ITransport.cs" />
     <Compile Include="MessageFrames\Diagnostic.cs" />
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
