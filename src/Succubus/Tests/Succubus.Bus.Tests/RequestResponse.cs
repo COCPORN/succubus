@@ -22,6 +22,7 @@ namespace Succubus.Bus.Tests
             bus = new Core.Bus();
 
             //bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
+            //Thread.Sleep(1500);
             bus.Initialize(succubus => succubus.WithLoopback(clear: true));
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse

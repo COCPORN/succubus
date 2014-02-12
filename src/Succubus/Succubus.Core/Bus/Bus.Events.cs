@@ -1,4 +1,5 @@
-﻿using Succubus.Core.Interfaces;
+﻿using System.Threading;
+using Succubus.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -66,6 +67,7 @@ namespace Succubus.Core
                 else
                 {
                     SetupSubscriber("__REPLY");
+               
                     replySubscriptionSetup = true;
                 }
             }
