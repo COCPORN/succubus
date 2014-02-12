@@ -6,7 +6,6 @@ namespace Succubus.Core.Interfaces
     public interface IBus
     {
         #region Initialization
-        void Initialize();
         void Initialize(Action<IBusConfigurator> initializationHandler);
         #endregion
 

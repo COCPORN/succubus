@@ -2,6 +2,7 @@
 {
     public interface ISubscriptionManager
     {
-         
+        void Subscribe(string address); 
+        void SubscribeAll();
     }
 }

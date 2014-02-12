@@ -3,6 +3,8 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
+using Succubus.Backend.Loopback;
+using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
 
@@ -19,9 +21,8 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.StartMessageHost());
-
-            Thread.Sleep(1500);
+            //bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
+            bus.Initialize(succubus => succubus.WithLoopback(clear: true));
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
@@ -98,8 +99,6 @@ namespace Succubus.Bus.Tests
         public void ComplexOrchestration1()
         {
             OrchestrationSetup1();
-
-            Thread.Sleep(500);
 
             bool res1res2in = false;
             bool res1res2res3in = false;

@@ -1,21 +1,13 @@
-﻿namespace Succubus.Core.Interfaces
+﻿using System.Security.Cryptography.X509Certificates;
+
+namespace Succubus.Core.Interfaces
 {
     public interface IBusConfigurator
     {
-        #region Communication        
-        string PublishAddress { get; set; }
-        string SubscribeAddress { get; set; }
-        #endregion
+     
+        ITransport Transport { get; set; }
+        ISubscriptionManager SubscriptionManager { get; set; }
 
-
-        #region Filtering
-        string Network { get; set;  }        
-        #endregion
-
-        #region Configuration sources
-        void GetFromConfigurationFile();
-        #endregion
-
-
+        ITransportBridge Bridge { get; set; }
     }
 }

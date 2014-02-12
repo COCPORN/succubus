@@ -2,6 +2,8 @@
 using System.Threading;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
+using Succubus.Backend.Loopback;
+using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
 
@@ -16,9 +18,8 @@ namespace Succubus.Bus.Tests
         public void Init()
         {
             bus = new Core.Bus();
-
-            bus.Initialize(succubus => succubus.StartMessageHost());
-            Thread.Sleep(1500);
+            //bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
+            bus.Initialize(succubus => succubus.WithLoopback(clear: true));
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
@@ -125,8 +126,7 @@ namespace Succubus.Bus.Tests
         public void ReqResAsEventsSecondBusInstance()
         {
             var bus2 = new Core.Bus();
-            bus2.Initialize();
-            Thread.Sleep(1500);
+            bus2.Initialize(config => config.WithLoopback());
 
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);

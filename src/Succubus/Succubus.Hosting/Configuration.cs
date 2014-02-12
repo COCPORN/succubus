@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Succubus.Backend.ZeroMQ;
 using Succubus.Core.Interfaces;
 using Succubus.Hosting.Interfaces;
 
@@ -7,9 +8,9 @@ namespace Succubus.Hosting
 {
     public static class Configuration
     {
-        static Dictionary<IBusConfigurator, MessageHost> messageHosts = new Dictionary<IBusConfigurator, MessageHost>();
+        static Dictionary<IZeroMQConfigurator, MessageHost> messageHosts = new Dictionary<IZeroMQConfigurator, MessageHost>();
 
-        public static void StartMessageHost(this IBusConfigurator busConfigurator)
+        public static void StartMessageHost(this IZeroMQConfigurator busConfigurator)
         {
             StartMessageHost(busConfigurator, host =>
             {
@@ -19,7 +20,7 @@ namespace Succubus.Hosting
 
         }
 
-        public static void StartMessageHost(this IBusConfigurator busConfigurator,
+        public static void StartMessageHost(this IZeroMQConfigurator busConfigurator,
             Action<IHostConfigurator> hostConfigurator)
         {
       

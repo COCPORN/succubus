@@ -1,9 +1,7 @@
-﻿using System.Runtime.Remoting.Messaging;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Succubus.Collections;
 using Succubus.Core.Interfaces;
-using Succubus.Serialization;
 using System;
 using System.Collections.Generic;
 
@@ -48,7 +46,7 @@ namespace Succubus.Core
         {
             return new MessageFrames.Synchronous
             {
-                Message = JsonFrame.Serialize(o),
+                Message = o,
                 CorrelationId = guid ?? Guid.NewGuid(),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
@@ -60,7 +58,7 @@ namespace Succubus.Core
         {
             return new MessageFrames.Event
             {
-                Message = JsonFrame.Serialize(o),
+                Message = o,
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
             
             };
@@ -70,7 +68,7 @@ namespace Succubus.Core
         {
             return new MessageFrames.Synchronous
             {
-                Message = JsonFrame.Serialize(o),
+                Message = o,
                 CorrelationId = guid ?? Guid.NewGuid(),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = request.RequestType,
@@ -93,7 +91,7 @@ namespace Succubus.Core
             {
                 synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
             }
-            ObjectPublish(synchronizedRequest, address ?? "__BROADCAST");
+            Transport.ObjectPublish(synchronizedRequest, address ?? "__BROADCAST");
         }
 
         public TRes Call<TReq, TRes>(TReq request, string address = null, int timeout = 10000)
@@ -134,7 +132,7 @@ namespace Succubus.Core
             SynchronizationContext ctx = InstantiatePrototype(request, timeoutHandler, timeout, synchronizedRequest.CorrelationId);
             if (ctx != null) ctx.Request = request;
 
-            ObjectPublish(synchronizedRequest, address ?? "__BROADCAST");
+            Transport.ObjectPublish(synchronizedRequest, address ?? "__BROADCAST");
             return synchronizedRequest.CorrelationId;
         }
 

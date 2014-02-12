@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Succubus.Backend.Loopback;
+using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
 
@@ -20,9 +22,8 @@ namespace Succubus.Bus.Tests
         public void Init()
         {
             bus = new Core.Bus();
-
-            bus.Initialize(succubus => succubus.StartMessageHost());
-            Thread.Sleep(1500);
+            //bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
+            bus.Initialize(succubus => succubus.WithLoopback());
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
@@ -43,7 +44,6 @@ namespace Succubus.Bus.Tests
                     mre.Set();
                 }
             }, "CORRECTADDRESS");
-
             bus.Publish(new BasicEvent() { Message = "Wohey" }, "CORRECTADDRESS");
             if (mre.WaitOne(500) == false)
             {
@@ -90,13 +90,13 @@ namespace Succubus.Bus.Tests
 
         [Test]
         [ExpectedException(typeof(TimeoutException))]
-        public async void SimpleSynchronousWithIncorrectAddressing()
+        public void SimpleSynchronousWithIncorrectAddressing()
         {
             var reply = bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" }, "BADADDRESS", 1000);
-          
+
         }
-     
-     
+
+
 
     }
 }

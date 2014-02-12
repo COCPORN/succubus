@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Succubus.Backend.ZeroMQ;
 using Succubus.Hosting;
 
 namespace Succubus.Bus.Tests
@@ -13,7 +14,8 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.StartMessageHost());
+            bus.Initialize(succubus => 
+                succubus.WithZeroMQ(config => config.StartMessageHost()));
         }
 
     }

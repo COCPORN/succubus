@@ -1,66 +1,24 @@
-﻿using System.Threading.Tasks;
-using Succubus.Core.MessageFrames;
-using Succubus.Serialization;
+﻿using System.Net.Sockets;
+using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using ZeroMQ;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Core
 {
-    public partial class Bus
+    public partial class Bus : ITransportBridge
     {
-        ManualResetEvent subscriberOnline = new ManualResetEvent(false);
-        bool run = true;
+     
 
 
-        void Subscriber()
-        {
-            try
-            {
-                using (subscribeSocket = context.CreateSocket(SocketType.SUB))
-                {
-                    ConnectSubscriber();
-                    subscriberOnline.Set();
-                    while (run)
-                    {
-                        string address = subscribeSocket.Receive(Encoding.ASCII);
-                        string typename = subscribeSocket.Receive(Encoding.Unicode);
-                        string serialized = subscribeSocket.Receive(Encoding.Unicode);
-                        Type coreType = Type.GetType(typename + ", Succubus.Core");
-
-                        object coreMessage = JsonFrame.Deserlialize(serialized, coreType);
-
-                        var synchronousFrame = coreMessage as MessageFrames.Synchronous;
-                        var eventFrame = coreMessage as MessageFrames.Event;
-                        if (synchronousFrame != null)
-                        {
-                            ProcessSynchronousMessages(synchronousFrame, address);
-                            ProcessCatchAllEvents(synchronousFrame, address);
-                        }
-                        else if (eventFrame != null)
-                        {
-                            ProcessEvents(eventFrame, address);
-                        }
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // TODO: Create diagnostic messages
-            }
-        }
-
-
-
-        private void ProcessSynchronousMessages(MessageFrames.Synchronous synchronousFrame, string address)
+        public void ProcessSynchronousMessages(MessageFrames.Synchronous synchronousFrame, string address)
         {
      
 
             Type type = Type.GetType(synchronousFrame.EmbeddedType);
-            object message = JsonFrame.Deserlialize(synchronousFrame.Message, type);
+            object message = synchronousFrame.Message;
 
             ProcessReplyHandlers(synchronousFrame, type, message, address);
 
@@ -152,7 +110,7 @@ namespace Succubus.Core
                                 var response = handler.Handler(message);
                                 var framedResponse = FrameResponseSynchronously(synchronousFrame, response,
                                     synchronousFrame.CorrelationId);
-                                ObjectPublish(framedResponse, "__REPLY");
+                                Transport.ObjectPublish(framedResponse, "__REPLY");
                             });
                         }
                     }

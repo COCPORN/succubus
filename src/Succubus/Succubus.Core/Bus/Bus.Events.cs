@@ -1,9 +1,6 @@
-﻿using System.Security.AccessControl;
-using Succubus.Core.Interfaces;
-using Succubus.Serialization;
+﻿using Succubus.Core.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,14 +15,14 @@ namespace Succubus.Core
 
         public void Publish<T>(T request, string address = null)
         {
-            ObjectPublish(FrameEvent(request, address ?? "__BROADCAST"), address ?? "__BROADCAST");
+            Transport.ObjectPublish(FrameEvent(request, address ?? "__BROADCAST"), address ?? "__BROADCAST");
         }
 
         public IResponseContext On<T>(Action<T> handler, string address = null)
         {
             if (typeof(T).BaseType == null)
             {
-                subscribeSocket.SubscribeAll();
+                SubscriptionManager.SubscribeAll();
             }
             else
             {
@@ -51,11 +48,11 @@ namespace Succubus.Core
         {
             if (address == null)
             {
-                subscribeSocket.SubscribeAll();
+                SubscriptionManager.SubscribeAll();
             }
             else
             {
-                subscribeSocket.Subscribe(Encoding.ASCII.GetBytes(address));
+                SubscriptionManager.Subscribe(address);
             }
         }
 
@@ -75,14 +72,14 @@ namespace Succubus.Core
             
         }
 
-        private void ProcessEvents(MessageFrames.Event eventFrame, string address)
+        public void ProcessEvents(MessageFrames.Event eventFrame, string address)
         {
           
 
             Type type = Type.GetType(eventFrame.EmbeddedType);
             Type eventType = Type.GetType(eventFrame.EmbeddedType);
             IEnumerable<Type> interfaces = eventType.GetInterfaces();
-            object message = JsonFrame.Deserlialize(eventFrame.Message, type);
+            object message = eventFrame.Message;
 
             if (type == null || eventType == null || message == null) return;
 
@@ -122,7 +119,7 @@ namespace Succubus.Core
             }
         }
 
-        private void ProcessCatchAllEvents(MessageFrames.Synchronous eventFrame, string address)
+        public void ProcessCatchAllEvents(MessageFrames.Synchronous eventFrame, string address)
         {
          
             List<EventBlock> handlers = null;
@@ -139,7 +136,7 @@ namespace Succubus.Core
 
             Type type = Type.GetType(eventFrame.EmbeddedType);
             Type messageType = Type.GetType(eventFrame.EmbeddedType);
-            object message = JsonFrame.Deserlialize(eventFrame.Message, type);
+            object message = eventFrame.Message;
 
             if (type == null || messageType == null || message == null) return;
 

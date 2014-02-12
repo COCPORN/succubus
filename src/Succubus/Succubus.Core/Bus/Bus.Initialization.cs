@@ -2,7 +2,6 @@
 using Succubus.Core.Interfaces;
 using System;
 using System.Threading;
-using ZeroMQ;
 
 namespace Succubus.Core
 {
@@ -33,74 +32,31 @@ namespace Succubus.Core
 
         #region Members
 
-        #region ØMQ
-
-
-        private ZmqContext context;
-        private ZmqSocket publishSocket;
-        private ZmqSocket subscribeSocket;
-
-        #endregion
-
-        #region Threading
-
-        private Thread subscriberThread;
-
-        #endregion
 
 
         #endregion
 
         #region Initialization
 
-        public Bus()
-        {          
-            PublishAddress = "tcp://localhost:9000";
-            SubscribeAddress = "tcp://localhost:9001";
-            context = ZmqContext.Create();
-        }
 
-        public ZmqContext Context { get { return context; } set { context = value; } }
 
-        private bool initialized = false;
 
-        public void Initialize()
+        void Initialize()
         {
-            lock (this)
-            {
-                if (initialized == true)
-                {
-                    throw new InvalidOperationException("Bus is already initialized");
-                }
-                initialized = true;
-            }
-                  
-            ConnectPublisher();
-
-            subscriberThread = new Thread(Subscriber) { IsBackground = true };
-            subscriberThread.Start();
-
-  
+            if (Transport == null) throw new TypeInitializationException(this.GetType().FullName, new ArgumentException("Missing transport"));
+            //if (Serializer == null) throw new TypeInitializationException(this.GetType().FullName, new ArgumentException("Missing serializer"));
+            if (SubscriptionManager == null) throw new TypeInitializationException(this.GetType().FullName, new ArgumentException("Missing subscription manager"));
         }
 
         public void Initialize(Action<IBusConfigurator> initializationHandler)
-        { 
+        {
+            Bridge = this;
             initializationHandler(this);
             Initialize();
         }
 
         #endregion
 
-        private void ConnectPublisher()
-        {
-            publishSocket = context.CreateSocket(SocketType.PUB);
-            publishSocket.Connect(PublishAddress);
-        }
-
-        private void ConnectSubscriber()
-        {
-            subscribeSocket.Connect(SubscribeAddress);
-        }
 
 
     }

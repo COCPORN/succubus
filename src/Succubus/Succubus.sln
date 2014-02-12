@@ -22,6 +22,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Bus.Tests", "Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.EventStore", "Succubus.EventStore\Succubus.EventStore.csproj", "{8BBAE0C1-60FC-4AA3-8CA4-4EF200FD8E28}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.ZeroMQ", "Succubus.Backend.ZeroMQ\Succubus.Backend.ZeroMQ.csproj", "{AB82E968-7A81-40AD-B7A1-82692A74C80D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.Loopback", "Succubus.Backend.Loopback\Succubus.Backend.Loopback.csproj", "{39472ED0-BB38-4865-81C9-9F55423FCA60}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +52,14 @@ Global
 		{8BBAE0C1-60FC-4AA3-8CA4-4EF200FD8E28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BBAE0C1-60FC-4AA3-8CA4-4EF200FD8E28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BBAE0C1-60FC-4AA3-8CA4-4EF200FD8E28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB82E968-7A81-40AD-B7A1-82692A74C80D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB82E968-7A81-40AD-B7A1-82692A74C80D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB82E968-7A81-40AD-B7A1-82692A74C80D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB82E968-7A81-40AD-B7A1-82692A74C80D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39472ED0-BB38-4865-81C9-9F55423FCA60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39472ED0-BB38-4865-81C9-9F55423FCA60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39472ED0-BB38-4865-81C9-9F55423FCA60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39472ED0-BB38-4865-81C9-9F55423FCA60}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

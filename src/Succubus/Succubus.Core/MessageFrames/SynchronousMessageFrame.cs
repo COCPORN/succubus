@@ -14,7 +14,7 @@ namespace Succubus.Core.MessageFrames
 
         public string ParentType { get; set; }
 
-        public string Message { get; set; }
+        public object Message { get; set; }
 
     }
 }

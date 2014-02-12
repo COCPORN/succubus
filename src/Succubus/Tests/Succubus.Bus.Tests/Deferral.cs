@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Security.Cryptography;
 using System.Threading;
 using NUnit.Framework;
+using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Collections;
 using Succubus.Collections.Interfaces;
@@ -20,13 +21,13 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.StartMessageHost());
+            bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse { Message = "FROM SERVER: " + req.Message });
             bus.ReplyTo<ChildRequest, ChildBase>(req => new ChildResponse1 { Message = "FROM SERVER: " + req.Message });
 
-           // bus.Defer<BasicRequest, BasicResponse>();
-           // bus.Defer<ChildRequest, ChildBase>();
+            // bus.Defer<BasicRequest, BasicResponse>();
+            // bus.Defer<ChildRequest, ChildBase>();
         }
 
 
@@ -47,13 +48,15 @@ namespace Succubus.Bus.Tests
         public void DoubleDeferrence()
         {
             Core.Bus bus2 = new Core.Bus();
-            bus2.Initialize();
+            bus2.Initialize(
+                config => config.WithZeroMQ()
+                );
 
             Thread.Sleep(500);
 
             bus2.Defer<BasicRequest, BasicResponse>();
 
-   
+
             var id = bus.Call(new BasicRequest() { Message = "Double deferrence" });
 
             bus.Pickup<BasicRequest, BasicResponse>(id, (req, res) =>
@@ -66,7 +69,7 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual("FROM SERVER: " + request.Message, response.Message);
             });
 
-    
+
         }
 
         [Test]
@@ -82,10 +85,10 @@ namespace Succubus.Bus.Tests
             catch (InvalidOperationException ex)
             {
                 Assert.AreEqual("Unable to find context", ex.Message);
-            }    
+            }
         }
 
-    
+
 
         [Test]
         public void UnresolvedDeferral()
@@ -99,15 +102,15 @@ namespace Succubus.Bus.Tests
                 {
                     Assert.Fail("This shouldn't happen");
                 });
-               
+
             }
             catch (InvalidOperationException ex)
             {
-                Assert.AreEqual("Context unsatisfied", ex.Message);             
+                Assert.AreEqual("Context unsatisfied", ex.Message);
             }
         }
 
-           
+
 
         [Test]
         public void BaseClassDeferrence()

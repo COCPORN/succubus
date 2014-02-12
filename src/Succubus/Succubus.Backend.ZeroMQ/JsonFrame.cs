@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Text;
+using Newtonsoft.Json;
+using Succubus.Core.Interfaces;
 using ZeroMQ;
 
 namespace Succubus.Serialization
 {
-    public static class JsonFrame
+    public static class JsonFrame 
     {
         private static JsonSerializerSettings settings = new JsonSerializerSettings
         {
@@ -19,7 +20,7 @@ namespace Succubus.Serialization
             return new Frame(Encoding.UTF8.GetBytes(message));
         }
 
-        public static T DeSerialize<T>(Frame frame)
+        public static  T DeSerialize<T>(Frame frame)
         {
             var messageObject =
                       JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(frame.Buffer), settings);
@@ -32,7 +33,7 @@ namespace Succubus.Serialization
             return messageObject;
         }
 
-        public static object Deserlialize(string serialized, Type type)
+        public static object Deserialize(string serialized, Type type)
         {
             var messageObject = JsonConvert.DeserializeObject(serialized, type, settings);
             return messageObject;
@@ -42,5 +43,7 @@ namespace Succubus.Serialization
         {
             return JsonConvert.SerializeObject(message, Formatting.None, settings);
         }
+
+     
     }
 }
