@@ -76,6 +76,14 @@ namespace Succubus.Core
                             }
                         }
                     }
+                    else if (ctx.TimedOut == true)
+                    {
+                        lock (synchronizationContexts)
+                        {
+                            synchronizationContexts.Remove(synchronousFrame.CorrelationId);
+                            timeoutHandler.RemoveTimeout(synchronousFrame.CorrelationId);
+                        }
+                    }
 
                 }
                 catch

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Data.Odbc;
+using System.Threading;
 using System.Threading.Tasks;
 using Succubus.Collections;
 using Succubus.Core.Interfaces;
@@ -50,7 +51,7 @@ namespace Succubus.Core
                 CorrelationId = CorrelationIdProvider.CreateCorrelationId(o),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-          
+
             };
         }
 
@@ -60,7 +61,7 @@ namespace Succubus.Core
             {
                 Message = o,
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-            
+
             };
         }
 
@@ -76,6 +77,7 @@ namespace Succubus.Core
             };
         }
 
+
         public void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null)
         {
             SetupReplySubscription();
@@ -87,10 +89,28 @@ namespace Succubus.Core
             synchronizationContext.Stacks.Add(stack);
 
             var synchronizedRequest = FrameSynchronously(request);
+            SynchronizationContext existing = null;
             lock (synchronizationContexts)
             {
-                synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+                if (synchronizationContexts.TryGetValue(synchronizedRequest.CorrelationId, out existing) == false)
+                {
+                    synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+                }
             }
+
+            // Wait for existing synchronization contexts to finish in case of crashing correlation ids
+            while (existing != null)
+            {           
+                existing.ResolvedResetEvent.WaitOne(10000);
+                lock (synchronizationContexts)
+                {
+                    if (synchronizationContexts.TryGetValue(synchronizedRequest.CorrelationId, out existing) == false)
+                    {
+                        synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
+                    }
+                }
+            }
+
             Transport.ObjectPublish(synchronizedRequest, address ?? "__BROADCAST");
         }
 
@@ -140,7 +160,7 @@ namespace Succubus.Core
             string correlationId)
         {
             SynchronizationContext prototype;
-            
+
             lock (staticSynchronizationPrototypes)
             {
                 staticSynchronizationPrototypes.TryGetValue(request.GetType(), out prototype);
@@ -149,7 +169,7 @@ namespace Succubus.Core
             {
                 //var synchronizationContext = Serialization.ObjectCopier.Clone(prototype);
                 var synchronizationContext = SynchronizationContext.Clone(prototype);
-       
+
                 if (timeout != 0)
                 {
                     if (timeoutHandler != null) synchronizationContext.SetTimeoutHandler(timeoutHandler);

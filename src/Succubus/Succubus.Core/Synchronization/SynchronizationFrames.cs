@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Runtime.Remoting;
+using System.Threading;
 
 namespace Succubus
 {
@@ -24,9 +25,13 @@ namespace Succubus
 
         protected Action<string, object, Dictionary<Type, object>> correlationHandler;
 
+        readonly ManualResetEvent handleEvent = new ManualResetEvent(false);
+        public ManualResetEvent HandleEvent { get { return handleEvent; } }
+
         public void CallHandler(Dictionary<Type, object> messages)
         {
             if (handler != null) handler(messages);
+            handleEvent.Set();
         }
 
         public void CallStaticHandler(Dictionary<Type, object> messages)

@@ -41,6 +41,7 @@ namespace Succubus
 
         public ContextType ContextType { get; set; }
         public ManualResetEvent DeferredResetEvent { get; set; }
+        public ManualResetEvent ResolvedResetEvent { get; set; }
 
         public string CorrelationId { get; set; }
         public string Id { get { return CorrelationId; } }
@@ -56,6 +57,7 @@ namespace Succubus
         {
             Stacks = new List<SynchronizationStack>();
             DeferredResetEvent = new ManualResetEvent(false);
+            ResolvedResetEvent = new ManualResetEvent(false);
         }
 
         public bool TimedOut { get; set; }
@@ -83,6 +85,8 @@ namespace Succubus
             }
 
             if (unresolvedFrames) return false;
+
+            ResolvedResetEvent.Set();
             return true;
         }
 
