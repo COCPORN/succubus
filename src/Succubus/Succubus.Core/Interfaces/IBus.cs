@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Succubus.Core.Diagnostics;
 
 namespace Succubus.Core.Interfaces
 {
@@ -68,7 +69,15 @@ namespace Succubus.Core.Interfaces
         
         #endregion
 
+        #region Error handling
+
+        event EventHandler<ExceptionEventArgs> Exception;
+
+        #endregion
+
+
         #region Fan out
+
         #endregion
 
     }

@@ -47,6 +47,7 @@
     <Compile Include="Addressing.cs" />
     <Compile Include="Correlation.cs" />
     <Compile Include="Deferral.cs" />
+    <Compile Include="ErrorHandling.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="Messages\BasicEvent.cs" />
     <Compile Include="Messages\BasicRequest.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Messages\ChildEvent.cs" />
     <Compile Include="Messages\ChildMessages.cs" />
     <Compile Include="Messages\ComplexOrchestrationMessages.cs" />
+    <Compile Include="Messages\ErrorRequest.cs" />
     <Compile Include="Messages\Marker.cs" />
     <Compile Include="Messages\ParentEvent.cs" />
     <Compile Include="Messages\Routing.cs" />

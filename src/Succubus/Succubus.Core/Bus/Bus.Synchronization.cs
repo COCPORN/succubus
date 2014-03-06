@@ -324,7 +324,18 @@ namespace Succubus.Core
         public void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler, string address = null)
         {
             SetupSubscriber(address);
-            SynchronousBlock objectHandler = new SynchronousBlock { Handler = (req) => (TRes)handler((TReq)req), Address = address ?? "__BROADCAST" };
+            SynchronousBlock objectHandler = new SynchronousBlock { Handler = (req) =>
+            {
+                try
+                {
+                    return (TRes) handler((TReq) req);
+                }
+                catch (Exception ex)
+                {
+                    RaiseExceptionEvent(ex);
+                    return default(TRes);
+                }
+            }, Address = address ?? "__BROADCAST" };
             lock (replyHandlers)
             {
                 if (replyHandlers.ContainsKey(typeof(TReq)) == false)

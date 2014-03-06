@@ -4,20 +4,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using Succubus.Core.Diagnostics;
 using Succubus.Core.Interfaces;
 
 namespace Succubus.Core
 {
     public partial class Bus : ITransportBridge
     {
-     
+
 
 
         public void ProcessSynchronousMessages(MessageFrames.Synchronous synchronousFrame, string address)
         {
-     
 
-            
+
+
             object message = synchronousFrame.Message;
 
             if (message == null) return;
@@ -32,7 +33,7 @@ namespace Succubus.Core
 
         private SynchronizationContext ProcessSynchronousHandlers(MessageFrames.Synchronous synchronousFrame, object message, string address)
         {
-         
+
 
             SynchronizationContext ctx;
 
@@ -49,7 +50,7 @@ namespace Succubus.Core
                             if (ctx != null)
                             {
                                 ctx.Request = message;
-                                
+
                                 lock (deferredWaitHandles)
                                 {
                                     ManualResetEvent handle = null;
@@ -100,7 +101,7 @@ namespace Succubus.Core
 
         private void ProcessReplyHandlers(MessageFrames.Synchronous synchronousFrame, Type type, object message, string address)
         {
-        
+
             List<SynchronousBlock> handlers = null;
 
             lock (replyHandlers)
@@ -109,24 +110,33 @@ namespace Succubus.Core
             }
             if (handlers != null)
             {
-                try
+
+                foreach (var replyHandler in handlers)
                 {
-                    foreach (var replyHandler in handlers)
+                    SynchronousBlock handler = replyHandler;
+                    if (handler.Address == address)
                     {
-                        SynchronousBlock handler = replyHandler;
-                        if (handler.Address == address)
+                        try
                         {
                             Task.Factory.StartNew(() =>
                             {
                                 var response = handler.Handler(message);
-                                var framedResponse = FrameResponseSynchronously(synchronousFrame, response,
-                                    synchronousFrame.CorrelationId);
-                                Transport.ObjectPublish(framedResponse, "__REPLY");
+                                if (response != null)
+                                {
+                                    var framedResponse = FrameResponseSynchronously(synchronousFrame, response,
+                                        synchronousFrame.CorrelationId);
+                                    Transport.ObjectPublish(framedResponse, "__REPLY");
+                                }
                             });
                         }
+                        catch (Exception ex)
+                        {
+                            RaiseExceptionEvent(ex);
+                        }
+
                     }
                 }
-                catch { }
+
             }
         }
 

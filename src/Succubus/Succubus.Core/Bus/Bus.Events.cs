@@ -117,7 +117,14 @@ namespace Succubus.Core
                 var handler = eventHandler;
                 if (handler.Address == null || handler.Address == address)
                 {
-                    Task.Factory.StartNew(() => handler.Handler(message));
+                    try
+                    {
+                        Task.Factory.StartNew(() => handler.Handler(message));
+                    }
+                    catch (Exception ex)
+                    {
+                        RaiseExceptionEvent(ex);
+                    }
                 }
             }
         }
@@ -152,7 +159,14 @@ namespace Succubus.Core
                     var handler = eventHandler;
                     if (handler.Address == null || handler.Address == address)
                     {
-                        Task.Factory.StartNew(() => handler.Handler(message));
+                        try
+                        {
+                            Task.Factory.StartNew(() => handler.Handler(message));
+                        }
+                        catch (Exception ex)
+                        {
+                            RaiseExceptionEvent(ex);
+                        }
                     }
                 }
             }

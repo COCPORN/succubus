@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using NUnit.Framework;
+using Succubus.Backend.Loopback;
 using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
@@ -16,7 +17,7 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
+            bus.Initialize(succubus => succubus.WithLoopback());
             bus.ReplyTo<A, B1>(a => new B1());
             bus.ReplyTo<A, B2>(a => new B2());
             bus.ReplyTo<B1, C>(b1 => new D1());

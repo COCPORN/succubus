@@ -98,10 +98,7 @@ namespace Succubus.Bus.Tests
             {
                 bus.Defer<BasicRequest, BasicResponse>();
                 var id = bus.Call(new BasicRequest { Message = "You will never be satisfied, context" });
-                bus.Pickup<BasicRequest, ChildResponse1>(id, (req, res) =>
-                {
-                    Assert.Fail("This shouldn't happen");
-                });
+                bus.Pickup<BasicRequest, ChildResponse1>(id, (req, res) => Assert.Fail("This shouldn't happen"));
 
             }
             catch (InvalidOperationException ex)
