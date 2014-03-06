@@ -71,7 +71,7 @@ namespace Succubus.Core.Interfaces
 
         #region Error handling
 
-        event EventHandler<ExceptionEventArgs> Exception;
+        event EventHandler<ExceptionEventArgs> HandlerException;
 
         #endregion
 

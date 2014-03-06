@@ -5,11 +5,11 @@ namespace Succubus.Core
 {
     public partial class Bus
     {
-        public event EventHandler<ExceptionEventArgs> Exception;
+        public event EventHandler<ExceptionEventArgs> HandlerException;
 
         void RaiseExceptionEvent(Exception ex)
         {
-            EventHandler<ExceptionEventArgs> eh = Exception;
+            EventHandler<ExceptionEventArgs> eh = HandlerException;
             if (eh != null)
             {
                 eh(this, new ExceptionEventArgs {Exception = ex});

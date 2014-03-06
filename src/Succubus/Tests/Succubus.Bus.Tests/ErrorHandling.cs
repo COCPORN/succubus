@@ -34,7 +34,7 @@ namespace Succubus.Bus.Tests
                 throw new Exception("Yeah, see, that doesn't really work");
             });
 
-            bus.Exception += (sender, args) => are.Set();
+            bus.HandlerException += (sender, args) => are.Set();
         }
 
         [Test]
