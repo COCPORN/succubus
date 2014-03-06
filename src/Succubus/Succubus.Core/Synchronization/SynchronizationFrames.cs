@@ -19,6 +19,8 @@ namespace Succubus
 
         public Type GenericType { get; set; }
 
+        public Action<Action> Marshal { get; set; }
+
         protected Action<Dictionary<Type, object>> handler;
 
         protected Action<object, Dictionary<Type, object>> staticHandler;
@@ -30,7 +32,18 @@ namespace Succubus
 
         public void CallHandler(Dictionary<Type, object> messages)
         {
-            if (handler != null) handler(messages);
+            if (handler != null)
+            {
+                if (Marshal == null)
+                {
+                    handler(messages);
+                }
+                else
+                {
+                    Action execute = () => handler(messages);
+                    Marshal(execute);
+                }
+            }
             handleEvent.Set();
         }
 

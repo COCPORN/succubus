@@ -14,12 +14,21 @@ namespace Succubus.Core
         /// </summary>
         readonly Dictionary<Type, List<EventBlock>> eventHandlers = new Dictionary<Type, List<EventBlock>>();
 
-        public void Publish<T>(T request, string address = null)
+        public void Publish<T>(T request, string address = null, Action<Action> marshal = null)
         {
-            Transport.ObjectPublish(FrameEvent(request), address ?? "__BROADCAST");
+            Action execute = () => Transport.ObjectPublish(FrameEvent(request), address ?? "__BROADCAST");
+
+            if (marshal == null)
+            {
+                execute();
+            }
+            else
+            {
+                marshal(execute);
+            }
         }
 
-        public IResponseContext On<T>(Action<T> handler, string address = null)
+        public IResponseContext On<T>(Action<T> handler, string address = null, Action<Action> marshal = null)
         {
             if (typeof(T).BaseType == null)
             {
@@ -40,7 +49,7 @@ namespace Succubus.Core
                     eventHandlers.Add(typeof(T), handlers);
                 }
 
-                handlers.Add(new EventBlock() { Handler = myHandler, Address = address });
+                handlers.Add(new EventBlock() { Handler = myHandler, Address = address, Marshal = marshal });
             }
             return new Bus.ResponseContext(this);
         }
@@ -119,7 +128,14 @@ namespace Succubus.Core
                 {
                     try
                     {
-                        Task.Factory.StartNew(() => handler.Handler(message));
+                        if (handler.Marshal == null)
+                        {
+                            Task.Factory.StartNew(() => handler.Handler(message));
+                        }
+                        else
+                        {
+                            handler.Marshal(() => handler.Handler(message));
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -177,5 +193,6 @@ namespace Succubus.Core
     {
         internal string Address;
         internal Action<object> Handler;
+        internal Action<Action> Marshal;
     }
 }

@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.ZeroMQ", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.Loopback", "Succubus.Backend.Loopback\Succubus.Backend.Loopback.csproj", "{39472ED0-BB38-4865-81C9-9F55423FCA60}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.Caliburn.Micro.EventAggregator", "Succubus.Backend.Caliburn.Micro.EventAggregator\Succubus.Backend.Caliburn.Micro.EventAggregator.csproj", "{961406ED-7628-4FF7-8E4F-E4F7DED8D392}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +62,10 @@ Global
 		{39472ED0-BB38-4865-81C9-9F55423FCA60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39472ED0-BB38-4865-81C9-9F55423FCA60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39472ED0-BB38-4865-81C9-9F55423FCA60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{961406ED-7628-4FF7-8E4F-E4F7DED8D392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{961406ED-7628-4FF7-8E4F-E4F7DED8D392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{961406ED-7628-4FF7-8E4F-E4F7DED8D392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{961406ED-7628-4FF7-8E4F-E4F7DED8D392}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

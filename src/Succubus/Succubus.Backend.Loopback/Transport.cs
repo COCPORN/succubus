@@ -42,6 +42,12 @@ namespace Succubus.Backend.Loopback
 
         }
 
+        public void ObjectPublish(object message, string address, Action<Action> marshal)
+        {
+            if (marshal == null) ObjectPublish(message, address);
+            else marshal(() => ObjectPublish(message, address));           
+        }
+
 
 
         public void Subscribe(string address)

@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Security.Cryptography;
 using System.Threading;
 using NUnit.Framework;
+using Succubus.Backend.Loopback;
 using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Collections;
@@ -21,7 +22,7 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
+            bus.Initialize(succubus => succubus.WithLoopback(clear:true));
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse { Message = "FROM SERVER: " + req.Message });
             bus.ReplyTo<ChildRequest, ChildBase>(req => new ChildResponse1 { Message = "FROM SERVER: " + req.Message });
