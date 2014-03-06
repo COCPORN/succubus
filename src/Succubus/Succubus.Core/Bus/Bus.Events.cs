@@ -78,12 +78,13 @@ namespace Succubus.Core
         {
           
 
-            Type type = Type.GetType(eventFrame.EmbeddedType);
-            Type eventType = Type.GetType(eventFrame.EmbeddedType);
-            IEnumerable<Type> interfaces = eventType.GetInterfaces();
+            //Type type = Type.GetType(eventFrame.EmbeddedType);
+            //Type eventType = Type.GetType(eventFrame.EmbeddedType);
             object message = eventFrame.Message;
+            if (message == null) return;
 
-            if (type == null || eventType == null || message == null) return;
+            Type eventType = message.GetType();
+            IEnumerable<Type> interfaces = eventType.GetInterfaces();        
 
             List<EventBlock> handlers = new List<EventBlock>();
 

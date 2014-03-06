@@ -15,7 +15,7 @@ namespace Succubus.Backend.ZeroMQ
   
             configurator.Transport = transport;
             configurator.SubscriptionManager = transport;
-
+            configurator.CorrelationIdProvider = transport;
             transport.Initialize();
         }
 
@@ -29,6 +29,7 @@ namespace Succubus.Backend.ZeroMQ
        
             configurator.Transport = transport;
             configurator.SubscriptionManager = transport;
+            configurator.CorrelationIdProvider = transport;
             transport.Initialize();
         }
     }

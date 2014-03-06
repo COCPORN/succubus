@@ -17,8 +17,11 @@ namespace Succubus.Core
         {
      
 
-            Type type = Type.GetType(synchronousFrame.EmbeddedType);
+            
             object message = synchronousFrame.Message;
+
+            if (message == null) return;
+            Type type = message.GetType();
 
             ProcessReplyHandlers(synchronousFrame, type, message, address);
 

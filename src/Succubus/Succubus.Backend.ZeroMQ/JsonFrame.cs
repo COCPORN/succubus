@@ -8,7 +8,7 @@ namespace Succubus.Serialization
 {
     public static class JsonFrame 
     {
-        private static JsonSerializerSettings settings = new JsonSerializerSettings
+        private static readonly JsonSerializerSettings settings = new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.All
         };

@@ -18,8 +18,12 @@ namespace Succubus.Bus.Tests
         public void Init()
         {
             bus = new Core.Bus();
-            //bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
+#if ZEROMQ_BACKEND
+            bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
+            Thread.Sleep(2500);
+#else
             bus.Initialize(succubus => succubus.WithLoopback(clear: true));
+#endif
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
@@ -50,7 +54,7 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual(1, counter);
         }
 
-     
+
 
         [Test]
         public void InheritedEvent()
@@ -62,7 +66,7 @@ namespace Succubus.Bus.Tests
                 mre.Set();
             });
             bus.Publish(new ChildEvent() { Message = "Child calling" });
-            if (mre.WaitOne(500) == false)
+            if (mre.WaitOne(1500) == false)
             {
                 Assert.Fail("Timeout waiting for event");
 
@@ -91,7 +95,7 @@ namespace Succubus.Bus.Tests
         {
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);
-         
+
             bus.On<object>(ev =>
             {
                 Console.WriteLine("Got event: {0}", ev.ToString());
@@ -126,11 +130,17 @@ namespace Succubus.Bus.Tests
         public void ReqResAsEventsSecondBusInstance()
         {
             var bus2 = new Core.Bus();
-            bus2.Initialize(config => config.WithLoopback());
 
+#if ZEROMQ_BACKEND
+    
+            bus2.Initialize(config => config.WithZeroMQ());
+            Thread.Sleep(1500);
+#else
+            bus2.Initialize(config => config.WithLoopback());
+#endif
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);
-      
+
             bus2.On<object>(ev =>
             {
                 Console.WriteLine("Got event: {0}", ev.ToString());
@@ -150,7 +160,7 @@ namespace Succubus.Bus.Tests
                 {
                     Message = "Testing eventing of synchronous messages"
                 });
-            bus.Publish(new BasicEvent() { Message = "Testing catchall of events"});
+            bus.Publish(new BasicEvent() { Message = "Testing catchall of events" });
             if (mre.WaitOne(500) == false)
             {
                 Assert.Fail("Timeout waiting for event");
