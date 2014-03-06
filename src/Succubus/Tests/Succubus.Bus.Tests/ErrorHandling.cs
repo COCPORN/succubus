@@ -11,7 +11,7 @@ namespace Succubus.Bus.Tests
     {
         private Core.Bus bus;
 
-        AutoResetEvent are = new AutoResetEvent(false);
+        readonly AutoResetEvent are = new AutoResetEvent(false);
 
         [SetUp]
         public void Init()
@@ -44,7 +44,7 @@ namespace Succubus.Bus.Tests
             var reply = bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" });
             Assert.AreEqual("Howdy", reply.Message);
 
-            var errorReply = bus.CallAsync<ErrorRequest, BasicResponse>(new ErrorRequest { Message = "Wild snorlax" }, timeout:1000);
+            var errorReply = bus.CallAsync<ErrorRequest, BasicResponse>(new ErrorRequest { Message = "Wild snorlax" }, timeout:100);
             if (are.WaitOne(1000) == false)
             {
                 Assert.Fail("No exception raised");
