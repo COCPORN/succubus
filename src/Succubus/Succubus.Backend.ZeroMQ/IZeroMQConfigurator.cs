@@ -17,7 +17,9 @@
         void GetFromConfigurationFile();
         #endregion
 
-
+        #region Raw
+        bool ReportRaw { get; set; }
+        #endregion
 
     }
 }

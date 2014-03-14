@@ -47,6 +47,7 @@
     <Compile Include="Bus\Bus.Core.cs" />
     <Compile Include="Bus\Bus.ErrorHandling.cs" />
     <Compile Include="Bus\Bus.Events.cs" />
+    <Compile Include="Bus\Bus.Frames.cs" />
     <Compile Include="Bus\Bus.Initialization.cs" />
     <Compile Include="Bus\Bus.Raw.cs" />
     <Compile Include="Bus\Bus.Subscriber.cs" />

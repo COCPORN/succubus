@@ -25,6 +25,8 @@ namespace Succubus.Backend.ZeroMQ
             }
         }
 
+        public bool ReportRaw { get; set; }
+
         public void SubscribeAll()
         {
             subscribeSocket.SubscribeAll();
@@ -117,10 +119,18 @@ namespace Succubus.Backend.ZeroMQ
       
                             Bridge.ProcessSynchronousMessages(synchronousFrame, address);
                             Bridge.ProcessCatchAllEvents(synchronousFrame, address);
+                            if (ReportRaw)
+                            {
+                                Bridge.RawMessage(synchronousFrame);
+                            }
                         }
                         else if (eventFrame != null)
                         {
                             Bridge.ProcessEvents(eventFrame, address);
+                            if (ReportRaw)
+                            {
+                                Bridge.RawMessage(eventFrame);
+                            }
                         }
 
                     }

@@ -22,10 +22,7 @@ namespace Succubus.Backend.Loopback
             {
                 foreach (var transport in transports)
                 {
-                    if (ReportRaw)
-                    {
-                        transport.Bridge.RawMessage(message);
-                    }
+                   
 
                     bool receive = false;
                     foreach (var subAddress in transport.SubscriptionList)
@@ -39,10 +36,18 @@ namespace Succubus.Backend.Loopback
                     {                    
                         transport.Bridge.ProcessSynchronousMessages(synchronousFrame, address);
                         transport.Bridge.ProcessCatchAllEvents(synchronousFrame, address);
+                        if (ReportRaw)
+                        {
+                            transport.Bridge.RawMessage(synchronousFrame.Message);
+                        }
                     }
                     else if (eventFrame != null)
                     {
                         transport.Bridge.ProcessEvents(eventFrame, address);
+                        if (ReportRaw)
+                        {
+                            transport.Bridge.RawMessage(eventFrame.Message);
+                        }
                     }
                 }
             }

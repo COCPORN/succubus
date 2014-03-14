@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using Succubus.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -28,30 +29,41 @@ namespace Succubus.Core
             }
         }
 
+
         public IResponseContext On<T>(Action<T> handler, string address = null, Action<Action> marshal = null)
         {
-            if (typeof(T).BaseType == null)
+            if (typeof (T) == typeof (IMessageFrame))
             {
-                SubscriptionManager.SubscribeAll();
+                var myHandler = new Action<IMessageFrame>(response => handler((T) response));
+                frameHandlers.Add(new FrameBlock() { Handler = myHandler, Marshal = marshal });
+                return new Bus.ResponseContext(this);
             }
             else
             {
-                SetupSubscriber(address);
-            }
-
-            var myHandler = new Action<object>(response => handler((T)response));
-            lock (eventHandlers)
-            {
-                List<EventBlock> handlers;
-                if (eventHandlers.TryGetValue(typeof(T), out handlers) == false)
+                if (typeof (T).BaseType == null)
                 {
-                    handlers = new List<EventBlock>();
-                    eventHandlers.Add(typeof(T), handlers);
+                    SubscriptionManager.SubscribeAll();
+                }
+                else
+                {
+                    SetupSubscriber(address);
                 }
 
-                handlers.Add(new EventBlock() { Handler = myHandler, Address = address, Marshal = marshal });
+                var myHandler = new Action<object>(response => handler((T) response));
+                lock (eventHandlers)
+                {
+                    List<EventBlock> handlers;
+                    if (eventHandlers.TryGetValue(typeof (T), out handlers) == false)
+                    {
+                        handlers = new List<EventBlock>();
+                        eventHandlers.Add(typeof (T), handlers);
+                    }
+
+                    handlers.Add(new EventBlock() { Handler = myHandler, Address = address, Marshal = marshal });
+                }
+
+                return new Bus.ResponseContext(this);
             }
-            return new Bus.ResponseContext(this);
         }
 
         private void SetupSubscriber(string address)
@@ -76,16 +88,16 @@ namespace Succubus.Core
                 else
                 {
                     SetupSubscriber("__REPLY");
-               
+
                     replySubscriptionSetup = true;
                 }
             }
-            
+
         }
 
         public void ProcessEvents(MessageFrames.Event eventFrame, string address)
         {
-          
+            FrameMessage(eventFrame);
 
             //Type type = Type.GetType(eventFrame.EmbeddedType);
             //Type eventType = Type.GetType(eventFrame.EmbeddedType);
@@ -93,7 +105,7 @@ namespace Succubus.Core
             if (message == null) return;
 
             Type eventType = message.GetType();
-            IEnumerable<Type> interfaces = eventType.GetInterfaces();        
+            IEnumerable<Type> interfaces = eventType.GetInterfaces();
 
             List<EventBlock> handlers = new List<EventBlock>();
 
@@ -147,7 +159,8 @@ namespace Succubus.Core
 
         public void ProcessCatchAllEvents(MessageFrames.Synchronous eventFrame, string address)
         {
-         
+
+            FrameMessage(eventFrame);
             List<EventBlock> handlers = null;
 
             lock (eventHandlers)
