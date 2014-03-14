@@ -1,4 +1,5 @@
-﻿using Succubus.Core.Interfaces;
+﻿using System;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Backend.Loopback
 {
@@ -13,6 +14,18 @@ namespace Succubus.Backend.Loopback
             configurator.CorrelationIdProvider = transport;
             configurator.SubscriptionManager = transport;
 
+        }
+
+        public static void WithLoopback(this IBusConfigurator configurator,
+            Action<ILoopbackConfigurator> loopbackConfigurator, bool clear = false)
+        {
+            Transport transport = new Transport();
+            loopbackConfigurator(transport);
+            transport.Bridge = configurator.Bridge;
+            transport.Initialize(clear);
+            configurator.Transport = transport;
+            configurator.CorrelationIdProvider = transport;
+            configurator.SubscriptionManager = transport;
         }
     }
 }

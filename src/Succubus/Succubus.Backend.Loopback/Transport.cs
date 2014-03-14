@@ -7,11 +7,13 @@ using Succubus.Core.Interfaces;
 
 namespace Succubus.Backend.Loopback
 {
-    public class Transport : ITransport, ISubscriptionManager, ICorrelationIdProvider
+    public class Transport : ITransport, ISubscriptionManager, ICorrelationIdProvider, ILoopbackConfigurator
     {
         static List<Transport> transports = new List<Transport>();
 
         public List<string> SubscriptionList = new List<string>();
+
+        public bool ReportRaw { get; set; }
 
         public void ObjectPublish(object message, string address)
         {
@@ -20,6 +22,11 @@ namespace Succubus.Backend.Loopback
             {
                 foreach (var transport in transports)
                 {
+                    if (ReportRaw)
+                    {
+                        transport.Bridge.RawMessage(message);
+                    }
+
                     bool receive = false;
                     foreach (var subAddress in transport.SubscriptionList)
                     {
