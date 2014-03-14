@@ -1,8 +1,9 @@
 ﻿using System;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Core.MessageFrames
 {
-    public class Synchronous
+    public class Synchronous : IMessageFrame
     {
         public string CorrelationId { get; set; }
 

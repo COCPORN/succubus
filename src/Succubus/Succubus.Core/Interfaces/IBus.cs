@@ -73,7 +73,16 @@ namespace Succubus.Core.Interfaces
 
         event EventHandler<ExceptionEventArgs> HandlerException;
 
+        event EventHandler<ExceptionEventArgs> MessageCreationException;
+
         #endregion
+
+        #region Diagnostics
+
+        IResponseContext OnRaw(Action<object> handler, Action<Action> marshal = null);
+
+        #endregion
+
 
 
         #region Fan out

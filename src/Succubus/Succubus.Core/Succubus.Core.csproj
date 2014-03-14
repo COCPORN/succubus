@@ -48,6 +48,7 @@
     <Compile Include="Bus\Bus.ErrorHandling.cs" />
     <Compile Include="Bus\Bus.Events.cs" />
     <Compile Include="Bus\Bus.Initialization.cs" />
+    <Compile Include="Bus\Bus.Raw.cs" />
     <Compile Include="Bus\Bus.Subscriber.cs" />
     <Compile Include="Bus\Bus.Synchronization.cs" />
     <Compile Include="Bus\Bus.TimeoutHandler.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Interfaces\IBusConfigurator.cs" />
     <Compile Include="Interfaces\ICorrelationIdProvider.cs" />
     <Compile Include="Interfaces\IExpiring.cs" />
+    <Compile Include="Interfaces\IMessageFrame.cs" />
     <Compile Include="Interfaces\INow.cs" />
     <Compile Include="Interfaces\IResponseContext.cs" />
     <Compile Include="Interfaces\ISerializer.cs" />

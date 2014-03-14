@@ -101,6 +101,15 @@ namespace Succubus.Backend.ZeroMQ
 
                         object coreMessage = JsonFrame.Deserialize(serialized, coreType);
 
+                        if (coreMessage == null)
+                        {
+                            Bridge.UnableToCreateMessage(
+                                new Exception(
+                                    String.Format(
+                                        "Unable to create message from: Address: {0} Typename: {1} Serialized: {2}",
+                                        address, typename, serialized)));
+                        }
+
                         var synchronousFrame = coreMessage as Core.MessageFrames.Synchronous;
                         var eventFrame = coreMessage as Core.MessageFrames.Event;
                         if (synchronousFrame != null)
@@ -148,6 +157,11 @@ namespace Succubus.Backend.ZeroMQ
 
         public ZmqContext Context { get { return context; } set { context = value; } }
 
+        public void ObjectPublish(object message, string address, Action<Action> marshal)
+        {
+            if (marshal == null) ObjectPublish(message, address);
+            else marshal(() => ObjectPublish(message, address));          
+        }
 
         public void ObjectPublish(object message, string address)
         {

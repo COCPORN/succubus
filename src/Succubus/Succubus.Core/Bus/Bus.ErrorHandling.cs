@@ -15,5 +15,16 @@ namespace Succubus.Core
                 eh(this, new ExceptionEventArgs {Exception = ex});
             }
         }
+
+        public event EventHandler<ExceptionEventArgs> MessageCreationException;
+
+        public void UnableToCreateMessage(Exception ex)
+        {
+            EventHandler<ExceptionEventArgs> eh = MessageCreationException;
+            if (eh != null)
+            {
+                eh(this, new ExceptionEventArgs { Exception = ex });
+            }
+        }
     }
 }
