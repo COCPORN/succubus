@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Succubus.Bus.Tests.Messages;
@@ -52,43 +51,6 @@ namespace Succubus.Bus.Tests
         public string CreateCorrelationId(object o)
         {
             return Guid.NewGuid().ToString();
-        }
-    }
-
-    class PredeterminedCorrelationProvider : ICorrelationIdProvider
-    {
-        private List<string> correlationIds = new List<string>
-        {
-            "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-                  "cid1",
-            "cid1",
-            "cid1"
-        };
-
-        public string CreateCorrelationId(object o)
-        {
-            string cid = correlationIds[0];
-            correlationIds.RemoveAt(0);
-            return cid;
         }
     }
 }

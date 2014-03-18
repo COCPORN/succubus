@@ -78,7 +78,13 @@ namespace Succubus.Core
         }
 
 
-        public void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null, Action<Action> marshal = null)
+        public void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null,
+            Action<Action> marshal = null)
+        {
+            InternalCall(request, handler, address, marshal);
+        }
+
+        string InternalCall<TReq, TRes>(TReq request, Action<TRes> handler, string address = null, Action<Action> marshal = null)
         {
             SetupReplySubscription();
             var synchronizationContext = new SynchronizationContext();
@@ -112,6 +118,7 @@ namespace Succubus.Core
             }
 
             Transport.ObjectPublish(synchronizedRequest, address ?? "__BROADCAST", marshal);
+            return synchronizedRequest.CorrelationId;
         }
 
         public TRes InternalCall<TReq, TRes>(TReq request, string address = null, int timeout = 10000)
@@ -120,10 +127,10 @@ namespace Succubus.Core
             var mre = new ManualResetEvent(false);
             var result = default(TRes);
 
-            Call<TReq, TRes>(request, res =>
+            var sc = InternalCall<TReq, TRes>(request, res =>
             {
                 result = res;
-                mre.Set();
+                mre.Set();                
             }, address);
 
             if (mre.WaitOne(timeout))
@@ -132,6 +139,16 @@ namespace Succubus.Core
             }
             else
             {
+                lock (synchronizationContexts)
+                {
+                    SynchronizationContext existing = null;
+                    if (synchronizationContexts.TryGetValue(sc, out existing) == false)
+                    {
+                        existing.ResolvedResetEvent.Set();
+
+                        synchronizationContexts.Remove(sc);
+                    }
+                }
                 throw new TimeoutException("Timeout waiting for synchronous call");
             }
 
