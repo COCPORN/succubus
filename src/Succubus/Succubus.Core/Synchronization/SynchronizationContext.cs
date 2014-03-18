@@ -60,7 +60,24 @@ namespace Succubus
             ResolvedResetEvent = new ManualResetEvent(false);
         }
 
-        public bool TimedOut { get; set; }
+        private bool timedOut = false;
+
+        public bool TimedOut
+        {
+            get
+            {
+                return timedOut;
+            }
+            set
+            {
+                if (value == true)
+                {
+                    ResolvedResetEvent.Set();
+                }
+                timedOut = value;
+
+            }
+        }
 
         public Action TimeoutHandler { get; set; }
 
