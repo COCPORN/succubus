@@ -81,6 +81,8 @@ namespace Succubus.Core.Interfaces
 
         IResponseContext OnRaw(Action<object> handler, Action<Action> marshal = null);
 
+        Diagnose GetDiagnose();
+
         #endregion
 
 

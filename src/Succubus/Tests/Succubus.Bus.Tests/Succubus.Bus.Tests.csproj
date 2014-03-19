@@ -45,10 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addressing.cs" />
+    <Compile Include="BusDiagnose.cs" />
     <Compile Include="Correlation.cs" />
     <Compile Include="Deferral.cs" />
     <Compile Include="ErrorHandling.cs" />
     <Compile Include="Events.cs" />
+    <Compile Include="GuidCorrelationProvider.cs" />
     <Compile Include="Marshalling.cs" />
     <Compile Include="Messages\BasicEvent.cs" />
     <Compile Include="Messages\BasicRequest.cs" />

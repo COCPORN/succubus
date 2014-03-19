@@ -34,9 +34,13 @@ namespace Succubus.Bus.Tests
 
         public string CreateCorrelationId(object o)
         {
+#if false
             string cid = correlationIds[0];
             correlationIds.RemoveAt(0);
             return cid;
+#else
+            return "cid1";
+#endif
         }
     }
 }

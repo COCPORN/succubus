@@ -1,8 +1,10 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using NUnit.Framework;
 using Succubus.Backend.Loopback;
 using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
+using Succubus.Core.Interfaces;
 using Succubus.Hosting;
 
 namespace Succubus.Bus.Tests
@@ -10,35 +12,53 @@ namespace Succubus.Bus.Tests
     [TestFixture]
     public class Timeout
     {
-        private Core.Bus bus;
+        IBus overlapbus = new Core.Bus();
 
         [SetUp]
         public void Init()
         {
-            bus = new Core.Bus();
 
-            bus.Initialize(succubus =>
+            overlapbus.Initialize(succubus =>
             {
                 succubus.WithLoopback();
                 succubus.CorrelationIdProvider = new PredeterminedCorrelationProvider();
             });
+
+
+
+            overlapbus.ReplyTo<BasicRequest, BasicResponse>(req =>
+            {
+                Thread.Sleep(500);
+                return new BasicResponse
+                {
+                    Message = req.Message
+                };
+            });
         }
+
 
         [Test]
-        public void TestAdvancedRouting()
+        public async void TimeoutOverlappingCorrelationIds()
         {
-            var mre = new ManualResetEvent(false);
-            bus.OnReply<A, Rb>((req, res) =>
+            for (int i = 0; i < 1; i++)
             {
-                Assert.AreEqual(typeof(A), req.GetType());
-                Assert.True(res.C is D1 && res.GetType() == typeof(R1) ||
-                    res.C is D2 && res.GetType() == typeof(R2));
-                mre.Set();
-            });
-            bus.Call(new A());
-            mre.WaitOne(500);
+                try
+                {
+                    var reply = overlapbus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" },
+                        timeout: 100);
+                    Assert.Fail("Call didn't timeout as expected");
+                }
+                catch (Exception ex)
+                {
+                    var reply = overlapbus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" },
+                       timeout: 1000);
+                    Assert.AreEqual("Howdy", reply.Message);
+                }
+              
 
+            }
         }
+
 
     }
 }

@@ -25,9 +25,12 @@ namespace Succubus.Backend.Loopback
                    
 
                     bool receive = false;
-                    foreach (var subAddress in transport.SubscriptionList)
+                    lock (transport.SubscriptionList)
                     {
-                        if (address.StartsWith(subAddress)) receive = true;
+                        foreach (var subAddress in transport.SubscriptionList)
+                        {
+                            if (address.StartsWith(subAddress)) receive = true;
+                        }
                     }
                     if (receive == false) continue;
                     var synchronousFrame = message as Core.MessageFrames.Synchronous;
@@ -64,12 +67,18 @@ namespace Succubus.Backend.Loopback
 
         public void Subscribe(string address)
         {
-            SubscriptionList.Add(address);
+            lock (SubscriptionList)
+            {
+                SubscriptionList.Add(address);
+            }
         }
 
         public void SubscribeAll()
         {
-            SubscriptionList.Add("");
+            lock (SubscriptionList)
+            {
+                SubscriptionList.Add("");
+            }
         }
 
         public ITransportBridge Bridge { get; set; }

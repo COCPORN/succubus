@@ -59,6 +59,7 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual("Howdy", reply.Message);
                 Assert.AreEqual("Hello", (await reply2).Message);
             }
+            BusDiagnose.CheckDiagnose(bus);
         }
 
 
@@ -81,7 +82,7 @@ namespace Succubus.Bus.Tests
             {
                 Assert.Fail("Timeout waiting for response");
             }
-
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         void OrchestrationSetup1()
@@ -125,7 +126,7 @@ namespace Succubus.Bus.Tests
 
             Assert.AreEqual(true, res1res2in);
             Assert.AreEqual(false, res1res2res3in);
-
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
@@ -157,7 +158,7 @@ namespace Succubus.Bus.Tests
 
             Assert.AreEqual(true, res1res2in);
             Assert.AreEqual(true, res1res2res3in);
-
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
@@ -170,13 +171,15 @@ namespace Succubus.Bus.Tests
             var response2 = bus.Call<ChildRequest, ChildResponse2>(new ChildRequest { Message = "Child2" });
             Assert.AreEqual("Child2", response2.Message);
             Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
         [ExpectedException(typeof(TimeoutException))]
         public void ChildMessages2_TimeoutOfMissingType()
         {
-            bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child2" }, timeout: 1000);
+            bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child2" }, timeout: 1000);            
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
@@ -189,12 +192,12 @@ namespace Succubus.Bus.Tests
             var response2 = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child2" }, timeout: 10000);
             Assert.AreEqual("Child2", response2.Message);
             Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
         public void ChildMessages4_BaseClassOrchestration()
-        {
-            var are = new AutoResetEvent(false);
+        {           
             bus.OnReply<ChildRequest, ChildBase, ChildResponse2>((req, cb, cr2) =>
             {
                 Assert.Fail("Got unexpected reply");
@@ -206,7 +209,11 @@ namespace Succubus.Bus.Tests
                 return;
             }, timeout: 1000);
 
+            Thread.Sleep(2500);
 
+            BusDiagnose.CheckDiagnose(bus);
         }
+
+       
     }
 }

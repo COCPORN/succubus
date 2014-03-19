@@ -74,6 +74,14 @@ namespace Succubus.Collections
             }
         }
 
+        public int NumberOfItemsForTimeout()
+        {
+            lock (sortedTimeoutSynchronizationContexts)
+            {
+                return sortedTimeoutSynchronizationContexts.Count;
+            }
+        }
+
         public Int64 Timeout(TValue value, int milliseconds)
         {
             var timespan = TimeSpan.FromMilliseconds(milliseconds);

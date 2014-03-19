@@ -142,7 +142,7 @@ namespace Succubus.Core
                 lock (synchronizationContexts)
                 {
                     SynchronizationContext existing = null;
-                    if (synchronizationContexts.TryGetValue(sc, out existing) == false)
+                    if (synchronizationContexts.TryGetValue(sc, out existing) == true)
                     {
                         existing.ResolvedResetEvent.Set();
 
@@ -349,7 +349,7 @@ namespace Succubus.Core
         public void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler, string address = null, Func<Func<TReq, TRes>, TReq, TRes> marshal = null)
         {
            
-            
+            //SetupReplySubscription();
             SetupSubscriber(address);
             SynchronousBlock objectHandler = new SynchronousBlock { Handler = (req) =>
             {

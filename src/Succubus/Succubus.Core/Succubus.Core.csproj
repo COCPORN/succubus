@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Bus\Bus.Configurator.cs" />
     <Compile Include="Bus\Bus.Core.cs" />
+    <Compile Include="Bus\Bus.Diagnostics.cs" />
     <Compile Include="Bus\Bus.ErrorHandling.cs" />
     <Compile Include="Bus\Bus.Events.cs" />
     <Compile Include="Bus\Bus.Frames.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="Bus\Bus.Subscriber.cs" />
     <Compile Include="Bus\Bus.Synchronization.cs" />
     <Compile Include="Bus\Bus.TimeoutHandler.cs" />
+    <Compile Include="Bus\Diagnose.cs" />
     <Compile Include="Collections\TimeoutHandler.cs" />
     <Compile Include="Diagnostics\ExceptionEventArgs.cs" />
     <Compile Include="Diagnostics\Ping.cs" />
