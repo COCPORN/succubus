@@ -57,6 +57,7 @@ namespace Succubus.Bus.Tests
               
 
             }
+            BusDiagnose.CheckDiagnose(overlapbus);
         }
 
 

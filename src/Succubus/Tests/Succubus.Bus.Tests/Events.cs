@@ -52,6 +52,8 @@ namespace Succubus.Bus.Tests
             }
             else
                 Assert.AreEqual(1, counter);
+
+            BusDiagnose.CheckDiagnose(bus);
         }
 
 
@@ -71,7 +73,7 @@ namespace Succubus.Bus.Tests
                 Assert.Fail("Timeout waiting for event");
 
             }
-
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
@@ -88,6 +90,7 @@ namespace Succubus.Bus.Tests
             {
                 Assert.Fail("Timeout waiting for event");
             }
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
@@ -124,6 +127,7 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual(2, counter);
                 Assert.AreEqual(response.Message, "Testing eventing of synchronous messages");
             }
+            BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
@@ -170,6 +174,7 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual(3, counter);
                 Assert.AreEqual(response.Message, "Testing eventing of synchronous messages");
             }
+            BusDiagnose.CheckDiagnose(bus);
         }
     }
 

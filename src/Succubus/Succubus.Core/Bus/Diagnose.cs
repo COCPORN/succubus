@@ -8,5 +8,8 @@ namespace Succubus.Core
         public int SynchronizationContexts { get; set; }
 
         public int NumberOfItemsForTimeout { get; set; }
+
+        public ulong ReceivedMessages { get; set; }
+        public ulong SentMessages { get; set;  }
     }
 }
