@@ -33,15 +33,15 @@ namespace Succubus.Core
 
         private SynchronizationContext ProcessSynchronousHandlers(MessageFrames.Synchronous synchronousFrame, object message, string address)
         {
-
-
             SynchronizationContext ctx;
 
             lock (synchronizationContexts)
             {
                 synchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx);
+#if false
                 if (ctx == null)
                 {
+
                     lock (deferredRequestTypes)
                     {
                         if (deferredRequestTypes.Contains(message.GetType()))
@@ -50,6 +50,7 @@ namespace Succubus.Core
                             if (ctx != null)
                             {
                                 ctx.Request = message;
+
 
                                 lock (deferredWaitHandles)
                                 {
@@ -64,6 +65,7 @@ namespace Succubus.Core
                         }
                     }
                 }
+#endif
             }
             if (ctx != null)
             {
@@ -125,7 +127,7 @@ namespace Succubus.Core
                                 {
                                     var framedResponse = FrameResponseSynchronously(synchronousFrame, response,
                                         synchronousFrame.CorrelationId);
-                                    Transport.ObjectPublish(framedResponse, "__REPLY");
+                                    Transport.BusPublish(framedResponse, "__REPLY");
                                 }
                             });
                         }

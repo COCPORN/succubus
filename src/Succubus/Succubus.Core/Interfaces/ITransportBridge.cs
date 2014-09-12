@@ -8,6 +8,6 @@ namespace Succubus.Core.Interfaces
         void ProcessEvents(MessageFrames.Event eventFrame, string address);
         void ProcessCatchAllEvents(MessageFrames.Synchronous eventFrame, string address);
         void UnableToCreateMessage(Exception exception);
-        void RawMessage(object o);
+        void RawMessage(object o);       
     }
 }

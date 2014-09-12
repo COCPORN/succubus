@@ -18,7 +18,7 @@ namespace Succubus.Core
         /// a synchronization context has been fulfilled, it should be removed
         /// from this dictionary.
         /// </summary>
-        Dictionary<string,
+        internal Dictionary<string,
             SynchronizationContext> synchronizationContexts =
             new Dictionary<string, SynchronizationContext>();
 
@@ -62,6 +62,15 @@ namespace Succubus.Core
                 Message = o,
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
 
+            };
+        }
+
+        MessageFrames.WorkItem FrameWorkItem(object o)
+        {
+            return new MessageFrames.WorkItem
+            {
+                Message = o,
+                EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
             };
         }
 
@@ -117,7 +126,7 @@ namespace Succubus.Core
                 }
             }
 
-            Transport.ObjectPublish(synchronizedRequest, address ?? "__BROADCAST", marshal);
+            Transport.BusPublish(synchronizedRequest, address ?? "__BROADCAST", marshal);
             return synchronizedRequest.CorrelationId;
         }
 
@@ -169,7 +178,7 @@ namespace Succubus.Core
 
         // TODO: Decide whether static routes are really necessary, as the tree
         // needs to be built on a per call basis anyway.
-        public string Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 0, Action<Action> marshal = null)
+        public string Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 10000, Action<Action> marshal = null)
         {
             SetupReplySubscription();
             var synchronizedRequest = FrameSynchronously(request);
@@ -177,7 +186,7 @@ namespace Succubus.Core
             SynchronizationContext ctx = InstantiatePrototype(request, timeoutHandler, timeout, synchronizedRequest.CorrelationId);
             if (ctx != null) ctx.Request = request;
 
-            Transport.ObjectPublish(synchronizedRequest, address ?? "__BROADCAST", marshal);
+            Transport.BusPublish(synchronizedRequest, address ?? "__BROADCAST", marshal);
             return synchronizedRequest.CorrelationId;
         }
 
@@ -199,7 +208,7 @@ namespace Succubus.Core
                 {
                     if (timeoutHandler != null) synchronizationContext.SetTimeoutHandler(timeoutHandler);
                     synchronizationContext.CorrelationId = correlationId;
-
+                    synchronizationContext.Bus = this;
                     this.timeoutHandler.Timeout(synchronizationContext, timeout);
                 }
                 // The static route implementation of timeouts needs to wait because

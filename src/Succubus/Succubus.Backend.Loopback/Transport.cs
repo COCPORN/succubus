@@ -15,7 +15,7 @@ namespace Succubus.Backend.Loopback
 
         public bool ReportRaw { get; set; }
 
-        public void ObjectPublish(object message, string address)
+        public void BusPublish(object message, string address)
         {
    
             lock (transports)
@@ -57,13 +57,11 @@ namespace Succubus.Backend.Loopback
 
         }
 
-        public void ObjectPublish(object message, string address, Action<Action> marshal)
+        public void BusPublish(object message, string address, Action<Action> marshal)
         {
-            if (marshal == null) ObjectPublish(message, address);
-            else marshal(() => ObjectPublish(message, address));           
+            if (marshal == null) BusPublish(message, address);
+            else marshal(() => BusPublish(message, address));           
         }
-
-
 
         public void Subscribe(string address)
         {
@@ -96,6 +94,11 @@ namespace Succubus.Backend.Loopback
         public string CreateCorrelationId(object o)
         {
             return Guid.NewGuid().ToString();
+        }
+
+        public void QueuePublish(object message, string address, Action<Action> marshal = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

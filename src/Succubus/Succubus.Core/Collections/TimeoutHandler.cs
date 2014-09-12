@@ -45,11 +45,14 @@ namespace Succubus.Collections
                             break;
                         }
                         entry.Value.TimedOut = true;
+                        entry.Value.OnTimeout();
 
                         if (entry.Value.TimeoutHandler != null)
                         {
                             entry.Value.TimeoutHandler();
                         }
+
+                        
                    
                         removeKeys.Add(entry.Key);
                         timeoutContexts.Remove(entry.Value.Id);

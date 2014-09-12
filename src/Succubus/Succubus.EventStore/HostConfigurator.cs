@@ -30,19 +30,28 @@ namespace Succubus.Stores.EventStore
             var classAttributes = type.GetCustomAttributes(true);
 
             string stream = null;
-          
+            string stype = null;
+            byte[] data  = Encoding.UTF8.GetBytes(eventArgs.RawJson);;
+
             foreach (var attribute in classAttributes)
             {
                 var store = attribute as StoreAttribute;
                 if (store != null)
                 {
                     stream = store.Stream;
+                    stype = store.Type;          
                 }
             }
 
             if (stream != null)
             {
-                //connection.AppendToStreamAsync(stream, ExpectedVersion.Any, 
+                
+                
+                connection.AppendToStreamAsync(stream, ExpectedVersion.Any, new EventData[]
+                {
+                    new EventData(Guid.NewGuid(), stype, true, data, new byte[0])
+                });
+                //connection.AppendToStreamAsync(stream, ExpectedVersion.Any,
                 //    new EventData(Guid.NewGuid(), type.ToString(), true, new object().ToJson(), eventArgs.Message.ToJson())
                 //    );
             }

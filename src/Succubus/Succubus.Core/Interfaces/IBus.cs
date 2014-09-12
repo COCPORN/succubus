@@ -39,6 +39,7 @@ namespace Succubus.Core.Interfaces
 
         #endregion
 
+#if false
         #region Deferrence
         
         IResponseContext Defer<TReq, T>();
@@ -58,6 +59,7 @@ namespace Succubus.Core.Interfaces
         IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class;
 
         #endregion
+#endif
 
         #region Publish/subscribe
 
@@ -88,6 +90,9 @@ namespace Succubus.Core.Interfaces
 
 
         #region Fan out
+
+        void Queue<T>(T request, string address = null, Action<Action> marshal = null);
+        IResponseContext Dequeue<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
 
         #endregion
 

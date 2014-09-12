@@ -14,6 +14,8 @@ namespace Succubus.Stores.EventStore
     {
         public string Stream { get; set; }
 
+        public string Type { get; set; }
+
         public StoreAttribute() : this("Succubus")
         {
            
@@ -22,6 +24,12 @@ namespace Succubus.Stores.EventStore
         public StoreAttribute(string stream)
         {
             Stream = stream;
+        }
+
+        public StoreAttribute(string stream, string type)
+        {
+            Stream = stream;
+            Type = type;
         }
 
     }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using Succubus.Collections.Interfaces;
+using Succubus.Core;
+using Succubus.Core.Interfaces;
 
 namespace Succubus
 {
@@ -19,11 +21,11 @@ namespace Succubus
     class SynchronizationContext : IExpiring<string>
     {
 
-        
+
         public static SynchronizationContext Clone(SynchronizationContext context)
         {
             var newContext = new SynchronizationContext();
-            newContext.CorrelationId = context.CorrelationId;      
+            newContext.CorrelationId = context.CorrelationId;
             newContext.Request = context.Request;
             newContext.ContextType = context.ContextType;
             newContext.TimedOut = context.TimedOut;
@@ -43,10 +45,12 @@ namespace Succubus
         public ManualResetEvent DeferredResetEvent { get; set; }
         public ManualResetEvent ResolvedResetEvent { get; set; }
 
+        public Bus Bus { get; set; }
+
         public string CorrelationId { get; set; }
         public string Id { get { return CorrelationId; } }
 
-        public List<SynchronizationStack> Stacks;     
+        public List<SynchronizationStack> Stacks;
 
         internal Dictionary<Type, object> responses = new Dictionary<Type, object>();
         internal Dictionary<Type, object> castMessages = null;
@@ -84,6 +88,7 @@ namespace Succubus
         public void SetTimeoutHandler<T>(Action<T> timeoutHandler)
         {
             this.TimeoutHandler = () => timeoutHandler((T)Request);
+           
         }
 
         public int TimeoutMilliseconds { get; set; }
@@ -111,7 +116,7 @@ namespace Succubus
         {
             get
             {
-                
+
                 foreach (var synchronizationStack in Stacks)
                 {
                     //if (synchronizationStack.TimedOut == true) continue;
@@ -126,6 +131,21 @@ namespace Succubus
                 return true;
             }
         }
-      
+
+
+
+        public void OnTimeout()
+        {
+            lock (Bus.synchronizationContexts)
+            {
+                SynchronizationContext existing = null;
+                if (Bus.synchronizationContexts.TryGetValue(Id, out existing) == true)
+                {
+                    existing.ResolvedResetEvent.Set();
+
+                    Bus.synchronizationContexts.Remove(Id);
+                }
+            }
+        }
     }
 }

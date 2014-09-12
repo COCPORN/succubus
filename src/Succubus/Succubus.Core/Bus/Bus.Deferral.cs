@@ -7,6 +7,7 @@ using Succubus.Core.Interfaces;
 
 namespace Succubus.Core
 {
+#if false
     public partial class Bus
     {
         private readonly HashSet<Type> deferredResponseTypes = new HashSet<Type>();
@@ -400,5 +401,5 @@ namespace Succubus.Core
             return new ResponseContext(this);
         }
     }
-
+#endif
 }

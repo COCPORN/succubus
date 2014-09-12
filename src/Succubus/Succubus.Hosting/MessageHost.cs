@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.Composition;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using Succubus.Core.Interfaces;
 using Succubus.Hosting.Interfaces;
+using Succubus.Serialization;
 using ZeroMQ;
 
 namespace Succubus.Hosting
@@ -74,6 +76,25 @@ namespace Succubus.Hosting
         void publishSocket_ReceiveReady(object sender, SocketEventArgs e)
         {            
             var message = e.Socket.ReceiveMessage();
+            if (ProcessedMessage != null)
+            {
+                string address = subscribeSocket.Receive(Encoding.ASCII);
+                string typename = subscribeSocket.Receive(Encoding.Unicode);
+                string serialized = subscribeSocket.Receive(Encoding.Unicode);
+                Type coreType = Type.GetType(typename + ", Succubus.Core");
+
+                object coreMessage = JsonFrame.Deserialize(serialized, coreType);
+                if (coreMessage != null)
+                {
+                    ProcessedMessage(this, new ProcessedMessageEventArgs
+                    {
+                        Address = address,
+                        Message = coreMessage,
+                        RawJson = serialized                      
+
+                    });
+                }
+            }
             subscribeSocket.SendMessage(message);
         }
 

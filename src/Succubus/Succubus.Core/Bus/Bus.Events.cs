@@ -17,7 +17,7 @@ namespace Succubus.Core
 
         public void Publish<T>(T request, string address = null, Action<Action> marshal = null)
         {
-            Action execute = () => Transport.ObjectPublish(FrameEvent(request), address ?? "__BROADCAST");
+            Action execute = () => Transport.BusPublish(FrameEvent(request), address ?? "__BROADCAST");
 
             if (marshal == null)
             {

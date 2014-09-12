@@ -119,13 +119,19 @@ namespace Succubus.Bus.Tests
                 mre2.Set();
             });
 
-            bus.Call(new Request1 { Message = "Hello!" });
+            bus.Call(new Request1 { Message = "Hello!" }, timeout:500);
+            
+
+            //BusDiagnose.CheckDiagnose(bus);
 
             mre1.WaitOne(1500);
             mre2.WaitOne(1500);
 
             Assert.AreEqual(true, res1res2in);
             Assert.AreEqual(false, res1res2res3in);
+
+            //Thread.Sleep(20000);
+
             BusDiagnose.CheckDiagnose(bus);
         }
 
@@ -196,7 +202,7 @@ namespace Succubus.Bus.Tests
         }
 
         [Test]
-        public void ChildMessages4_BaseClassOrchestration()
+        public void ChildMessages4_BaseClassOrchestrationTimeout()
         {           
             bus.OnReply<ChildRequest, ChildBase, ChildResponse2>((req, cb, cr2) =>
             {
@@ -206,10 +212,10 @@ namespace Succubus.Bus.Tests
             bus.Call(new ChildRequest { Message = "Child1" }, (req) =>
             {
                 Console.WriteLine("Got timeout");
-                return;
+                //return;
             }, timeout: 1000);
 
-            Thread.Sleep(2500);
+            Thread.Sleep(2000);
 
             BusDiagnose.CheckDiagnose(bus);
         }

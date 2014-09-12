@@ -8,5 +8,6 @@ namespace Succubus.Collections.Interfaces
         bool TimedOut { get; set; }
         Action TimeoutHandler { get; }
         T Id { get; }
+        void OnTimeout();
     }
 }

@@ -50,6 +50,7 @@
     <Compile Include="Bus\Bus.Events.cs" />
     <Compile Include="Bus\Bus.Frames.cs" />
     <Compile Include="Bus\Bus.Initialization.cs" />
+    <Compile Include="Bus\Bus.Queue.cs" />
     <Compile Include="Bus\Bus.Raw.cs" />
     <Compile Include="Bus\Bus.Subscriber.cs" />
     <Compile Include="Bus\Bus.Synchronization.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Interfaces\ITransportBridge.cs" />
     <Compile Include="MessageFrames\Diagnostic.cs" />
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
+    <Compile Include="MessageFrames\WorkItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\ObjectCopier.cs" />
     <Compile Include="Synchronization\SynchronizationFrames.cs" />
