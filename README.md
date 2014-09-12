@@ -22,19 +22,20 @@ These are the current and planned features of Succubus:
 - Orchestration of synchronous messages
 - Timeouts of synchronous messages
 - Planned for 0.3:
-	- Deferred messaging
 	- Addressable commands
 	- Work-item fan out
 
-Why?
-----
-
-Succubus is implemented just for fun, don't expect to see any best-in-class implementations or super stable code, at least not at this point. It is intended to have few dependencies, be quick to develop with and accommodate some "special" use cases. Most of the things implemented by Succubus are fairly simple to implement directly on ZeroMQ, but the idea is to take some of the hassle out of it when working with C#.
 
 Installation
 ------------
 
 Get lastest version of Succubus from GitHub or NuGet.
+
+Relevant packages:
+
+- Succubus
+- Succubus.Backend.ZeroMQ
+- Succubus.Hosting (to be renamed to Succubus.Hosting.ZeroMQ prior to 1.0 release)
 
 Instantiation
 -------------
@@ -53,7 +54,7 @@ Succubus allows you to get a singleton instance in addition to newing up objects
 
 ```C#
 Bus.Instance.Initialize(config => {
-    config.StartMessageHost =  true;
+    // Manipulate config-handle
 });
 ```
 
@@ -77,34 +78,33 @@ bus.Initialize(succubus =>
 
 When using the parameterless Initialize call, the bus will be initialized with default values. To actually start the message host, the Succubus.Hosting-assembly must be referenced.
 
-Configuration
--------------
+Backends
+--------
 
-There are a number of methods that allow you to configure your bus instance before using it. These calls can be found in the `IBusConfigurator`-interface, but will be documented in detail in the future.
+For Succubus to work, it needs a _backend_. The Loopback backend is always present, so you can initialize like this:
 
 ```C#
-        #region Communication        
-        string PublishAddress { get; set; }
-        string SubscribeAddress { get; set; }
-        #endregion
-
-        #region Hosting
-        string MessageHostPublishAddress { get; set; }
-        string MessageHostSubscribeAddress { get; set; }
-
-        bool StartMessageHost { get; set; }
-        #endregion
-
-        #region Filtering
-        string Network { get; set;  }        
-        #endregion
-
-        #region Configuration sources
-        void GetFromConfigurationFile();
-        #endregion
+bus.Initialize(succubus => succubus.WithLoopback());
 ```
 
-Most of these should be self explanatory. Network is currently not implemented.
+Other backends include ZeroMQ:
+
+```C#
+bus.Initialize(succubus => succubus.WithZeroMQ(zmq => {
+    zmq.PublishAddress = "...";
+    zmq.SubscribeAddress = "...";
+}))
+```
+
+If you are also wanting to run a ZeroMQ host in the process, you can:
+
+```C#
+bus.Initialize(succubus => succubus.WithZeroMQ(zmq => {
+    zmq.StartMessageHost();
+}))
+```
+
+These examples rely on using `Succubus.Backend.ZeroMQ` and `Succubus.Hosting.ZeroMQ` respectively.
 
 Events
 ------
@@ -168,7 +168,7 @@ bus.Call<Request, Response>(new Request { Message = "Hi from client"},
 	});
 ```
 
-A transient call with request/response-parameters will register a route and wrap the request/response objects in a `SynchronousMessageFrame` which decorates the messages with `CorrelationId`s. If multiple responses are made to the same synchronous call, only the first will be handled in the defined response handler, while the other messages will be raised as events.
+A transient call with request/response-parameters will register a route and wrap the request/response objects in a `SynchronousMessageFrame` which decorates the messages with `CorrelationId`s. If multiple responses are made to the same synchronous call, only the first will be handled in the defined response handler, all other messages will be silently discarded.
 
 ### Static routes
 
@@ -194,7 +194,7 @@ public class BaseResponse
     public string Message { get; set; }
 }
 
-public class SuccessResponse 
+public class SuccessResponse : BaseResponse
 {
     public SuccessResponse() 
     {
@@ -202,7 +202,7 @@ public class SuccessResponse
     }
 }
 
-public class FailureResponse 
+public class FailureResponse : BaseResponse
 {
     public FailureResponse() 
     {
@@ -292,31 +292,8 @@ bus.OnReply<UpdateRequest,
 	
 ```
 
-### Deferrence 
-
-Succubus supports deferring message handling. This is convenient when you are doing synchronous processing, but the response set needs to be handled in another context than where the request was posted.
-
-To use, simply:
-
-```C#
-bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse {
-	Message = "From server: " + req.Message;
-});
-
-bus.Defer<BasicRequest, BasicResponse>();
-
-Guid cId = bus.Call(new BasicRequest { Message = "Deferred "});
-
-bus.Pickup<BasicRequest, BasicResponse>(cId, (req, res) =>
-{
-
-});
-```
-
-The call to `Pickup` will _block_. Also, deferred calls will by default be held for one minute, or be removed from the bus as soon as they are picked up.
-
-Not that you can defer calls _across bus instances_ and it will still work correctly.
-
 
 Workload management
 -------------------
+
+Currently not implemented.
