@@ -16,6 +16,10 @@ namespace Succubus.Hosting
         ZmqSocket subscribeSocket;
         ZmqSocket publishSocket;
 
+        readonly ManualResetEvent initializationDone = new ManualResetEvent(false);
+
+        public ManualResetEvent InitializationDone { get { return initializationDone; } }
+
         public void Start()
         {
             serverThread = new Thread(ServerThread);
@@ -56,7 +60,9 @@ namespace Succubus.Hosting
                 publishSocket.ReceiveReady += publishSocket_ReceiveReady;
                 subscribeSocket.ReceiveReady += subscribeSocket_ReceiveReady;
 
-                var poller = new Poller(new List<ZmqSocket> { subscribeSocket, publishSocket });               
+                var poller = new Poller(new List<ZmqSocket> { subscribeSocket, publishSocket });
+
+                InitializationDone.Set();
 
                 while (true)
                 {         

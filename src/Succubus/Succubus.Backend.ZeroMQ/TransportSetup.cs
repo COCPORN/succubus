@@ -17,6 +17,10 @@ namespace Succubus.Backend.ZeroMQ
             configurator.SubscriptionManager = transport;
             configurator.CorrelationIdProvider = transport;
             transport.Initialize();
+            if (transport.SubscriberOnline.WaitOne(3000) == false)
+            {
+                throw new Exception("Subscriber thread timeout");
+            }
         }
 
         public static void WithZeroMQ(this IBusConfigurator configurator,
@@ -31,6 +35,10 @@ namespace Succubus.Backend.ZeroMQ
             configurator.SubscriptionManager = transport;
             configurator.CorrelationIdProvider = transport;
             transport.Initialize();
+            if (transport.SubscriberOnline.WaitOne(3000) == false)
+            {
+                throw new Exception("Subscriber thread timeout");
+            }
         }
     }
 }

@@ -36,6 +36,7 @@ namespace Succubus.Hosting
 
                 messageHost.Start();
                 messageHosts.Add(busConfigurator, messageHost);
+                messageHost.InitializationDone.WaitOne(0);
             }
         }
 

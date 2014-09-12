@@ -45,6 +45,12 @@ namespace Succubus.Backend.ZeroMQ
         }
 
         ManualResetEvent subscriberOnline = new ManualResetEvent(false);
+
+        public ManualResetEvent SubscriberOnline
+        {
+            get { return subscriberOnline; }            
+        }
+
         bool run = true;
         public ITransportBridge Bridge { get; set; }
         public IBusConfigurator Configurator { get; set; }
