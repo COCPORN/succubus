@@ -123,7 +123,7 @@ bus.Publish(new BasicEvent { Message = "Hi, there! "});
 
 ```C#
 public class BasicEvent
-{
+{ 
     public string Message { get; set; }
 }
 ```
