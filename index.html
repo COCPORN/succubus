@@ -1,36 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Succubus : A &quot;service bus&quot; implementation created on top of ZeroMQ">
+    <title>Succubus by COCPORN</title>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Succubus</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
+    <div class="wrapper">
+      <header>
+        <h1>Succubus</h1>
+        <p>A &quot;service bus&quot; implementation created on top of ZeroMQ</p>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/COCPORN/succubus">View on GitHub</a>
+        <p class="view"><a href="https://github.com/COCPORN/succubus">View the Project on GitHub <small>COCPORN/succubus</small></a></p>
 
-          <h1 id="project_title">Succubus</h1>
-          <h2 id="project_tagline">A &quot;service bus&quot; implementation created on top of ZeroMQ</h2>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/COCPORN/succubus/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/COCPORN/succubus/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+        <ul>
+          <li><a href="https://github.com/COCPORN/succubus/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/COCPORN/succubus/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/COCPORN/succubus">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
         <h1>
 <a name="succubus" class="anchor" href="#succubus"><span class="octicon octicon-link"></span></a>Succubus</h1>
 
@@ -58,22 +55,22 @@
 <li>Planned for 0.3:
 
 <ul>
-<li>Deferred messaging</li>
 <li>Addressable commands</li>
 <li>Work-item fan out</li>
 </ul>
 </li>
 </ul><h2>
-<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h2>
-
-<p>Succubus is implemented just for fun, don't expect to see any best-in-class implementations or super stable code, at least not at this point. It is intended to have few dependencies, be quick to develop with and accommodate some "special" use cases. Most of the things implemented by Succubus are fairly simple to implement directly on ZeroMQ, but the idea is to take some of the hassle out of it when working with C#.</p>
-
-<h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Get lastest version of Succubus from GitHub or NuGet (will be up soon).</p>
+<p>Get lastest version of Succubus from GitHub or NuGet.</p>
 
-<h2>
+<p>Relevant packages:</p>
+
+<ul>
+<li>Succubus</li>
+<li>Succubus.Backend.ZeroMQ</li>
+<li>Succubus.Hosting (to be renamed to Succubus.Hosting.ZeroMQ prior to 1.0 release)</li>
+</ul><h2>
 <a name="instantiation" class="anchor" href="#instantiation"><span class="octicon octicon-link"></span></a>Instantiation</h2>
 
 <p>To instantiate a handle to the bus, create an instance of <code>Succubus.Core.Bus</code>:</p>
@@ -89,7 +86,7 @@
 <p>Succubus allows you to get a singleton instance in addition to newing up objects. Note that the singleton object will always (obviously) point to the same instance, while all newed objects will be different. These can co-exist and will use separate message channels:</p>
 
 <div class="highlight highlight-C#"><pre><span class="n">Bus</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">config</span> <span class="p">=&gt;</span> <span class="p">{</span>
-    <span class="n">config</span><span class="p">.</span><span class="n">StartMessageHost</span> <span class="p">=</span>  <span class="k">true</span><span class="p">;</span>
+    <span class="c1">// Manipulate config-handle</span>
 <span class="p">});</span>
 </pre></div>
 
@@ -105,39 +102,36 @@
 
 <div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">succubus</span> <span class="p">=&gt;</span>
 <span class="p">{</span>
-    <span class="n">succubus</span><span class="p">.</span><span class="n">StartMessageHost</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+    <span class="n">succubus</span><span class="p">.</span><span class="n">WithZeroMQ</span><span class="p">();</span>
 <span class="p">});</span>
 </pre></div>
 
-<p>When using the parameterless Initialize call, the bus will be initialized with default values.</p>
+<p>When using the parameterless Initialize call, the bus will be initialized with default values. To actually start the message host, the Succubus.Hosting-assembly must be referenced.</p>
 
 <h2>
-<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
+<a name="backends" class="anchor" href="#backends"><span class="octicon octicon-link"></span></a>Backends</h2>
 
-<p>There are a number of methods that allow you to configure your bus instance before using it. These calls can be found in the <code>IBusConfigurator</code>-interface, but will be documented in detail in the future.</p>
+<p>For Succubus to work, it needs a <em>backend</em>. The Loopback backend is always present, so you can initialize like this:</p>
 
-<div class="highlight highlight-C#"><pre>        <span class="cp">#region Communication        </span>
-        <span class="kt">string</span> <span class="n">PublishAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-        <span class="kt">string</span> <span class="n">SubscribeAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-        <span class="cp">#endregion</span>
-
-        <span class="cp">#region Hosting</span>
-        <span class="kt">string</span> <span class="n">MessageHostPublishAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-        <span class="kt">string</span> <span class="n">MessageHostSubscribeAddress</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-
-        <span class="kt">bool</span> <span class="n">StartMessageHost</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-        <span class="cp">#endregion</span>
-
-        <span class="cp">#region Filtering</span>
-        <span class="kt">string</span> <span class="n">Network</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span>  <span class="p">}</span>        
-        <span class="cp">#endregion</span>
-
-        <span class="cp">#region Configuration sources</span>
-        <span class="k">void</span> <span class="nf">GetFromConfigurationFile</span><span class="p">();</span>
-        <span class="cp">#endregion</span>
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">succubus</span> <span class="p">=&gt;</span> <span class="n">succubus</span><span class="p">.</span><span class="n">WithLoopback</span><span class="p">());</span>
 </pre></div>
 
-<p>Most of these should be self explanatory. Network is currently not implemented.</p>
+<p>Other backends include ZeroMQ:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">succubus</span> <span class="p">=&gt;</span> <span class="n">succubus</span><span class="p">.</span><span class="n">WithZeroMQ</span><span class="p">(</span><span class="n">zmq</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="n">zmq</span><span class="p">.</span><span class="n">PublishAddress</span> <span class="p">=</span> <span class="s">"..."</span><span class="p">;</span>
+    <span class="n">zmq</span><span class="p">.</span><span class="n">SubscribeAddress</span> <span class="p">=</span> <span class="s">"..."</span><span class="p">;</span>
+<span class="p">}))</span>
+</pre></div>
+
+<p>If you are also wanting to run a ZeroMQ host in the process, you can:</p>
+
+<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">Initialize</span><span class="p">(</span><span class="n">succubus</span> <span class="p">=&gt;</span> <span class="n">succubus</span><span class="p">.</span><span class="n">WithZeroMQ</span><span class="p">(</span><span class="n">zmq</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="n">zmq</span><span class="p">.</span><span class="n">StartMessageHost</span><span class="p">();</span>
+<span class="p">}))</span>
+</pre></div>
+
+<p>These examples rely on using <code>Succubus.Backend.ZeroMQ</code> and <code>Succubus.Hosting.ZeroMQ</code> respectively.</p>
 
 <h2>
 <a name="events" class="anchor" href="#events"><span class="octicon octicon-link"></span></a>Events</h2>
@@ -200,7 +194,7 @@
     <span class="p">});</span>
 </pre></div>
 
-<p>A transient call with request/response-parameters will register a route and wrap the request/response objects in a <code>SynchronousMessageFrame</code> which decorates the messages with <code>CorrelationId</code>s. If multiple responses are made to the same synchronous call, only the first will be handled in the defined response handler, while the other messages will be raised as events.</p>
+<p>A transient call with request/response-parameters will register a route and wrap the request/response objects in a <code>SynchronousMessageFrame</code> which decorates the messages with <code>CorrelationId</code>s. If multiple responses are made to the same synchronous call, only the first will be handled in the defined response handler, all other messages will be silently discarded.</p>
 
 <h3>
 <a name="static-routes" class="anchor" href="#static-routes"><span class="octicon octicon-link"></span></a>Static routes</h3>
@@ -226,7 +220,7 @@
     <span class="k">public</span> <span class="kt">string</span> <span class="n">Message</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">SuccessResponse</span> 
+<span class="k">public</span> <span class="k">class</span> <span class="nc">SuccessResponse</span> <span class="p">:</span> <span class="n">BaseResponse</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nf">SuccessResponse</span><span class="p">()</span> 
     <span class="p">{</span>
@@ -234,7 +228,7 @@
     <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="k">public</span> <span class="k">class</span> <span class="nc">FailureResponse</span> 
+<span class="k">public</span> <span class="k">class</span> <span class="nc">FailureResponse</span> <span class="p">:</span> <span class="n">BaseResponse</span>
 <span class="p">{</span>
     <span class="k">public</span> <span class="nf">FailureResponse</span><span class="p">()</span> 
     <span class="p">{</span>
@@ -321,42 +315,17 @@ the value of 0.</p>
 
 </pre></div>
 
-<h3>
-<a name="deferrence-03" class="anchor" href="#deferrence-03"><span class="octicon octicon-link"></span></a>Deferrence (0.3)</h3>
-
-<p>Succubus supports deferring message handling. This is convenient when you are doing synchronous processing, but the response set needs to be handled in another context than where the request was posted.</p>
-
-<p>To use, simply:</p>
-
-<div class="highlight highlight-C#"><pre><span class="n">bus</span><span class="p">.</span><span class="n">ReplyTo</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">,</span> <span class="n">BasicResponse</span><span class="p">&gt;(</span><span class="n">req</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="n">BasicResponse</span> <span class="p">{</span>
-    <span class="n">Message</span> <span class="p">=</span> <span class="s">"From server: "</span> <span class="p">+</span> <span class="n">req</span><span class="p">.</span><span class="n">Message</span><span class="p">;</span>
-<span class="p">});</span>
-
-<span class="n">bus</span><span class="p">.</span><span class="n">Defer</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">,</span> <span class="n">BasicResponse</span><span class="p">&gt;();</span>
-
-<span class="n">Guid</span> <span class="n">cId</span> <span class="p">=</span> <span class="n">bus</span><span class="p">.</span><span class="n">Call</span><span class="p">(</span><span class="k">new</span> <span class="n">BasicRequest</span> <span class="p">{</span> <span class="n">Message</span> <span class="p">=</span> <span class="s">"Deferred "</span><span class="p">});</span>
-
-<span class="n">bus</span><span class="p">.</span><span class="n">Pickup</span><span class="p">&lt;</span><span class="n">BasicRequest</span><span class="p">,</span> <span class="n">BasicResponse</span><span class="p">&gt;(</span><span class="n">cId</span><span class="p">,</span> <span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span> <span class="p">=&gt;</span>
-<span class="p">{</span>
-
-<span class="p">});</span>
-</pre></div>
-
-<p>The call to <code>Pickup</code> will <em>block</em>. Also, deferred calls will by default be held for one minute, or be removed from the bus as soon as they are picked up.</p>
-
 <h2>
 <a name="workload-management" class="anchor" href="#workload-management"><span class="octicon octicon-link"></span></a>Workload management</h2>
-      </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Succubus maintained by <a href="https://github.com/COCPORN">COCPORN</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+<p>Currently not implemented.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/COCPORN">COCPORN</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
-
+    <script src="javascripts/scale.fix.js"></script>
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -367,7 +336,6 @@ the value of 0.</p>
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
-
 
   </body>
 </html>
