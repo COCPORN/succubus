@@ -72,7 +72,7 @@ The `Initialize`-call to the bus alternatively returns a configuration handle.
 ```C#
 bus.Initialize(succubus =>
 {
-    succubus.StartMessageHost();
+    succubus.WithZeroMQ();
 });
 ```
 
