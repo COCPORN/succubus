@@ -67,7 +67,10 @@ namespace Succubus.Backend.Loopback
         {
             lock (SubscriptionList)
             {
-                SubscriptionList.Add(address);
+                if (SubscriptionList.Contains(address) == false)
+                {
+                    SubscriptionList.Add(address);
+                }
             }
         }
 
@@ -75,7 +78,10 @@ namespace Succubus.Backend.Loopback
         {
             lock (SubscriptionList)
             {
-                SubscriptionList.Add("");
+                if (SubscriptionList.Contains("") == false)
+                {
+                    SubscriptionList.Add("");
+                }
             }
         }
 

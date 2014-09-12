@@ -16,9 +16,6 @@ namespace Succubus.Core
 
         public void ProcessSynchronousMessages(MessageFrames.Synchronous synchronousFrame, string address)
         {
-
-
-
             object message = synchronousFrame.Message;
 
             if (message == null) return;
@@ -38,34 +35,6 @@ namespace Succubus.Core
             lock (synchronizationContexts)
             {
                 synchronizationContexts.TryGetValue(synchronousFrame.CorrelationId, out ctx);
-#if false
-                if (ctx == null)
-                {
-
-                    lock (deferredRequestTypes)
-                    {
-                        if (deferredRequestTypes.Contains(message.GetType()))
-                        {
-                            ctx = InstantiatePrototype(message, null, 60000, synchronousFrame.CorrelationId);
-                            if (ctx != null)
-                            {
-                                ctx.Request = message;
-
-
-                                lock (deferredWaitHandles)
-                                {
-                                    ManualResetEvent handle = null;
-                                    if (deferredWaitHandles.TryGetValue(synchronousFrame.CorrelationId, out handle))
-                                    {
-                                        handle.Set();
-                                    }
-                                }
-                            }
-                            else throw new InvalidOperationException("Unable to instantiate context from prototype");
-                        }
-                    }
-                }
-#endif
             }
             if (ctx != null)
             {
@@ -73,14 +42,13 @@ namespace Succubus.Core
                 {
                     if (ctx.ResolveFor(message) == true)
                     {
-                        if (ctx.ContextType != ContextType.Deferred)
+
+                        lock (synchronizationContexts)
                         {
-                            lock (synchronizationContexts)
-                            {
-                                synchronizationContexts.Remove(synchronousFrame.CorrelationId);
-                                timeoutHandler.RemoveTimeout(synchronousFrame.CorrelationId);
-                            }
+                            synchronizationContexts.Remove(synchronousFrame.CorrelationId);
+                            timeoutHandler.RemoveTimeout(synchronousFrame.CorrelationId);
                         }
+
                     }
                     else if (ctx.TimedOut == true)
                     {

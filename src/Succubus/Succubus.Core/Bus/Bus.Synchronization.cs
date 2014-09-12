@@ -55,6 +55,18 @@ namespace Succubus.Core
             };
         }
 
+        MessageFrames.Synchronous FrameResponseSynchronously(MessageFrames.Synchronous request, object o, string guid)
+        {
+            return new MessageFrames.Synchronous
+            {
+                Message = o,
+                CorrelationId = guid ?? CorrelationIdProvider.CreateCorrelationId(o),
+                EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
+                RequestType = request.RequestType,
+                Request = o
+            };
+        }
+
         MessageFrames.Event FrameEvent(object o)
         {
             return new MessageFrames.Event
@@ -74,17 +86,7 @@ namespace Succubus.Core
             };
         }
 
-        MessageFrames.Synchronous FrameResponseSynchronously(MessageFrames.Synchronous request, object o, string guid)
-        {
-            return new MessageFrames.Synchronous
-            {
-                Message = o,
-                CorrelationId = guid ?? CorrelationIdProvider.CreateCorrelationId(o),
-                EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-                RequestType = request.RequestType,
-                Request = o
-            };
-        }
+     
 
 
         public void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null,

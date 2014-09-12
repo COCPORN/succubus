@@ -17,8 +17,10 @@ namespace Succubus.Bus.Tests
         {
             bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.WithLoopback());
-            bus.ReplyTo<A, B1>(a => new B1());
+            bus.Initialize(succubus => succubus.WithLoopback(clear: true));
+            bus.ReplyTo<A, B1>(a =>
+                new B1()
+                );
             bus.ReplyTo<A, B2>(a => new B2());
             bus.ReplyTo<B1, C>(b1 => new D1());
             bus.ReplyTo<B2, C>(b2 => new D2());
@@ -31,6 +33,14 @@ namespace Succubus.Bus.Tests
         // will not fire from other replyto-handlers
         public void TestAdvancedRouting()
         {
+            var result1 = bus.Call<A, B1>(new A());
+            //var result2 = bus.Call<A, B2>(new A());
+            //var result3 = bus.Call<A, C>(new A());
+
+            Assert.AreEqual(typeof(B1), result1.GetType());
+            //Assert.AreEqual(typeof(B2), result2.GetType());
+            //Assert.AreEqual(typeof(C), result3.GetType());
+            return;
             var mre = new ManualResetEvent(false);
 
             bus.OnReply<A, Rb>((req, res) =>
