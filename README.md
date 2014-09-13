@@ -1,19 +1,15 @@
-Succubus
-========
+# Succubus
 
-A light .NET distributed application framework created on top of ZeroMQ.
 
-About
------
+A light .NET distributed application framework with multiple and pluggable backends.
+
+## About
 
 Succubus is a simple (at this point) implementation of convenience functions for .NET on top of ZeroMQ, presenting an interface similar to that of MassTransit.
 
 Because it uses ZeroMQ, all brokers live in the Succubus process space, and you do not install anything besides the dependencies in the library.
 
-Succubus is currently in a pre-release but usable state. The repository will go public once it reaches a 0.2-release.
-
-Features
---------
+## Features
 
 These are the current and planned features of Succubus:
 
@@ -26,8 +22,8 @@ These are the current and planned features of Succubus:
 	- Work-item fan out
 
 
-Installation
-------------
+## Installation
+
 
 Get lastest version of Succubus from GitHub or NuGet.
 
@@ -37,8 +33,7 @@ Relevant packages:
 - Succubus.Backend.ZeroMQ
 - Succubus.Hosting (to be renamed to Succubus.Hosting.ZeroMQ prior to 1.0 release)
 
-Instantiation
--------------
+## Instantiation
 
 To instantiate a handle to the bus, create an instance of `Succubus.Core.Bus`:
 ```C#
@@ -47,8 +42,7 @@ IBus bus = new Succubus.Core.Bus();
 
 Each handle will have a separate channel to the message host. Each handle will also have separate event handlers, and synchronous message responses need to be handled on the same bus as the request.
 
-Singleton instantiation
------------------------
+## Singleton instantiation
 
 Succubus allows you to get a singleton instance in addition to newing up objects. Note that the singleton object will always (obviously) point to the same instance, while all newed objects will be different. These can co-exist and will use separate message channels:
 
@@ -58,8 +52,7 @@ Bus.Instance.Initialize(config => {
 });
 ```
 
-Initialization
---------------
+## Initialization
 
 Before using the bus, it needs to be initialized:
 
@@ -78,8 +71,7 @@ bus.Initialize(succubus =>
 
 When using the parameterless Initialize call, the bus will be initialized with default values. To actually start the message host, the Succubus.Hosting-assembly must be referenced.
 
-Backends
---------
+## Backends
 
 For Succubus to work, it needs a _backend_. The Loopback backend is always present, so you can initialize like this:
 
@@ -106,8 +98,7 @@ bus.Initialize(succubus => succubus.WithZeroMQ(zmq => {
 
 These examples rely on using `Succubus.Backend.ZeroMQ` and `Succubus.Hosting.ZeroMQ` respectively.
 
-Events
-------
+## Events
 
 Succubus supports publishing and consuming events. Events are agnostic to where they are posted from and who consumes them. A single event can have multiple consumers.
 
@@ -138,8 +129,7 @@ bus.On<BasicEvent>(e => {
 });
 ```
 
-Synchronous processing
-----------------------
+## Synchronous processing
 
 Succubus supports two types of synchronous calling; static and transient routes. A transient route is setup as the call is made, and is removed after a call has been processed, while a static route is permanent in the bus.
 
@@ -293,7 +283,6 @@ bus.OnReply<UpdateRequest,
 ```
 
 
-Workload management
--------------------
+## Workload management
 
 Currently not implemented.
