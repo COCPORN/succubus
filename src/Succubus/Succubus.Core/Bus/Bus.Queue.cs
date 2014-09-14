@@ -9,7 +9,7 @@ namespace Succubus.Core
 
         public void Queue<T>(T request, string address = null, Action<Action> marshal = null)
         {
-            Action execute = () => Transport.QueuePublish(FrameWorkItem(request), address ?? "__BROADCAST");
+            Action execute = () => Transport.QueuePublish(FrameWorkItem(request), address ?? "__QUEUE");
 
             if (marshal == null)
             {
