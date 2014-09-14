@@ -21,6 +21,15 @@ These are the current and planned features of Succubus:
 	- Addressable commands
 	- Work-item fan out
 
+## Messaging patterns
+
+- Eventing, one-to-many
+    - `Publish<T>` - `On<T>`
+- Synchronous call, one-to-many
+    - `Call<TReq>` - `OnReply<TReq, TRes, TRes2...>`
+    - `Call<TReq, TRes>`
+- Work item fan out, one-to-one
+    - `Queue<T>` - `Dequeue<T>`
 
 ## Installation
 
@@ -158,7 +167,7 @@ bus.Call<Request, Response>(new Request { Message = "Hi from client"},
 	});
 ```
 
-A transient call with request/response-parameters will register a route and wrap the request/response objects in a `SynchronousMessageFrame` which decorates the messages with `CorrelationId`s. If multiple responses are made to the same synchronous call, only the first will be handled in the defined response handler, all other messages will be silently discarded.
+A transient call with request/response-parameters will register a route and wrap the request/response objects in a `SynchronousMessageFrame` which decorates the messages with `CorrelationId`s. 
 
 ### Static routes
 
@@ -285,4 +294,23 @@ bus.OnReply<UpdateRequest,
 
 ## Workload management
 
-Currently not implemented.
+Workload management is implemented as queues. Many producers can queue items onto the same point and many consumers can read from the queue simultaneously. Only one consumer will get a work item, as opposed to the event model where all `On`-handlers will receive the message.
+
+```C#
+class WorkItem 
+{
+    string WorkDescription { get; set; }
+}
+```
+
+Given the above POCO work item, use as follows:
+
+```C#
+bus.Enqueue(new WorkItem { WorkDescription = "Do this work" });
+```
+
+To fetch more work, do:
+
+```C#
+var workRequest = bus.Dequeue<WorkItem>();
+```

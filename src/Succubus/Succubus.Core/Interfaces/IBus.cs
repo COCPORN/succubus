@@ -6,26 +6,29 @@ namespace Succubus.Core.Interfaces
 {
     public interface IBus
     {
-        #region Initialization
+        // --- INITIALIZATION ---
+
         void Initialize(Action<IBusConfigurator> initializationHandler);
-        #endregion
 
-        #region Synchronous
+        // --- EVENT PROCESSING ---
 
-        // Make a "synchronous" call
+        // Post an event on the bus
+        void Publish<T>(T request, string address = null, Action<Action> marshal = null);        
 
-        // Throw away calls
+        // Act on events
+        IResponseContext On<T>(Action<T> handler, string address = null, Action<Action> marshal = null);        
+
+        // --- SYNCHRONOUS PROCESSING ---
+
+        // One-to-one, only first response is honored
         void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null, Action<Action> marshal = null);
         TRes Call<TReq, TRes>(TReq request, string address = null, int timeout = 10000, Func<Func<TReq, TRes>, TReq, TRes> marshal = null);
         Task<TRes> CallAsync<TReq, TRes>(TReq request, string address = null, int timeout = 10000, Func<Func<TReq, TRes>, TReq, TRes> marshal = null);
 
-        // Calls to static routes
+        // One-to-N+
         string Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 60000, Action<Action> marshal = null);
 
-        
-
-        // Static routes
-        //IResponseContext OnReply<TReq, T>(Action<TReq, T> handler, Action<TReq> timeoutHandler = null, int timeout = 0);
+        // Static routes    
         IResponseContext OnReply<TReq, T>(Action<TReq, T> handler, Action<Action> marshal = null);
         IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler, Action<Action> marshal = null);
         IResponseContext OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler, Action<Action> marshal = null);
@@ -37,64 +40,26 @@ namespace Succubus.Core.Interfaces
         // Handle incoming message with a reply, "server side" logic
         void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler, string address = null, Func<Func<TReq, TRes>, TReq, TRes> marshal = null);
 
-        #endregion
+        // --- WORKLOAD MANAGEMENT ---
 
-#if false
-        #region Deferrence
-        
-        IResponseContext Defer<TReq, T>();
-        IResponseContext Defer<TReq, T1, T2>();
-        IResponseContext Defer<TReq, T1, T2, T3>();
-        IResponseContext Defer<TReq, T1, T2, T3, T4>();
-        IResponseContext Defer<TReq, T1, T2, T3, T4, T5>();
-        IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6>();
-        IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6, T7>();
+        // Add new work item
+        void Queue<T>(T request, string address = null, Action<Action> marshal = null);
 
-        IResponseContext Pickup<TReq, T>(string correlationId, Action<TReq, T> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2>(string correlationId, Action<TReq, T1, T2> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3>(string correlationId, Action<TReq, T1, T2, T3> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4>(string correlationId, Action<TReq, T1, T2, T3, T4> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5>(string correlationId, Action<TReq, T1, T2, T3, T4, T5> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class;
+        // Get new work item
+        IResponseContext Dequeue<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
 
-        #endregion
-#endif
-
-        #region Publish/subscribe
-
-        // Post an event on the bus
-        void Publish<T>(T request, string address = null, Action<Action> marshal = null);        
-
-        // Act on events
-        IResponseContext On<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
-        
-        #endregion
-
-        #region Error handling
+     
+        // --- ERROR HANDLING ---
 
         event EventHandler<ExceptionEventArgs> HandlerException;
 
         event EventHandler<ExceptionEventArgs> MessageCreationException;
 
-        #endregion
-
-        #region Diagnostics
+        // --- DIAGNOSTICS ---
 
         IResponseContext OnRaw(Action<object> handler, Action<Action> marshal = null);
 
         Diagnose GetDiagnose();
-
-        #endregion
-
-
-
-        #region Fan out
-
-        void Queue<T>(T request, string address = null, Action<Action> marshal = null);
-        IResponseContext Dequeue<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
-
-        #endregion
 
     }
 }

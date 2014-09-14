@@ -11,14 +11,14 @@ namespace Succubus.Core
         public Diagnose GetDiagnose()
         {
             lock (this)
-                lock (synchronizationContexts)
+            lock (synchronizationContexts)
+            {
+                return new Diagnose()
                 {
-                    return new Diagnose()
-                    {
-                        NumberOfItemsForTimeout = timeoutHandler.NumberOfItemsForTimeout(),
-                        SynchronizationContexts = synchronizationContexts.Count
-                    };
-                }
+                    NumberOfItemsForTimeout = timeoutHandler.NumberOfItemsForTimeout(),
+                    SynchronizationContexts = synchronizationContexts.Count
+                };
+            }
         }
 
 
