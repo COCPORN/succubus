@@ -6,7 +6,7 @@ using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
 
 namespace Succubus.Bus.Tests
-{
+{ 
     [TestFixture]
     public class Routing
     {
@@ -34,12 +34,12 @@ namespace Succubus.Bus.Tests
         public void TestAdvancedRouting()
         {
             var result1 = bus.Call<A, B1>(new A());
-            //var result2 = bus.Call<A, B2>(new A());
-            //var result3 = bus.Call<A, C>(new A());
+            var result2 = bus.Call<A, B2>(new A());
+            var result3 = bus.Call<A, C>(new A());
 
             Assert.AreEqual(typeof(B1), result1.GetType());
-            //Assert.AreEqual(typeof(B2), result2.GetType());
-            //Assert.AreEqual(typeof(C), result3.GetType());
+            Assert.AreEqual(typeof(B2), result2.GetType());
+            Assert.AreEqual(typeof(D2), result3.GetType());
             return;
             var mre = new ManualResetEvent(false);
 
