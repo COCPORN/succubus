@@ -1,8 +1,13 @@
 ﻿namespace Succubus.Bus.Tests.Messages
 {
-    public class ChildRequest
+    public class BaseRequest
     {
         public string Message { get; set; }
+    }
+
+    public class ChildRequest : BaseRequest
+    {
+       
     }
 
     public abstract class ChildBase
