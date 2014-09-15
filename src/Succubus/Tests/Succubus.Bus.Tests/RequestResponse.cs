@@ -35,7 +35,7 @@ namespace Succubus.Bus.Tests
                 Message = req.Message
             });
 
-            bus.ReplyTo<ChildRequest, ChildBase>(req =>
+            bus.ReplyTo<BaseRequest, ChildBase>(req =>
             {
                 if (req.Message == "Child1")
                 {
@@ -168,13 +168,26 @@ namespace Succubus.Bus.Tests
         }
 
         [Test]
-        public void ChildMessages1_SimpleMapping()
+        public void ChildMessages1_SimpleResponseMapping()
         {
-            var response = bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child1" });
+            var response = bus.Call<BaseRequest, ChildResponse1>(new BaseRequest { Message = "Child1" });
             Assert.AreEqual("Child1", response.Message);
             Assert.AreEqual(typeof(ChildResponse1), response.GetType());
 
-            var response2 = bus.Call<ChildRequest, ChildResponse2>(new ChildRequest { Message = "Child2" });
+            var response2 = bus.Call<BaseRequest, ChildResponse2>(new BaseRequest { Message = "Child2" });
+            Assert.AreEqual("Child2", response2.Message);
+            Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
+            BusDiagnose.CheckDiagnose(bus);
+        }
+
+        [Test]
+        public void ChildMessages2_SimpleRequestMapping()
+        {
+            var response = bus.Call<BaseRequest, ChildResponse1>(new ChildRequest { Message = "Child1" });
+            Assert.AreEqual("Child1", response.Message);
+            Assert.AreEqual(typeof(ChildResponse1), response.GetType());
+
+            var response2 = bus.Call<BaseRequest, ChildResponse2>(new ChildRequest { Message = "Child2" });
             Assert.AreEqual("Child2", response2.Message);
             Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
             BusDiagnose.CheckDiagnose(bus);
@@ -184,18 +197,18 @@ namespace Succubus.Bus.Tests
         [ExpectedException(typeof(TimeoutException))]
         public void ChildMessages2_TimeoutOfMissingType()
         {
-            bus.Call<ChildRequest, ChildResponse1>(new ChildRequest { Message = "Child2" }, timeout: 1000);            
+            bus.Call<BaseRequest, ChildResponse1>(new BaseRequest { Message = "Child2" }, timeout: 1000);            
             BusDiagnose.CheckDiagnose(bus);
         }
 
         [Test]
         public void ChildMessages3_HandlingOfBaseClassResponse()
         {
-            var response = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child1" }, timeout: 10000);
+            var response = bus.Call<BaseRequest, ChildBase>(new BaseRequest { Message = "Child1" }, timeout: 10000);
             Assert.AreEqual("Child1", response.Message);
             Assert.AreEqual(typeof(ChildResponse1), response.GetType());
 
-            var response2 = bus.Call<ChildRequest, ChildBase>(new ChildRequest { Message = "Child2" }, timeout: 10000);
+            var response2 = bus.Call<BaseRequest, ChildBase>(new BaseRequest { Message = "Child2" }, timeout: 10000);
             Assert.AreEqual("Child2", response2.Message);
             Assert.AreEqual(typeof(ChildResponse2), response2.GetType());
             BusDiagnose.CheckDiagnose(bus);
@@ -204,12 +217,12 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ChildMessages4_BaseClassOrchestrationTimeout()
         {           
-            bus.OnReply<ChildRequest, ChildBase, ChildResponse2>((req, cb, cr2) =>
+            bus.OnReply<BaseRequest, ChildBase, ChildResponse2>((req, cb, cr2) =>
             {
                 Assert.Fail("Got unexpected reply");
             });
 
-            bus.Call(new ChildRequest { Message = "Child1" }, (req) =>
+            bus.Call(new BaseRequest { Message = "Child1" }, (req) =>
             {
                 Console.WriteLine("Got timeout");
                 //return;

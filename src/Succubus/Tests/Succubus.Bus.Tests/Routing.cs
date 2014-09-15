@@ -6,7 +6,7 @@ using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
 
 namespace Succubus.Bus.Tests
-{
+{ 
     [TestFixture]
     public class Routing
     {
@@ -18,6 +18,13 @@ namespace Succubus.Bus.Tests
             bus = new Core.Bus();
 
             bus.Initialize(succubus => succubus.WithLoopback(clear: true));
+
+            // Setup chaining
+            bus.ReplyTo<C1, C2>(c => new C2());
+            bus.ReplyTo<C2, C3>(c => new C3());
+            bus.ReplyTo<C3, C4>(c => new C4());
+
+            // Complex routing
             bus.ReplyTo<A, B1>(a =>
                 new B1()
                 );
@@ -29,18 +36,28 @@ namespace Succubus.Bus.Tests
         }
 
         [Test]
+        public void SimpleChaining()
+        {
+            var mre = new ManualResetEvent(false);
+
+            bus.OnReply<C1, C4>((req, res) =>
+            {               
+                mre.Set();
+            });
+            bus.Call(new C1());
+            if (mre.WaitOne(2500) == false)
+            {
+                Assert.Fail("Call timed out");
+            }
+
+        }
+
+        [Test]
         // Unfortunately, routing doesn't seem to work as expected, as ReplyTo-handlers
         // will not fire from other replyto-handlers
         public void TestAdvancedRouting()
         {
-            var result1 = bus.Call<A, B1>(new A());
-            //var result2 = bus.Call<A, B2>(new A());
-            //var result3 = bus.Call<A, C>(new A());
-
-            Assert.AreEqual(typeof(B1), result1.GetType());
-            //Assert.AreEqual(typeof(B2), result2.GetType());
-            //Assert.AreEqual(typeof(C), result3.GetType());
-            return;
+        
             var mre = new ManualResetEvent(false);
 
             bus.OnReply<A, Rb>((req, res) =>
