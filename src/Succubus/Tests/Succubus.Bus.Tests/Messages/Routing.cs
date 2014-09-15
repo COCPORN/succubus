@@ -1,5 +1,11 @@
 ﻿namespace Succubus.Bus.Tests.Messages
 {
+
+    public class C1 { }
+    public class C2 { }
+    public class C3 { }
+    public class C4 { }
+
     public class A
     {
         

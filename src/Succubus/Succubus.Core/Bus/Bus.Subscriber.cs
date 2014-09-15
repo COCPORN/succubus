@@ -84,7 +84,7 @@ namespace Succubus.Core
                 foreach (var replyHandler in handlers)
                 {
                     SynchronousBlock handler = replyHandler;
-                    if (handler.Address == address)
+                    if (handler.Address == "__BROADCAST" || handler.Address == "__REPLY" || handler.Address == address)
                     {
                         try
                         {

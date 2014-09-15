@@ -174,10 +174,9 @@ namespace Succubus.Core
             }
 
             Type type = Type.GetType(eventFrame.EmbeddedType);
-            Type messageType = Type.GetType(eventFrame.EmbeddedType);
             object message = eventFrame.Message;
 
-            if (type == null || messageType == null || message == null) return;
+            if (type == null || message == null) return;
 
             // TODO: This has a potential race condition in where
             // handlers are added to/subtracted from while iterating on it
