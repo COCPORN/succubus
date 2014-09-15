@@ -122,7 +122,6 @@ namespace Succubus.Backend.ZeroMQ
                         var eventFrame = coreMessage as Core.MessageFrames.Event;
                         if (synchronousFrame != null)
                         {
-      
                             Bridge.ProcessSynchronousMessages(synchronousFrame, address);
                             Bridge.ProcessCatchAllEvents(synchronousFrame, address);
                             if (ReportRaw)

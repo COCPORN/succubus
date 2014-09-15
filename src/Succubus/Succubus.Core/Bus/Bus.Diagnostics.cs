@@ -16,7 +16,9 @@ namespace Succubus.Core
                     return new Diagnose()
                     {
                         NumberOfItemsForTimeout = timeoutHandler.NumberOfItemsForTimeout(),
-                        SynchronizationContexts = synchronizationContexts.Count
+                        SynchronizationContexts = synchronizationContexts.Count,
+                        SentMessages = sentMessages,
+                        ReceivedMessages = receivedMessages
                     };
                 }
         }
