@@ -2,7 +2,6 @@ namespace Succubus.Core.Interfaces {
 
 	public interface IQueue
 	{
-
 		// --- WORKLOAD MANAGEMENT ---
 
 	       // Add new work item

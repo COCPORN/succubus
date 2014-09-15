@@ -25,7 +25,7 @@ namespace Succubus.Core.Interfaces
         TRes Call<TReq, TRes>(TReq request, string address = null, int timeout = 10000, Func<Func<TReq, TRes>, TReq, TRes> marshal = null);
         Task<TRes> CallAsync<TReq, TRes>(TReq request, string address = null, int timeout = 10000, Func<Func<TReq, TRes>, TReq, TRes> marshal = null);
 
-        // One-to-N+
+        // One-to-N
         string Call<TReq>(TReq request, Action<TReq> timeoutHandler = null, string address = null, int timeout = 60000, Action<Action> marshal = null);
 
         // Static routes    
@@ -39,20 +39,12 @@ namespace Succubus.Core.Interfaces
 
         // Handle incoming message with a reply, "server side" logic
         void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler, string address = null, Func<Func<TReq, TRes>, TReq, TRes> marshal = null);
+        void Handle<TReq>(Action<TReq> handler, string address = null);
+        void Reply<TRes>(TRes res, string address = null);
 
-        // --- WORKLOAD MANAGEMENT ---
-
-        // Add new work item
-        void Queue<T>(T request, string address = null, Action<Action> marshal = null);
-
-        // Get new work item
-        IResponseContext Dequeue<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
-
-     
         // --- ERROR HANDLING ---
 
         event EventHandler<ExceptionEventArgs> HandlerException;
-
         event EventHandler<ExceptionEventArgs> MessageCreationException;
 
         // --- DIAGNOSTICS ---
