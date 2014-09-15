@@ -17,5 +17,10 @@ namespace Succubus.Core.MessageFrames
 
         public object Message { get; set; }
 
+        public override string ToString()
+        {
+            return String.Format("Sync {2} CId: {0} Type: {1} ", CorrelationId, EmbeddedType,
+                Request == null ? "Request" : "Response");
+        }
     }
 }
