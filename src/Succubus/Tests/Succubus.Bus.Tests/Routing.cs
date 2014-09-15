@@ -53,8 +53,8 @@ namespace Succubus.Bus.Tests
         }
 
         [Test]
-        // Unfortunately, routing doesn't seem to work as expected, as ReplyTo-handlers
-        // will not fire from other replyto-handlers
+        // This currently doesn't work because ReplyTo doesn't work
+        // with child classes
         public void TestAdvancedRouting()
         {
         
