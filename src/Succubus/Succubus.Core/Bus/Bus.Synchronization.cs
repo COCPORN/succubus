@@ -1,4 +1,6 @@
 ﻿using System.Data.Odbc;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Succubus.Collections;
@@ -383,15 +385,31 @@ namespace Succubus.Core
             }, Address = address ?? "__BROADCAST" };
             lock (replyHandlers)
             {
-                if (replyHandlers.ContainsKey(typeof(TReq)) == false)
+              
+                var subclasses = Assembly.GetAssembly(typeof (TReq))
+                    .GetTypes()
+                    .Where(t => t.IsSubclassOf(typeof (TReq)));
+
+                var classList = subclasses.ToList();
+                classList.Add(typeof(TReq));
+
+                foreach (var subclass in classList)
                 {
-                    var handlers = new List<SynchronousBlock>();
-                    handlers.Add(objectHandler);
-                    replyHandlers.Add(typeof(TReq), handlers);
+                    Console.WriteLine(subclass.ToString());
                 }
-                else
+
+                foreach (var t in classList)
                 {
-                    replyHandlers[typeof(TReq)].Add(objectHandler);
+                    if (replyHandlers.ContainsKey(typeof (TReq)) == false)
+                    {
+                        var handlers = new List<SynchronousBlock>();
+                        handlers.Add(objectHandler);
+                        replyHandlers.Add(t, handlers);
+                    }
+                    else
+                    {
+                        replyHandlers[t].Add(objectHandler);
+                    }
                 }
             }
         }
