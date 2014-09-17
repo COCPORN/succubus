@@ -2,11 +2,8 @@
 
 namespace Succubus.Core.MessageFrames
 {
-    public class WorkItem : IMessageFrame
-    {
-        public string EmbeddedType { get; set; }
-
-        public object Message { get; set; }
+    public class WorkItem : MessageBase, IMessageFrame
+    {       
 
     }
 }

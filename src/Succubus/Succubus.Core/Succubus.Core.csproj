@@ -73,6 +73,7 @@
     <Compile Include="Interfaces\ITransportBridge.cs" />
     <Compile Include="MessageFrames\Diagnostic.cs" />
     <Compile Include="MessageFrames\EventMessageFrame.cs" />
+    <Compile Include="MessageFrames\MessageBase.cs" />
     <Compile Include="MessageFrames\WorkItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\ObjectCopier.cs" />
