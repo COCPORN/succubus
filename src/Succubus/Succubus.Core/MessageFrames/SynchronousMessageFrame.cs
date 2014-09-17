@@ -11,8 +11,6 @@ namespace Succubus.Core.MessageFrames
 
         public object Request { get; set; }
 
-        public string ParentType { get; set; }
-
         public override string ToString()
         {
             return String.Format("Sync {2} CId: {0} Type: {1} ", CorrelationId, EmbeddedType,

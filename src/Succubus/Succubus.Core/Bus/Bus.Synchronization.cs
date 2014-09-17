@@ -59,13 +59,17 @@ namespace Succubus.Core
 
         MessageFrames.Synchronous FrameResponseSynchronously(MessageFrames.Synchronous request, object o, string guid)
         {
+            if (String.IsNullOrEmpty(guid))
+            {
+                throw new ArgumentException("No guid provided");
+            }
             return new MessageFrames.Synchronous
             {
                 Message = o,
-                CorrelationId = guid ?? CorrelationIdProvider.CreateCorrelationId(o),
+                CorrelationId = guid,
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = request.RequestType,
-                Request = o,
+                Request = request,
                 Originator = request.Originator,
                 Responder = MachineName
             };
