@@ -53,7 +53,7 @@ namespace Succubus.Core
                 CorrelationId = CorrelationIdProvider.CreateCorrelationId(o),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-
+                Originator = MachineName
             };
         }
 
@@ -65,7 +65,9 @@ namespace Succubus.Core
                 CorrelationId = guid ?? CorrelationIdProvider.CreateCorrelationId(o),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = request.RequestType,
-                Request = o
+                Request = o,
+                Originator = request.Originator,
+                Responder = MachineName
             };
         }
 
@@ -75,7 +77,7 @@ namespace Succubus.Core
             {
                 Message = o,
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-
+                Originator = MachineName
             };
         }
 
@@ -393,10 +395,10 @@ namespace Succubus.Core
                 var classList = subclasses.ToList();
                 classList.Add(typeof(TReq));
 
-                foreach (var subclass in classList)
-                {
-                    Console.WriteLine(subclass.ToString());
-                }
+                //foreach (var subclass in classList)
+                //{
+                //    Console.WriteLine(subclass.ToString());
+                //}
 
                 foreach (var t in classList)
                 {
