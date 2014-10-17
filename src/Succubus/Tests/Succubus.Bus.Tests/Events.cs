@@ -20,7 +20,13 @@ namespace Succubus.Bus.Tests
         public void Init()
         {
 
-            bus = Configuration.Factory.CreateBusWithHosting();
+            bus = new Succubus.Core.Bus();
+            bus.Initialize(succubus =>
+            {
+                succubus.WithLoopback(config => config.ReportRaw = true, clear: true);
+                succubus.IncludeMessageOriginator = true;
+            });
+
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
@@ -65,13 +71,13 @@ namespace Succubus.Bus.Tests
                 var b = o as MessageBase;
                 if (b != null)
                 {
-                    //Console.WriteLine("Got the request: " + o + " MachineName: " + b.Originator);
+                    Console.WriteLine("Got the request: " + o + " MachineName: " + b.Originator);
                     counter++;
                     machineName = b.Originator;
                     mre.Set();
                 }
             });
-            
+
             bus.Publish(new BasicEvent() { Message = "Wohey" });
             if (mre.WaitOne(500) == false)
             {
