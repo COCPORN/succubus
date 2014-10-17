@@ -167,7 +167,7 @@ namespace Succubus.Backend.ZeroMQ
             }
             catch (Exception ex)
             {
-            
+                Bridge.GeneralTransportException(ex);
             }
         }
 
