@@ -10,12 +10,12 @@ namespace Succubus.Bus.Tests
     [TestFixture]
     public class Frames
     {
-        private Core.Bus bus;
+        private IBus bus;
 
         [SetUp]
         public void Init()
         {
-            bus = new Core.Bus();
+            bus = Configuration.Factory.CreateBusWithHosting();
 #if ZEROMQ_BACKEND
             bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
             Thread.Sleep(2500);

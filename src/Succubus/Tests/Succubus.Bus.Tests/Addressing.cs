@@ -9,6 +9,7 @@ using Succubus.Backend.Loopback;
 using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Bus.Tests
 {
@@ -16,42 +17,20 @@ namespace Succubus.Bus.Tests
     class Addressing
     {
 
-        private Core.Bus bus;
+        private IBus bus;
 
         [SetUp]
         public void Init()
         {
-            bus = new Core.Bus();
-            //bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
-            bus.Initialize(succubus => succubus.WithLoopback());
-
+            bus = Configuration.Factory.CreateBusWithHosting();
+            
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
                 Message = req.Message
             }, "ADDRESS");
         }
 
-        [Test]
-        public void SimpleEventWithCorrectAddressing()
-        {
-            int counter = 0;
-            ManualResetEvent mre = new ManualResetEvent(false);
-            bus.On<BasicEvent>(ev =>
-            {
-                if (ev.Message == "Wohey")
-                {
-                    counter++;
-                    mre.Set();
-                }
-            }, "CORRECTADDRESS");
-            bus.Publish(new BasicEvent() { Message = "Wohey" }, "CORRECTADDRESS");
-            if (mre.WaitOne(500) == false)
-            {
-                Assert.Fail("Timeout waiting for event");
-            }
-            else
-                Assert.AreEqual(1, counter);
-        }
+        
 
         [Test]
         public void SimpleEventWithIncorrectAddressing()
@@ -96,7 +75,28 @@ namespace Succubus.Bus.Tests
 
         }
 
-
+        [Test]
+        public void SimpleEventWithCorrectAddressing()
+        {
+            int counter = 0;
+            ManualResetEvent mre = new ManualResetEvent(false);
+            bus.On<BasicEvent>(ev =>
+            {
+                if (ev.Message == "Wohey")
+                {
+                    counter++;
+                    mre.Set();
+                }
+            }, "CORRECTADDRESS");
+            Thread.Sleep(1000);
+            bus.Publish(new BasicEvent() { Message = "Wohey" }, "CORRECTADDRESS");
+            if (mre.WaitOne(2500) == false)
+            {
+                Assert.Fail("Timeout waiting for event");
+            }
+            else
+                Assert.AreEqual(1, counter);
+        }
 
     }
 }

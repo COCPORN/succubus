@@ -13,18 +13,13 @@ namespace Succubus.Bus.Tests
     [TestFixture]
     public class Correlation
     {
-
-        IBus overlapbus = new Core.Bus();
-
+        IBus overlapbus;
+      
         [SetUp]
         public void Init()
         {
 
-            overlapbus.Initialize(succubus =>
-            {
-                succubus.WithLoopback();
-                //succubus.CorrelationIdProvider = new PredeterminedCorrelationProvider();
-            });
+            overlapbus = Configuration.Factory.CreateBusWithHosting();
 
 
 

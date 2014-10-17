@@ -1,25 +1,21 @@
 ﻿using NUnit.Framework;
 using Succubus.Backend.Loopback;
 using Succubus.Bus.Tests.Messages;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Bus.Tests
 {
     [TestFixture]
     public class Marshalling
     {
-        private Core.Bus bus;
+        private IBus bus;
 
         [SetUp]
         public void Init()
         {
-            bus = new Core.Bus();
+            bus = Configuration.Factory.CreateBusWithHosting();
 
-#if ZEROMQ_BACKEND
-            bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
-            Thread.Sleep(2500);
-#else
-            bus.Initialize(succubus => succubus.WithLoopback(clear: true));
-#endif
+
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {

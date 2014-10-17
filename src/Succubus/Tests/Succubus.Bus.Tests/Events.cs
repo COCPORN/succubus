@@ -6,24 +6,19 @@ using Succubus.Backend.Loopback;
 using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Bus.Tests
 {
     [TestFixture]
     public class Events
     {
-        private Core.Bus bus;
+        private IBus bus;
 
         [SetUp]
         public void Init()
         {
-            bus = new Core.Bus();
-#if ZEROMQ_BACKEND
-            bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
-            Thread.Sleep(2500);
-#else
-            bus.Initialize(succubus => succubus.WithLoopback(clear: true));
-#endif
+            bus = Configuration.Factory.CreateBusWithHosting();
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
@@ -68,7 +63,7 @@ namespace Succubus.Bus.Tests
                 mre.Set();
             });
             bus.Publish(new ChildEvent() { Message = "Child calling" });
-            if (mre.WaitOne(1500) == false)
+            if (mre.WaitOne(2500) == false)
             {
                 Assert.Fail("Timeout waiting for event");
 
