@@ -8,25 +8,38 @@ using Succubus.Core.Interfaces;
 
 namespace Succubus.Core
 {
-    internal class RawBlock
+    internal class RawMessageBlock
     {
         internal Action<object> Handler;
         internal Action<Action> Marshal;
     }
 
+    internal class RawDataBlock
+    {
+        internal Action<string> Handler;
+        internal Action<Action> Marshal;
+    }
+
     public partial class Bus
     {
-        private readonly List<RawBlock> rawHandlers = new List<RawBlock>();
+        private readonly List<RawMessageBlock> rawMessageHandlers = new List<RawMessageBlock>();
+        private readonly List<RawDataBlock> rawDataHandlers = new List<RawDataBlock>();
 
-        public IResponseContext OnRaw(Action<object> handler, Action<Action> marshal = null)
+        public IResponseContext OnRawMessage(Action<object> handler, Action<Action> marshal = null)
         {
-            rawHandlers.Add(new RawBlock() { Handler = handler, Marshal = marshal });
+            rawMessageHandlers.Add(new RawMessageBlock() { Handler = handler, Marshal = marshal });
+            return new Bus.ResponseContext(this);
+        }
+
+        public IResponseContext OnRawData(Action<string> handler, Action<Action> marshal = null)
+        {
+            rawDataHandlers.Add(new RawDataBlock { Handler = handler, Marshal = marshal });
             return new Bus.ResponseContext(this);
         }
 
         public void RawMessage(object o)
         {
-            foreach (var eventHandler in rawHandlers)
+            foreach (var eventHandler in rawMessageHandlers)
             {
                 var handler = eventHandler;
 
@@ -47,6 +60,32 @@ namespace Succubus.Core
                 }
 
             }
+        }
+
+        public void RawData(string data)
+        {
+            foreach (var eventHandler in rawDataHandlers)
+            {
+                var handler = eventHandler;
+
+                try
+                {
+                    if (handler.Marshal == null)
+                    {
+                        Task.Factory.StartNew(() => handler.Handler(data));
+                    }
+                    else
+                    {
+                        handler.Marshal(() => handler.Handler(data));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    RaiseExceptionEvent(ex);
+                }
+
+            }
+
         }
     }
 }

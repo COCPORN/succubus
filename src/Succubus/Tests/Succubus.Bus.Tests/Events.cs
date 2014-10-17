@@ -15,16 +15,34 @@ namespace Succubus.Bus.Tests
     public class Events
     {
         private IBus bus;
+        IBus bus2;
 
         [SetUp]
         public void Init()
         {
 
             bus = new Succubus.Core.Bus();
-            bus.Initialize(succubus =>
+            bus2 = new Succubus.Core.Bus();
+            //bus.Initialize(succubus =>
+            //{
+            //    succubus.WithLoopback(config => config.ReportRaw = true, clear: true);
+            //    succubus.IncludeMessageOriginator = true;
+            //});
+
+            bus.Initialize(config =>
             {
-                succubus.WithLoopback(config => config.ReportRaw = true, clear: true);
-                succubus.IncludeMessageOriginator = true;
+                config.WithZeroMQ();
+                var transport = config.Transport as Succubus.Backend.ZeroMQ.Transport;
+                transport.ReportRaw = true;
+                config.IncludeMessageOriginator = true;
+            });
+
+            bus2.Initialize(config =>
+            {
+                config.WithZeroMQ();
+                var transport = config.Transport as Succubus.Backend.ZeroMQ.Transport;
+                transport.ReportRaw = true;
+                config.IncludeMessageOriginator = true;
             });
 
 
@@ -66,8 +84,9 @@ namespace Succubus.Bus.Tests
             int counter = 0;
             string machineName = String.Empty;
             ManualResetEvent mre = new ManualResetEvent(false);
-            bus.OnRaw((o) =>
+            bus2.OnRawMessage((o) =>
             {
+                Console.WriteLine(o.ToString());
                 var b = o as MessageBase;
                 if (b != null)
                 {
@@ -79,7 +98,7 @@ namespace Succubus.Bus.Tests
             });
 
             bus.Publish(new BasicEvent() { Message = "Wohey" });
-            if (mre.WaitOne(500) == false)
+            if (mre.WaitOne(1500) == false)
             {
                 Assert.Fail("Timeout waiting for event");
             }

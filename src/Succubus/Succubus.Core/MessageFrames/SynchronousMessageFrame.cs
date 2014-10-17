@@ -7,6 +7,8 @@ namespace Succubus.Core.MessageFrames
     {
         public string CorrelationId { get; set; }
 
+        public string Responder { get; set; }
+
         public string RequestType { get; set; }
 
         public object Request { get; set; }

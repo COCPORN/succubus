@@ -25,13 +25,29 @@ namespace Succubus.Backend.ZeroMQ
             }
         }
 
-        public bool ReportRaw { get; set; }
+        bool reportRaw = false;
+        public bool ReportRaw
+        {
+            get
+            {
+                return reportRaw;
+            }
+            set
+            {
+                if (value != reportRaw)
+                {
+                    if (value == true)
+                    {
+                        SubscribeAll();
+                    }
+                    reportRaw = value;
+                }
+            }
+        }
 
-        bool subscribeSetup = false;
         public void SubscribeAll()
         {
             subscribeSocket.SubscribeAll();
-            //subscribeSetup = true;
         }
 
         public void Subscribe(string address)
@@ -110,8 +126,13 @@ namespace Succubus.Backend.ZeroMQ
                         string serialized = subscribeSocket.Receive(Encoding.Unicode);
                         Type coreType = Type.GetType(typename + ", Succubus.Core");
 
-                        object coreMessage = JsonFrame.Deserialize(serialized, coreType);
+                        if (reportRaw == true)
+                        {
+                            Bridge.RawData(serialized);
+                        }
 
+                        object coreMessage = JsonFrame.Deserialize(serialized, coreType);
+                        
                         if (coreMessage == null)
                         {
                             Bridge.UnableToCreateMessage(
@@ -146,7 +167,7 @@ namespace Succubus.Backend.ZeroMQ
             }
             catch (Exception ex)
             {
-                // TODO: Create diagnostic messages
+                Bridge.GeneralTransportException(ex);
             }
         }
 

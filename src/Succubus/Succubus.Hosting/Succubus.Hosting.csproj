@@ -42,11 +42,11 @@
     </Reference>
     <Reference Include="Succubus.Backend.ZeroMQ, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Succubus.Backend.ZeroMQ.0.1.9-pre\lib\net45\Succubus.Backend.ZeroMQ.dll</HintPath>
+      <HintPath>..\packages\Succubus.Backend.ZeroMQ.0.1.15-pre\lib\net45\Succubus.Backend.ZeroMQ.dll</HintPath>
     </Reference>
     <Reference Include="Succubus.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Succubus.Core.0.1.27\lib\net45\Succubus.Core.dll</HintPath>
+      <HintPath>..\packages\Succubus.Core.0.1.29\lib\net45\Succubus.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />

@@ -36,7 +36,7 @@ namespace Succubus.Bus.Tests
         {
             bool success = false;
             ManualResetEvent mre = new ManualResetEvent(false);
-            bus.OnRaw(o =>
+            bus.OnRawMessage(o =>
             {
                 Assert.IsTrue(o is MessageBase);       
                 Assert.IsTrue(o is Core.MessageFrames.Event);                
