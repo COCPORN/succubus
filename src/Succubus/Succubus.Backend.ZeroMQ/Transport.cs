@@ -27,14 +27,17 @@ namespace Succubus.Backend.ZeroMQ
 
         public bool ReportRaw { get; set; }
 
+        bool subscribeSetup = false;
         public void SubscribeAll()
         {
             subscribeSocket.SubscribeAll();
+            //subscribeSetup = true;
         }
 
         public void Subscribe(string address)
         {
-          
+            //if (subscribeSetup == false) SubscribeAll();
+            //return;
             subscribeSocket.Subscribe(Encoding.ASCII.GetBytes(address));
 
             // Make sure the reply channel is fully registered on the host before contiuing.
@@ -172,13 +175,20 @@ namespace Succubus.Backend.ZeroMQ
 
         public ZmqContext Context { get { return context; } set { context = value; } }
 
-        public void ObjectPublish(object message, string address, Action<Action> marshal)
+        public void BusPublish(object message, string address, Action<Action> marshal)
         {
-            if (marshal == null) ObjectPublish(message, address);
-            else marshal(() => ObjectPublish(message, address));          
+            if (marshal == null) BusPublish(message, address);
+            else marshal(() => BusPublish(message, address));          
         }
 
-        public void ObjectPublish(object message, string address)
+
+        public void QueuePublish(object message, string address, Action<Action> marshal)
+        {
+            
+        }
+
+
+        public void BusPublish(object message, string address)
         {
             lock (publishSocket)
             {

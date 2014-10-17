@@ -24,12 +24,17 @@ namespace Succubus.Backend.Caliburn.Micro.EventAggregator
             }, null);
         }
 
-        public void ObjectPublish(object message, string address, Action<System.Action> marshal = null)
+        public void BusPublish(object message, string address, Action<System.Action> marshal = null)
         {
             if (marshal == null) EventAggregator.PublishOnUIThread(message);
             else EventAggregator.Publish(message, marshal);
         }
-      
+
+        public void QueuePublish(object message, string address, Action<System.Action> marshal = null)
+        {
+            
+        }
+
         public void Subscribe(string address)
         {
           

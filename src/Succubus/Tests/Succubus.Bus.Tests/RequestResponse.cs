@@ -10,6 +10,7 @@ using Succubus.Bus.Tests.Messages;
 using Succubus.Core.Interfaces;
 using Succubus.Core.MessageFrames;
 using Succubus.Hosting;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Bus.Tests
 {
@@ -17,16 +18,14 @@ namespace Succubus.Bus.Tests
     [Serializable]
     public class RequestResponse
     {
-        private Core.Bus bus;
+        private IBus bus;
 
         [SetUp]
         public void Init()
         {
-            bus = new Core.Bus();
 
-            bus.Initialize(succubus => succubus.WithLoopback(clear: true));
-                    
-
+            bus = Configuration.Factory.CreateBusWithHosting();
+         
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
                 Message = req.Message
@@ -222,6 +221,7 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ChildMessages1_SimpleResponseMapping()
         {
+            Thread.Sleep(5000);
             var response = bus.Call<BaseRequest, ChildResponse1>(new BaseRequest { Message = "Child1" });
             Assert.AreEqual("Child1", response.Message);
             Assert.AreEqual(typeof(ChildResponse1), response.GetType());

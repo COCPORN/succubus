@@ -4,21 +4,20 @@ using Succubus.Backend.Loopback;
 using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Hosting;
+using Succubus.Core.Interfaces;
 
 namespace Succubus.Bus.Tests
 { 
     [TestFixture]
     public class Routing
     {
-        private Core.Bus bus;
+        private IBus bus;
 
         [SetUp]
         public void Init()
         {
-            bus = new Core.Bus();
-
-            bus.Initialize(succubus => succubus.WithLoopback(clear: true));
-
+            bus = Configuration.Factory.CreateBusWithHosting();
+            
             // Setup chaining
             bus.ReplyTo<C1, C2>(c => new C2());
             bus.ReplyTo<C2, C3>(c => new C3());

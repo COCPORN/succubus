@@ -38,15 +38,15 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Succubus.Backend.ZeroMQ, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Succubus.Backend.ZeroMQ.0.1.5-pre\lib\net45\Succubus.Backend.ZeroMQ.dll</HintPath>
+      <HintPath>..\packages\Succubus.Backend.ZeroMQ.0.1.9-pre\lib\net45\Succubus.Backend.ZeroMQ.dll</HintPath>
     </Reference>
     <Reference Include="Succubus.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Succubus.Core.0.1.18-pre\lib\net45\Succubus.Core.dll</HintPath>
+      <HintPath>..\packages\Succubus.Core.0.1.26\lib\net45\Succubus.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
