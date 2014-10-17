@@ -53,19 +53,25 @@ namespace Succubus.Core
                 CorrelationId = CorrelationIdProvider.CreateCorrelationId(o),
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-
+                Originator = MachineName
             };
         }
 
         MessageFrames.Synchronous FrameResponseSynchronously(MessageFrames.Synchronous request, object o, string guid)
         {
+            if (String.IsNullOrEmpty(guid))
+            {
+                throw new ArgumentException("No guid provided");
+            }
             return new MessageFrames.Synchronous
             {
                 Message = o,
-                CorrelationId = guid ?? CorrelationIdProvider.CreateCorrelationId(o),
+                CorrelationId = guid,
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
                 RequestType = request.RequestType,
-                Request = o
+                Request = request,
+                Originator = request.Originator,
+                Responder = MachineName
             };
         }
 
@@ -75,7 +81,7 @@ namespace Succubus.Core
             {
                 Message = o,
                 EmbeddedType = o.GetType().ToString() + ", " + o.GetType().Assembly.GetName().ToString().Split(',')[0],
-
+                Originator = MachineName
             };
         }
 
@@ -393,10 +399,10 @@ namespace Succubus.Core
                 var classList = subclasses.ToList();
                 classList.Add(typeof(TReq));
 
-                foreach (var subclass in classList)
-                {
-                    Console.WriteLine(subclass.ToString());
-                }
+                //foreach (var subclass in classList)
+                //{
+                //    Console.WriteLine(subclass.ToString());
+                //}
 
                 foreach (var t in classList)
                 {

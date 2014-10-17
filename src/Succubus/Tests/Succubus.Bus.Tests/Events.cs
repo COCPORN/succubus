@@ -5,6 +5,7 @@ using NUnit.Framework.Constraints;
 using Succubus.Backend.Loopback;
 using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
+using Succubus.Core.MessageFrames;
 using Succubus.Hosting;
 using Succubus.Core.Interfaces;
 
@@ -18,7 +19,14 @@ namespace Succubus.Bus.Tests
         [SetUp]
         public void Init()
         {
-            bus = Configuration.Factory.CreateBusWithHosting();
+
+            bus = new Succubus.Core.Bus();
+            bus.Initialize(succubus =>
+            {
+                succubus.WithLoopback(config => config.ReportRaw = true, clear: true);
+                succubus.IncludeMessageOriginator = true;
+            });
+
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
@@ -47,6 +55,39 @@ namespace Succubus.Bus.Tests
             }
             else
                 Assert.AreEqual(1, counter);
+
+            BusDiagnose.CheckDiagnose(bus);
+        }
+
+
+        [Test]
+        public void CheckOriginator()
+        {
+            int counter = 0;
+            string machineName = String.Empty;
+            ManualResetEvent mre = new ManualResetEvent(false);
+            bus.OnRaw((o) =>
+            {
+                var b = o as MessageBase;
+                if (b != null)
+                {
+                    Console.WriteLine("Got the request: " + o + " MachineName: " + b.Originator);
+                    counter++;
+                    machineName = b.Originator;
+                    mre.Set();
+                }
+            });
+
+            bus.Publish(new BasicEvent() { Message = "Wohey" });
+            if (mre.WaitOne(500) == false)
+            {
+                Assert.Fail("Timeout waiting for event");
+            }
+            else
+            {
+                Assert.AreEqual(1, counter);
+                Assert.AreNotEqual(String.Empty, machineName);
+            }
 
             BusDiagnose.CheckDiagnose(bus);
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Odbc;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using NUnit.Framework;
@@ -6,6 +7,8 @@ using NUnit.Framework.Constraints;
 using Succubus.Backend.Loopback;
 using Succubus.Backend.ZeroMQ;
 using Succubus.Bus.Tests.Messages;
+using Succubus.Core.Interfaces;
+using Succubus.Core.MessageFrames;
 using Succubus.Hosting;
 using Succubus.Core.Interfaces;
 
@@ -20,6 +23,7 @@ namespace Succubus.Bus.Tests
         [SetUp]
         public void Init()
         {
+
             bus = Configuration.Factory.CreateBusWithHosting();
          
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
@@ -60,6 +64,56 @@ namespace Succubus.Bus.Tests
         }
 
 
+
+        [Test]
+        public async void CheckSynchronousOriginatorAndResponder()
+        {
+            IBus rawbus = new Core.Bus();
+            rawbus.Initialize(succubus =>
+            {
+                succubus.WithLoopback(config => config.ReportRaw = true, clear: true);
+                succubus.IncludeMessageOriginator = true;
+            });
+
+            rawbus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse() { Message = req.Message });
+
+            ManualResetEvent gotOriginator = new ManualResetEvent(false);
+            ManualResetEvent gotResponder = new ManualResetEvent(false);
+
+
+            rawbus.OnRaw((o) =>
+            {
+                MessageBase b = o as MessageBase;
+                if (b != null)
+                {
+                    if (String.IsNullOrEmpty(b.Originator) == false)
+                    {                      
+                        gotOriginator.Set();
+                    }
+                    if (String.IsNullOrEmpty(b.Responder) == false)
+                    {                     
+                        gotResponder.Set();
+                    }
+                }
+
+
+            });
+
+            var response = rawbus.Call<BasicRequest, BasicResponse>(new BasicRequest() { Message = "Wohey" });
+
+            if (gotOriginator.WaitOne(500) == false)
+            {
+                Assert.Fail("Timeout waiting for originator");
+            }
+            if (gotResponder.WaitOne(500) == false)
+            {
+                Assert.Fail("Timeout waiting for responder");
+            }
+
+            Assert.AreEqual("Wohey", response.Message);
+
+            BusDiagnose.CheckDiagnose(rawbus);
+        }
 
         [Test]
         public void SimpleReqResStaticRouteSynchronous()

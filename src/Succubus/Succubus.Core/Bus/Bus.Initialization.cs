@@ -30,11 +30,18 @@ namespace Succubus.Core
 
         }
 
-        #region Members
+        public bool IncludeMessageOriginator { get; set; }
 
+        private string machineName = null;
 
-
-        #endregion
+        private string MachineName
+        {
+            get
+            {
+                return machineName ?? 
+                    (IncludeMessageOriginator ? (machineName = Environment.MachineName) : (machineName = String.Empty ));
+            }
+        }
 
         #region Initialization
 

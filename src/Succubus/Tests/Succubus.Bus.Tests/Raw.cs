@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Succubus.Backend.Loopback;
 using Succubus.Bus.Tests.Messages;
 using Succubus.Core.Interfaces;
+using Succubus.Core.MessageFrames;
 
 namespace Succubus.Bus.Tests
 {
@@ -37,7 +38,8 @@ namespace Succubus.Bus.Tests
             ManualResetEvent mre = new ManualResetEvent(false);
             bus.OnRaw(o =>
             {
-                Assert.IsTrue(o is BasicEvent);                
+                Assert.IsTrue(o is MessageBase);       
+                Assert.IsTrue(o is Core.MessageFrames.Event);                
                 success = true;
                 mre.Set();
             });
