@@ -26,7 +26,7 @@ Get lastest version of Succubus from GitHub or NuGet.
 
 Relevant packages:
 
-- Succubus
+- Succubus.Core
 - Succubus.Backend.ZeroMQ
 - Succubus.Hosting.ZeroMQ
 
