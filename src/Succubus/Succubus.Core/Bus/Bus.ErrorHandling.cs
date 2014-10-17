@@ -5,6 +5,8 @@ namespace Succubus.Core
 {
     public partial class Bus
     {
+        public event EventHandler<ExceptionEventArgs> Exception;
+
         public event EventHandler<ExceptionEventArgs> HandlerException;
 
         void RaiseExceptionEvent(Exception ex)
@@ -13,6 +15,11 @@ namespace Succubus.Core
             if (eh != null)
             {
                 eh(this, new ExceptionEventArgs {Exception = ex});
+            }
+            eh = Exception;
+            if (eh != null)
+            {
+                eh(this, new ExceptionEventArgs { Exception = ex });
             }
         }
 
@@ -25,6 +32,28 @@ namespace Succubus.Core
             {
                 eh(this, new ExceptionEventArgs { Exception = ex });
             }
+            eh = Exception;
+            if (eh != null)
+            {
+                eh(this, new ExceptionEventArgs { Exception = ex });
+            }
         }
+     
+        public event EventHandler<ExceptionEventArgs> TransportException;
+
+        public void GeneralTransportException(Exception ex)
+        {
+            EventHandler<ExceptionEventArgs> eh = TransportException;
+            if (eh != null)
+            {
+                eh(this, new ExceptionEventArgs { Exception = ex });
+            }
+            eh = Exception;
+            if (eh != null)
+            {
+                eh(this, new ExceptionEventArgs { Exception = ex });
+            }
+        }
+
     }
 }

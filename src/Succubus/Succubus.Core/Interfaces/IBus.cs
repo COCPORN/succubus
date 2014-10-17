@@ -77,11 +77,16 @@ namespace Succubus.Core.Interfaces
 
         event EventHandler<ExceptionEventArgs> MessageCreationException;
 
+        event EventHandler<ExceptionEventArgs> TransportException;
+
+        event EventHandler<ExceptionEventArgs> Exception;
+
         #endregion
 
         #region Diagnostics
 
-        IResponseContext OnRaw(Action<object> handler, Action<Action> marshal = null);
+        IResponseContext OnRawMessage(Action<object> handler, Action<Action> marshal = null);
+        IResponseContext OnRawData(Action<string> handler, Action<Action> marshal = null);
 
         Diagnose GetDiagnose();
 

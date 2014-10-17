@@ -11,7 +11,7 @@
     <iconUrl>https://dl.dropboxusercontent.com/u/5489626/Succubus/succubus128x128.jpg</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Initial release, features moved from Succubus.Core</releaseNotes>
+    <releaseNotes>Fixed an error where subscriber pattern wasn't properly set when wanting raw messages</releaseNotes>
     <copyright>Copyright Succubus.io 2014</copyright>
     <tags>zeromq esb</tags>
   </metadata>
