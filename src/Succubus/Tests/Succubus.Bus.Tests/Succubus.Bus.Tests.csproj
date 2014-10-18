@@ -50,6 +50,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Correlation.cs" />
     <Compile Include="Deferral.cs" />
+    <Compile Include="Diagnostics.cs" />
     <Compile Include="ErrorHandling.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="GuidCorrelationProvider.cs" />

@@ -90,6 +90,8 @@ namespace Succubus.Core.Interfaces
 
         Diagnose GetDiagnose();
 
+        string Name { get; }
+
         #endregion
 
 

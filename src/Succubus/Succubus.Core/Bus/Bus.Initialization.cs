@@ -56,10 +56,16 @@ namespace Succubus.Core
         }
 
         public void Initialize(Action<IBusConfigurator> initializationHandler)
-        {
+        {           
+            IncludeMessageOriginator = true;
             Bridge = this;
-            initializationHandler(this);
+            initializationHandler(this);            
             Initialize();
+            if (String.IsNullOrEmpty(Name))
+            {
+                Name = Guid.NewGuid().ToString();
+            }
+            Info("Bus initialized");
         }
 
         #endregion

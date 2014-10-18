@@ -52,9 +52,7 @@ namespace Succubus.Backend.ZeroMQ
 
         public void Subscribe(string address)
         {
-            //if (subscribeSetup == false) SubscribeAll();
-            //return;
-            subscribeSocket.Subscribe(Encoding.ASCII.GetBytes(address));
+            subscribeSocket.Subscribe(Encoding.ASCII.GetBytes(address));            
 
             // Make sure the reply channel is fully registered on the host before contiuing.
             // The reply channel is only setup once per bus instance, so this sleep will only incur

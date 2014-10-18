@@ -26,7 +26,7 @@ namespace Succubus.Bus.Tests
             {
                 hostingbus = new Succubus.Core.Bus();
                 hostingbus.Initialize(config => config.WithZeroMQ(c => c.StartMessageHost()));
-                Thread.Sleep(5000);
+                Thread.Sleep(1000);
             }
             return hostingbus;
         }
