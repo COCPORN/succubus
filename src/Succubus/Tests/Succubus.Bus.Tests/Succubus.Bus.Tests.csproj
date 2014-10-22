@@ -50,11 +50,12 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Correlation.cs" />
     <Compile Include="Deferral.cs" />
+    <Compile Include="Diagnostics.cs" />
     <Compile Include="ErrorHandling.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="GuidCorrelationProvider.cs" />
     <Compile Include="IFactory.cs" />
-    <Compile Include="InMemoryFactory.cs" />
+    <Compile Include="LoopbackFactory.cs" />
     <Compile Include="Marshalling.cs" />
     <Compile Include="Messages\BasicEvent.cs" />
     <Compile Include="Messages\BasicRequest.cs" />

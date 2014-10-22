@@ -21,31 +21,9 @@ namespace Succubus.Bus.Tests
         public void Init()
         {
 
-            bus = new Succubus.Core.Bus();
-            bus2 = new Succubus.Core.Bus();
-            //bus.Initialize(succubus =>
-            //{
-            //    succubus.WithLoopback(config => config.ReportRaw = true, clear: true);
-            //    succubus.IncludeMessageOriginator = true;
-            //});
-
-            bus.Initialize(config =>
-            {
-                config.WithZeroMQ();
-                var transport = config.Transport as Succubus.Backend.ZeroMQ.Transport;
-                transport.ReportRaw = true;
-                config.IncludeMessageOriginator = true;
-            });
-
-            bus2.Initialize(config =>
-            {
-                config.WithZeroMQ();
-                var transport = config.Transport as Succubus.Backend.ZeroMQ.Transport;
-                transport.ReportRaw = true;
-                config.IncludeMessageOriginator = true;
-            });
-
-
+            bus = Configuration.Factory.CreateBusWithHosting(true);
+            bus2 = Configuration.Factory.CreateBus(true);
+         
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {
                 Message = req.Message
@@ -81,7 +59,7 @@ namespace Succubus.Bus.Tests
         [Test]
         public void CheckOriginator()
         {
-            int counter = 0;
+            int counter = 0; 
             string machineName = String.Empty;
             ManualResetEvent mre = new ManualResetEvent(false);
             bus2.OnRawMessage((o) =>
@@ -188,15 +166,9 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ReqResAsEventsSecondBusInstance()
         {
-            var bus2 = new Core.Bus();
+            var bus2 = Configuration.Factory.CreateBus();
+            //Thread.Sleep(1000);
 
-#if ZEROMQ_BACKEND
-    
-            bus2.Initialize(config => config.WithZeroMQ());
-            Thread.Sleep(1500);
-#else
-            bus2.Initialize(config => config.WithLoopback());
-#endif
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);
 

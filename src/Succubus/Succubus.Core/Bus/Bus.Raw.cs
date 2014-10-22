@@ -27,12 +27,14 @@ namespace Succubus.Core
 
         public IResponseContext OnRawMessage(Action<object> handler, Action<Action> marshal = null)
         {
-            rawMessageHandlers.Add(new RawMessageBlock() { Handler = handler, Marshal = marshal });
+            SubscriptionManager.SubscribeAll();
+            rawMessageHandlers.Add(new RawMessageBlock() { Handler = handler, Marshal = marshal });            
             return new Bus.ResponseContext(this);
         }
 
         public IResponseContext OnRawData(Action<string> handler, Action<Action> marshal = null)
         {
+            SubscriptionManager.SubscribeAll();
             rawDataHandlers.Add(new RawDataBlock { Handler = handler, Marshal = marshal });
             return new Bus.ResponseContext(this);
         }

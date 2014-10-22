@@ -9,7 +9,7 @@ namespace Succubus.Bus.Tests
 {
     interface IFactory
     {
-        IBus CreateBus();
-        IBus CreateBusWithHosting();
+        IBus CreateBus(bool reportRaw = false);
+        IBus CreateBusWithHosting(bool reportRaw = false);        
     }
 }

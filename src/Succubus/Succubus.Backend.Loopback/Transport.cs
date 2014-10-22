@@ -39,7 +39,7 @@ namespace Succubus.Backend.Loopback
                     {                    
                         transport.Bridge.ProcessSynchronousMessages(synchronousFrame, address);
                         transport.Bridge.ProcessCatchAllEvents(synchronousFrame, address);
-                        if (ReportRaw)
+                        if (transport.ReportRaw)
                         {
                             transport.Bridge.RawMessage(synchronousFrame);
                         }
@@ -47,7 +47,7 @@ namespace Succubus.Backend.Loopback
                     else if (eventFrame != null)
                     {
                         transport.Bridge.ProcessEvents(eventFrame, address);
-                        if (ReportRaw)
+                        if (transport.ReportRaw)
                         {
                             transport.Bridge.RawMessage(eventFrame);
                         }

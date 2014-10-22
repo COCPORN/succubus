@@ -9,5 +9,6 @@ namespace Succubus.Core
         public ITransportBridge Bridge { get; set; }
 
      
+
     }
 }
