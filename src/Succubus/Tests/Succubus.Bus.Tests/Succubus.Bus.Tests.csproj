@@ -55,7 +55,7 @@
     <Compile Include="Events.cs" />
     <Compile Include="GuidCorrelationProvider.cs" />
     <Compile Include="IFactory.cs" />
-    <Compile Include="InMemoryFactory.cs" />
+    <Compile Include="LoopbackFactory.cs" />
     <Compile Include="Marshalling.cs" />
     <Compile Include="Messages\BasicEvent.cs" />
     <Compile Include="Messages\BasicRequest.cs" />

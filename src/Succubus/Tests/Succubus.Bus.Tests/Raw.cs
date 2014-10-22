@@ -11,18 +11,12 @@ namespace Succubus.Bus.Tests
     [TestFixture]
     public class Raw
     {
-        private Core.Bus bus;
+        private IBus bus;
 
         [SetUp]
         public void Init()
         {
-            bus = new Core.Bus();
-#if ZEROMQ_BACKEND
-            bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
-            Thread.Sleep(2500);
-#else
-            bus.Initialize(succubus => succubus.WithLoopback(clear: true, loopbackConfigurator: config => config.ReportRaw = true));
-#endif
+            bus = Configuration.Factory.CreateBusWithHosting(true);
 
             bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
             {

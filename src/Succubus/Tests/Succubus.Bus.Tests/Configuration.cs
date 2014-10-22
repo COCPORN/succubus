@@ -8,7 +8,7 @@ namespace Succubus.Bus.Tests
 {
     static class Configuration
     {
-        static IFactory factory = new InMemoryFactory();
+        static IFactory factory = new LoopbackFactory();
 
         public static IFactory Factory { get { return factory; } }
     }
