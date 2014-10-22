@@ -166,15 +166,9 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ReqResAsEventsSecondBusInstance()
         {
-            var bus2 = new Core.Bus();
+            var bus2 = Configuration.Factory.CreateBus();
+            //Thread.Sleep(1000);
 
-#if ZEROMQ_BACKEND
-    
-            bus2.Initialize(config => config.WithZeroMQ());
-            Thread.Sleep(1500);
-#else
-            bus2.Initialize(config => config.WithLoopback());
-#endif
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);
 
