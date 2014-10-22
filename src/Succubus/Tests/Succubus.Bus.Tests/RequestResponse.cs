@@ -52,6 +52,7 @@ namespace Succubus.Bus.Tests
         [Test]
         public async void SimpleReqResTransientRouteSynchronousAndAsynchronous()
         {
+            //Thread.Sleep(1000);
             for (int i = 0; i < 250; i++)
             {
                 var reply2 = bus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Hello" });
@@ -67,12 +68,9 @@ namespace Succubus.Bus.Tests
         [Test]
         public async void CheckSynchronousOriginatorAndResponder()
         {
-            IBus rawbus = new Core.Bus();
-            rawbus.Initialize(succubus =>
-            {
-                succubus.WithLoopback(config => config.ReportRaw = true, clear: true);
-                succubus.IncludeMessageOriginator = true;
-            });
+            IBus rawbus = Configuration.Factory.CreateBusWithHosting(true);
+
+            Thread.Sleep(1000);
 
             rawbus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse() { Message = req.Message });
 

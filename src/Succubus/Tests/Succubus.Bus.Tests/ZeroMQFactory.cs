@@ -42,7 +42,7 @@ namespace Succubus.Bus.Tests
                     }
                     
                 });
-                Thread.Sleep(1000);
+                Thread.Sleep(2000);
             }
             return hostingbus;
         }
