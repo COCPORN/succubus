@@ -94,14 +94,5 @@ namespace Succubus.Core.Interfaces
 
         #endregion
 
-
-
-        #region Fan out
-
-        void Queue<T>(T request, string address = null, Action<Action> marshal = null);
-        IResponseContext Dequeue<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
-
-        #endregion
-
     }
 }
