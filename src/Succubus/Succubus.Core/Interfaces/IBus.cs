@@ -25,14 +25,14 @@ namespace Succubus.Core.Interfaces
         
 
         // Static routes
-        //IResponseContext OnReply<TReq, T>(Action<TReq, T> handler, Action<TReq> timeoutHandler = null, int timeout = 0);
-        IResponseContext OnReply<TReq, T>(Action<TReq, T> handler, Action<Action> marshal = null);
-        IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler, Action<Action> marshal = null);
-        IResponseContext OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler, Action<Action> marshal = null);
-        IResponseContext OnReply<TReq, T1, T2, T3, T4>(Action<TReq, T1, T2, T3, T4> handler, Action<Action> marshal = null);
-        IResponseContext OnReply<TReq, T1, T2, T3, T4, T5>(Action<TReq, T1, T2, T3, T4, T5> handler, Action<Action> marshal = null);
-        IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6>(Action<TReq, T1, T2, T3, T4, T5, T6> handler, Action<Action> marshal = null);
-        IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6, T7>(Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler, Action<Action> marshal = null);
+        //void OnReply<TReq, T>(Action<TReq, T> handler, Action<TReq> timeoutHandler = null, int timeout = 0);
+        void OnReply<TReq, T>(Action<TReq, T> handler, Action<Action> marshal = null);
+        void OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler, Action<Action> marshal = null);
+        void OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler, Action<Action> marshal = null);
+        void OnReply<TReq, T1, T2, T3, T4>(Action<TReq, T1, T2, T3, T4> handler, Action<Action> marshal = null);
+        void OnReply<TReq, T1, T2, T3, T4, T5>(Action<TReq, T1, T2, T3, T4, T5> handler, Action<Action> marshal = null);
+        void OnReply<TReq, T1, T2, T3, T4, T5, T6>(Action<TReq, T1, T2, T3, T4, T5, T6> handler, Action<Action> marshal = null);
+        void OnReply<TReq, T1, T2, T3, T4, T5, T6, T7>(Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler, Action<Action> marshal = null);
 
         // Handle incoming message with a reply, "server side" logic
         void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler, string address = null, Func<Func<TReq, TRes>, TReq, TRes> marshal = null);
@@ -42,21 +42,21 @@ namespace Succubus.Core.Interfaces
 #if false
         #region Deferrence
         
-        IResponseContext Defer<TReq, T>();
-        IResponseContext Defer<TReq, T1, T2>();
-        IResponseContext Defer<TReq, T1, T2, T3>();
-        IResponseContext Defer<TReq, T1, T2, T3, T4>();
-        IResponseContext Defer<TReq, T1, T2, T3, T4, T5>();
-        IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6>();
-        IResponseContext Defer<TReq, T1, T2, T3, T4, T5, T6, T7>();
+        void Defer<TReq, T>();
+        void Defer<TReq, T1, T2>();
+        void Defer<TReq, T1, T2, T3>();
+        void Defer<TReq, T1, T2, T3, T4>();
+        void Defer<TReq, T1, T2, T3, T4, T5>();
+        void Defer<TReq, T1, T2, T3, T4, T5, T6>();
+        void Defer<TReq, T1, T2, T3, T4, T5, T6, T7>();
 
-        IResponseContext Pickup<TReq, T>(string correlationId, Action<TReq, T> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2>(string correlationId, Action<TReq, T1, T2> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3>(string correlationId, Action<TReq, T1, T2, T3> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4>(string correlationId, Action<TReq, T1, T2, T3, T4> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5>(string correlationId, Action<TReq, T1, T2, T3, T4, T5> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler) where TReq : class;
-        IResponseContext Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class;
+        void Pickup<TReq, T>(string correlationId, Action<TReq, T> handler) where TReq : class;
+        void Pickup<TReq, T1, T2>(string correlationId, Action<TReq, T1, T2> handler) where TReq : class;
+        void Pickup<TReq, T1, T2, T3>(string correlationId, Action<TReq, T1, T2, T3> handler) where TReq : class;
+        void Pickup<TReq, T1, T2, T3, T4>(string correlationId, Action<TReq, T1, T2, T3, T4> handler) where TReq : class;
+        void Pickup<TReq, T1, T2, T3, T4, T5>(string correlationId, Action<TReq, T1, T2, T3, T4, T5> handler) where TReq : class;
+        void Pickup<TReq, T1, T2, T3, T4, T5, T6>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler) where TReq : class;
+        void Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class;
 
         #endregion
 #endif
@@ -67,7 +67,7 @@ namespace Succubus.Core.Interfaces
         void Publish<T>(T request, string address = null, Action<Action> marshal = null);        
 
         // Act on events
-        IResponseContext On<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
+        void On<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
         
         #endregion
 
@@ -85,8 +85,8 @@ namespace Succubus.Core.Interfaces
 
         #region Diagnostics
 
-        IResponseContext OnRawMessage(Action<object> handler, Action<Action> marshal = null);
-        IResponseContext OnRawData(Action<string> handler, Action<Action> marshal = null);
+        void OnRawMessage(Action<object> handler, Action<Action> marshal = null);
+        void OnRawData(Action<string> handler, Action<Action> marshal = null);
 
         Diagnose GetDiagnose();
 

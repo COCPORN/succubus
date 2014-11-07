@@ -68,7 +68,6 @@
     <Compile Include="Interfaces\IMessageFrame.cs" />
     <Compile Include="Interfaces\INow.cs" />
     <Compile Include="Interfaces\IQueueTransport.cs" />
-    <Compile Include="Interfaces\IResponseContext.cs" />
     <Compile Include="Interfaces\ISerializer.cs" />
     <Compile Include="Interfaces\ISubscriptionManager.cs" />
     <Compile Include="Interfaces\ITransport.cs" />

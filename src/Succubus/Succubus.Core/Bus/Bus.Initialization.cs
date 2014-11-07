@@ -9,27 +9,6 @@ namespace Succubus.Core
     public partial class Bus : IBus
     {
 
-        private class ResponseContext : IResponseContext
-        {
-            private Bus bus;
-
-            public ResponseContext(Bus bus)
-            {
-                this.bus = bus;
-            }
-
-            public IResponseContext On<T>(Action<T> handler)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IResponseContext Then<T>(Action<T> handler)
-            {
-                throw new NotImplementedException();
-            }
-
-        }
-
         public bool IncludeMessageOriginator { get; set; }
 
         private string machineName = null;
