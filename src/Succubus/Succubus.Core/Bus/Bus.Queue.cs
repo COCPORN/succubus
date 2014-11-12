@@ -22,13 +22,12 @@ namespace Succubus.Core
         }
 
 
-        public IResponseContext Dequeue<T>(Action<T> handler, string address = null, Action<Action> marshal = null)
+        public void Dequeue<T>(Action<T> handler, string address = null, Action<Action> marshal = null)
         {
             if (typeof(T) == typeof(IMessageFrame))
             {
                 var myHandler = new Action<IMessageFrame>(response => handler((T)response));
-                frameHandlers.Add(new FrameBlock() { Handler = myHandler, Marshal = marshal });
-                return new Bus.ResponseContext(this);
+                frameHandlers.Add(new FrameBlock() { Handler = myHandler, Marshal = marshal });                
             }
             else
             {
@@ -52,9 +51,7 @@ namespace Succubus.Core
                     }
 
                     handlers.Add(new EventBlock() { Handler = myHandler, Address = address, Marshal = marshal });
-                }
-
-                return new Bus.ResponseContext(this);
+                }                
             }
         }
          

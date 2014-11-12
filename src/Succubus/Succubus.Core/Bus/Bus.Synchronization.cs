@@ -100,14 +100,17 @@ namespace Succubus.Core
         public void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null,
             Action<Action> marshal = null)
         {
-            InternalCall(request, handler, address, marshal);
+            InternalCall(request, handler, address, 10000, null, marshal);
         }
 
-        string InternalCall<TReq, TRes>(TReq request, Action<TRes> handler, string address = null, Action<Action> marshal = null)
+        Succubus.Core.MessageFrames.Synchronous InternalCall<TReq, TRes>(TReq request, Action<TRes> handler, string address = null, int timeout = 10000, Action timeoutHandler = null, Action<Action> marshal = null)
         {
             SetupReplySubscription();
             var synchronizationContext = new SynchronizationContext();
-
+            if (timeoutHandler != null) {
+                synchronizationContext.TimeoutHandler = timeoutHandler;
+                synchronizationContext.TimeoutMilliseconds = timeout;                
+            }
 
             SynchronizationStack stack = new SynchronizationStack(synchronizationContext);
             stack.Frames.Add(new SynchronizationFrame<TReq, TRes> { Handler = handler });
@@ -121,6 +124,13 @@ namespace Succubus.Core
                 {
                     synchronizationContexts.Add(synchronizedRequest.CorrelationId, synchronizationContext);
                 }
+            }
+
+            if (timeoutHandler != null)
+            {
+                synchronizationContext.CorrelationId = synchronizedRequest.CorrelationId;
+                synchronizationContext.Bus = this;
+                this.timeoutHandler.Timeout(synchronizationContext, timeout);
             }
 
             // Wait for existing synchronization contexts to finish in case of crashing correlation ids
@@ -137,7 +147,7 @@ namespace Succubus.Core
             }
 
             Transport.BusPublish(synchronizedRequest, address ?? "__BROADCAST", marshal);
-            return synchronizedRequest.CorrelationId;
+            return synchronizedRequest;
         }
 
         public TRes InternalCall<TReq, TRes>(TReq request, string address = null, int timeout = 10000)
@@ -146,11 +156,13 @@ namespace Succubus.Core
             var mre = new ManualResetEvent(false);
             var result = default(TRes);
 
-            var sc = InternalCall<TReq, TRes>(request, res =>
+            var synchronizedRequest = InternalCall<TReq, TRes>(request, res =>
             {
                 result = res;
                 mre.Set();                
             }, address);
+
+            var sc = synchronizedRequest.CorrelationId;
 
             if (mre.WaitOne(timeout))
             {
@@ -182,8 +194,17 @@ namespace Succubus.Core
         }
 
         public Task<TRes> CallAsync<TReq, TRes>(TReq request, string address = null, int timeout = 10000, Func<Func<TReq, TRes>, TReq, TRes> marshal = null)
-        {
-            return Task.Factory.StartNew(() => Call<TReq, TRes>(request, address, timeout, marshal));
+        {            
+            TaskCompletionSource<TRes> completionSource = new TaskCompletionSource<TRes>();
+            var synchronizedRequest = InternalCall<TReq, TRes>(request, res =>
+            {
+                completionSource.SetResult(res);
+            }, address, timeout, () =>
+            {
+                completionSource.SetException(new TimeoutException());
+            });
+            
+            return completionSource.Task;
         }
 
         // TODO: Decide whether static routes are really necessary, as the tree
@@ -280,7 +301,7 @@ namespace Succubus.Core
             synchronizationStack = new SynchronizationStack(synchronizationContext);
         }
 
-        public IResponseContext OnReply<TReq, T>(Action<TReq, T> handler, Action<Action> marshal = null)
+        public void OnReply<TReq, T>(Action<TReq, T> handler, Action<Action> marshal = null)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
@@ -288,79 +309,65 @@ namespace Succubus.Core
             var synchronizationFrame = new SynchronizationFrame<TReq, T> { StaticHandler = handler, Marshal = marshal };
 
             synchronizationStack.Frames.Add(synchronizationFrame);
-            synchronizationContext.Stacks.Add(synchronizationStack);
-
-            return new Bus.ResponseContext(this);
+            synchronizationContext.Stacks.Add(synchronizationStack);           
         }
 
-        public IResponseContext OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler, Action<Action> marshal = null)
+        public void OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler, Action<Action> marshal = null)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2> { StaticHandler = handler, Marshal = marshal });
             synchronizationContext.Stacks.Add(synchronizationStack);
-
-            return new Bus.ResponseContext(this);
         }
 
 
 
-        public IResponseContext OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler, Action<Action> marshal = null)
+        public void OnReply<TReq, T1, T2, T3>(Action<TReq, T1, T2, T3> handler, Action<Action> marshal = null)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3> { StaticHandler = handler, Marshal = marshal });
             synchronizationContext.Stacks.Add(synchronizationStack);
-
-            return new Bus.ResponseContext(this);
         }
 
 
 
-        public IResponseContext OnReply<TReq, T1, T2, T3, T4>(Action<TReq, T1, T2, T3, T4> handler, Action<Action> marshal = null)
+        public void OnReply<TReq, T1, T2, T3, T4>(Action<TReq, T1, T2, T3, T4> handler, Action<Action> marshal = null)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4> { StaticHandler = handler, Marshal = marshal });
             synchronizationContext.Stacks.Add(synchronizationStack);
-
-            return new Bus.ResponseContext(this);
         }
 
-        public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5>(Action<TReq, T1, T2, T3, T4, T5> handler, Action<Action> marshal = null)
+        public void OnReply<TReq, T1, T2, T3, T4, T5>(Action<TReq, T1, T2, T3, T4, T5> handler, Action<Action> marshal = null)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5> { StaticHandler = handler, Marshal = marshal });
             synchronizationContext.Stacks.Add(synchronizationStack);
-
-            return new Bus.ResponseContext(this);
         }
 
-        public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6>(Action<TReq, T1, T2, T3, T4, T5, T6> handler, Action<Action> marshal = null)
+        public void OnReply<TReq, T1, T2, T3, T4, T5, T6>(Action<TReq, T1, T2, T3, T4, T5, T6> handler, Action<Action> marshal = null)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5, T6> { StaticHandler = handler, Marshal = marshal });
             synchronizationContext.Stacks.Add(synchronizationStack);
-
-            return new Bus.ResponseContext(this);
         }
 
-        public IResponseContext OnReply<TReq, T1, T2, T3, T4, T5, T6, T7>(Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler, Action<Action> marshal = null)
+        public void OnReply<TReq, T1, T2, T3, T4, T5, T6, T7>(Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler, Action<Action> marshal = null)
         {
             SynchronizationContext synchronizationContext;
             SynchronizationStack synchronizationStack;
             SetupContext<TReq>(out synchronizationContext, out synchronizationStack, ContextType.Static);
             synchronizationStack.Frames.Add(new SynchronizationFrame<TReq, T1, T2, T3, T4, T5, T6, T7> { StaticHandler = handler, Marshal = marshal });
             synchronizationContext.Stacks.Add(synchronizationStack);
-
-            return new Bus.ResponseContext(this);
         }
 
         #endregion

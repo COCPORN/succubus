@@ -25,18 +25,16 @@ namespace Succubus.Core
         private readonly List<RawMessageBlock> rawMessageHandlers = new List<RawMessageBlock>();
         private readonly List<RawDataBlock> rawDataHandlers = new List<RawDataBlock>();
 
-        public IResponseContext OnRawMessage(Action<object> handler, Action<Action> marshal = null)
+        public void OnRawMessage(Action<object> handler, Action<Action> marshal = null)
         {
             SubscriptionManager.SubscribeAll();
-            rawMessageHandlers.Add(new RawMessageBlock() { Handler = handler, Marshal = marshal });            
-            return new Bus.ResponseContext(this);
+            rawMessageHandlers.Add(new RawMessageBlock() { Handler = handler, Marshal = marshal });                        
         }
 
-        public IResponseContext OnRawData(Action<string> handler, Action<Action> marshal = null)
+        public void OnRawData(Action<string> handler, Action<Action> marshal = null)
         {
             SubscriptionManager.SubscribeAll();
-            rawDataHandlers.Add(new RawDataBlock { Handler = handler, Marshal = marshal });
-            return new Bus.ResponseContext(this);
+            rawDataHandlers.Add(new RawDataBlock { Handler = handler, Marshal = marshal });            
         }
 
         public void RawMessage(object o)
