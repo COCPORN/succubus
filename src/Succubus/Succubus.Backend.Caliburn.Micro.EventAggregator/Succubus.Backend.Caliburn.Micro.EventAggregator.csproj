@@ -42,7 +42,7 @@
     </Reference>
     <Reference Include="Succubus.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Succubus.Core.0.1.29\lib\net45\Succubus.Core.dll</HintPath>
+      <HintPath>..\packages\Succubus.Core.0.1.31\lib\net45\Succubus.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
