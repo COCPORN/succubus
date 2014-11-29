@@ -90,12 +90,19 @@ namespace Succubus.Core
                         {
                             Task.Factory.StartNew(() =>
                             {
-                                var response = handler.Handler(message);
-                                if (response != null)
+                                try
                                 {
-                                    var framedResponse = FrameResponseSynchronously(synchronousFrame, response,
-                                        synchronousFrame.CorrelationId);
-                                    Transport.BusPublish(framedResponse, "__REPLY");
+                                    var response = handler.Handler(message);
+                                    if (response != null)
+                                    {
+                                        var framedResponse = FrameResponseSynchronously(synchronousFrame, response,
+                                            synchronousFrame.CorrelationId);
+                                        Transport.BusPublish(framedResponse, "__REPLY");
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    RaiseExceptionEvent(ex);
                                 }
                             });
                         }

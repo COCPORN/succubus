@@ -139,7 +139,16 @@ namespace Succubus.Core
                     {
                         if (handler.Marshal == null)
                         {
-                            Task.Factory.StartNew(() => handler.Handler(message));
+                            Task.Factory.StartNew(() => {
+                                try
+                                {
+                                    handler.Handler(message);
+                                }
+                                catch (Exception ex)
+                                {
+                                    RaiseExceptionEvent(ex);
+                                }
+                            });
                         }
                         else
                         {

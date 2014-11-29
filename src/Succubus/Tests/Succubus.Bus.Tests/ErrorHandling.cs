@@ -30,7 +30,10 @@ namespace Succubus.Bus.Tests
                 throw new Exception("Yeah, see, that doesn't really work");
             });
 
-            bus.HandlerException += (sender, args) => are.Set();
+            bus.HandlerException += (sender, args) =>
+            {
+                are.Set();
+            };
         }
 
         [Test]
@@ -40,13 +43,13 @@ namespace Succubus.Bus.Tests
             var reply = bus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" });
             Assert.AreEqual("Howdy", reply.Message);
 
-            var errorReply = bus.CallAsync<ErrorRequest, BasicResponse>(new ErrorRequest { Message = "Wild snorlax" }, timeout:100);
+            var errorReply = bus.Call<ErrorRequest, BasicResponse>(new ErrorRequest { Message = "Wild snorlax" }, timeout:100);
             if (are.WaitOne(1000) == false)
             {
                 Assert.Fail("No exception raised");
             }
 
-            await errorReply;
+            //await errorReply;
         }
 
     }
