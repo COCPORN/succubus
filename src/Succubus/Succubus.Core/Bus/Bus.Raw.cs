@@ -47,7 +47,25 @@ namespace Succubus.Core
                 {
                     if (handler.Marshal == null)
                     {
-                        Task.Factory.StartNew(() => handler.Handler(o));
+                        Task.Factory.StartNew(() =>
+                        {
+                            try
+                            {
+                                handler.Handler(o);
+                            }
+                            catch (AggregateException ex)
+                            {
+                                ex.Handle((x) =>
+                                {
+                                    RaiseExceptionEvent(x);
+                                    return true;
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                RaiseExceptionEvent(ex);
+                            }
+                        });                        
                     }
                     else
                     {
@@ -72,7 +90,26 @@ namespace Succubus.Core
                 {
                     if (handler.Marshal == null)
                     {
-                        Task.Factory.StartNew(() => handler.Handler(data));
+                        Task.Factory.StartNew(() =>
+                        {
+                            try
+                            {
+                                handler.Handler(data);
+                            }
+                            catch (AggregateException ex)
+                            {
+                                ex.Handle((x) =>
+                                {
+                                    RaiseExceptionEvent(x);
+                                    return true;
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                RaiseExceptionEvent(ex);
+                            }
+                        });
+                        
                     }
                     else
                     {

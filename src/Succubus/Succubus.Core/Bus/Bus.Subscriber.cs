@@ -100,6 +100,14 @@ namespace Succubus.Core
                                         Transport.BusPublish(framedResponse, "__REPLY");
                                     }
                                 }
+                                catch (AggregateException ex)
+                                {
+                                    ex.Handle((x) =>
+                                    {
+                                        RaiseExceptionEvent(x);
+                                        return true;
+                                    });
+                                }
                                 catch (Exception ex)
                                 {
                                     RaiseExceptionEvent(ex);

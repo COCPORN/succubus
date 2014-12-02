@@ -144,6 +144,14 @@ namespace Succubus.Core
                                 {
                                     handler.Handler(message);
                                 }
+                                catch (AggregateException ex)
+                                {
+                                    ex.Handle((x) =>
+                                    {
+                                        RaiseExceptionEvent(x);
+                                        return true;
+                                    });
+                                }
                                 catch (Exception ex)
                                 {
                                     RaiseExceptionEvent(ex);
@@ -197,7 +205,25 @@ namespace Succubus.Core
                         {
                             if (handler.Marshal == null)
                             {
-                                Task.Factory.StartNew(() => handler.Handler(message));
+                                Task.Factory.StartNew(() =>
+                                {
+                                    try
+                                    {
+                                        handler.Handler(message);
+                                    }
+                                    catch (AggregateException ex)
+                                    {
+                                        ex.Handle((x) =>
+                                        {
+                                            RaiseExceptionEvent(x);
+                                            return true;
+                                        });
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        RaiseExceptionEvent(ex);
+                                    }
+                                });
                             }
                             else
                             {
