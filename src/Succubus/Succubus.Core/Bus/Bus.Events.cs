@@ -104,30 +104,25 @@ namespace Succubus.Core
 
             List<EventBlock> handlers = new List<EventBlock>();
 
-            lock (eventHandlers)
+            while (eventType != null)
             {
-                while (eventType != null)
+                List<EventBlock> localHandlers = new List<EventBlock>();
+                if (eventHandlers.TryGetValue(eventType, out localHandlers))
                 {
-                    List<EventBlock> localHandlers = new List<EventBlock>();
-                    if (eventHandlers.TryGetValue(eventType, out localHandlers))
-                    {
-                        handlers.AddRange(localHandlers);
-                    }
-                    eventType = eventType.BaseType;
+                    handlers.AddRange(localHandlers);
                 }
-                foreach (var @interface in interfaces)
+                eventType = eventType.BaseType;
+            }
+            foreach (var @interface in interfaces)
+            {
+                List<EventBlock> localHandlers = new List<EventBlock>();
+                if (eventHandlers.TryGetValue(@interface, out localHandlers))
                 {
-                    List<EventBlock> localHandlers = new List<EventBlock>();
-                    if (eventHandlers.TryGetValue(@interface, out localHandlers))
-                    {
-                        handlers.AddRange(localHandlers);
-                    }
+                    handlers.AddRange(localHandlers);
                 }
             }
 
-            // TODO: This has a potential race condition in where
-            // handlers are added to/subtracted from while iterating on it
-            // TODO: DOES IT REALLY? I don't see that now, but I might in the future
+
             foreach (var eventHandler in handlers)
             {
                 var handler = eventHandler;
@@ -176,14 +171,9 @@ namespace Succubus.Core
             FrameMessage(eventFrame);
             List<EventBlock> handlers = null;
 
-            lock (eventHandlers)
+            if (eventHandlers.TryGetValue(typeof(object), out handlers) == false)
             {
-
-                if (eventHandlers.TryGetValue(typeof(object), out handlers) == false)
-                {
-                    return;
-                }
-
+                return;
             }
 
             Type type = Type.GetType(eventFrame.EmbeddedType);

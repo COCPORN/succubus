@@ -33,13 +33,12 @@ namespace Succubus.Backend.Loopback
             {
 
                 bool receive = false;
-                lock (transport.SubscriptionList)
+
+                foreach (var subAddress in transport.SubscriptionList)
                 {
-                    foreach (var subAddress in transport.SubscriptionList)
-                    {
-                        if (address.StartsWith(subAddress)) receive = true;
-                    }
+                    if (address.StartsWith(subAddress)) receive = true;
                 }
+
                 if (receive == false) continue;
 
                 var synchronousFrame = message as Core.MessageFrames.Synchronous;

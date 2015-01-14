@@ -94,7 +94,7 @@ namespace Succubus.Core
             };
         }
 
-     
+
 
 
         public void Call<TReq, TRes>(TReq request, Action<TRes> handler, string address = null,
@@ -107,9 +107,10 @@ namespace Succubus.Core
         {
             SetupReplySubscription();
             var synchronizationContext = new SynchronizationContext();
-            if (timeoutHandler != null) {
+            if (timeoutHandler != null)
+            {
                 synchronizationContext.TimeoutHandler = timeoutHandler;
-                synchronizationContext.TimeoutMilliseconds = timeout;                
+                synchronizationContext.TimeoutMilliseconds = timeout;
             }
 
             SynchronizationStack stack = new SynchronizationStack(synchronizationContext);
@@ -135,7 +136,7 @@ namespace Succubus.Core
 
             // Wait for existing synchronization contexts to finish in case of crashing correlation ids
             while (existing != null)
-            {           
+            {
                 existing.ResolvedResetEvent.WaitOne(10000);
                 lock (synchronizationContexts)
                 {
@@ -159,7 +160,7 @@ namespace Succubus.Core
             var synchronizedRequest = InternalCall<TReq, TRes>(request, res =>
             {
                 result = res;
-                mre.Set();                
+                mre.Set();
             }, address);
 
             var sc = synchronizedRequest.CorrelationId;
@@ -190,11 +191,11 @@ namespace Succubus.Core
         {
             if (marshal == null) return InternalCall<TReq, TRes>(request, address, timeout);
             else return marshal((req) => InternalCall<TReq, TRes>(req, address, timeout), request);
-            
+
         }
 
         public Task<TRes> CallAsync<TReq, TRes>(TReq request, string address = null, int timeout = 10000, Func<Func<TReq, TRes>, TReq, TRes> marshal = null)
-        {            
+        {
             TaskCompletionSource<TRes> completionSource = new TaskCompletionSource<TRes>();
             var synchronizedRequest = InternalCall<TReq, TRes>(request, res =>
             {
@@ -203,7 +204,7 @@ namespace Succubus.Core
             {
                 completionSource.SetException(new TimeoutException());
             });
-            
+
             return completionSource.Task;
         }
 
@@ -309,7 +310,7 @@ namespace Succubus.Core
             var synchronizationFrame = new SynchronizationFrame<TReq, T> { StaticHandler = handler, Marshal = marshal };
 
             synchronizationStack.Frames.Add(synchronizationFrame);
-            synchronizationContext.Stacks.Add(synchronizationStack);           
+            synchronizationContext.Stacks.Add(synchronizationStack);
         }
 
         public void OnReply<TReq, T1, T2>(Action<TReq, T1, T2> handler, Action<Action> marshal = null)
@@ -374,57 +375,60 @@ namespace Succubus.Core
 
         public void ReplyTo<TReq, TRes>(Func<TReq, TRes> handler, string address = null, Func<Func<TReq, TRes>, TReq, TRes> marshal = null)
         {
-           
+
             //SetupReplySubscription();
             SetupSubscriber(address);
-            SynchronousBlock objectHandler = new SynchronousBlock { Handler = (req) =>
+            SynchronousBlock objectHandler = new SynchronousBlock
             {
-                try
-                {
-                    if (marshal == null)
+                Handler = (req) =>
                     {
-                        return (TRes) handler((TReq) req);
-                    }
-                    else
-                    {
-                        return marshal(handler, (TReq)req);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    RaiseExceptionEvent(ex);
-                    return default(TRes);
-                }
-            }, Address = address ?? "__BROADCAST" };
-            lock (replyHandlers)
+                        try
+                        {
+                            if (marshal == null)
+                            {
+                                return (TRes)handler((TReq)req);
+                            }
+                            else
+                            {
+                                return marshal(handler, (TReq)req);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            RaiseExceptionEvent(ex);
+                            return default(TRes);
+                        }
+                    },
+                Address = address ?? "__BROADCAST"
+            };
+
+
+            var subclasses = Assembly.GetAssembly(typeof(TReq))
+                .GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(TReq)));
+
+            var classList = subclasses.ToList();
+            classList.Add(typeof(TReq));
+
+            //foreach (var subclass in classList)
+            //{
+            //    Console.WriteLine(subclass.ToString());
+            //}
+
+            foreach (var t in classList)
             {
-              
-                var subclasses = Assembly.GetAssembly(typeof (TReq))
-                    .GetTypes()
-                    .Where(t => t.IsSubclassOf(typeof (TReq)));
-
-                var classList = subclasses.ToList();
-                classList.Add(typeof(TReq));
-
-                //foreach (var subclass in classList)
-                //{
-                //    Console.WriteLine(subclass.ToString());
-                //}
-
-                foreach (var t in classList)
+                if (replyHandlers.ContainsKey(typeof(TReq)) == false)
                 {
-                    if (replyHandlers.ContainsKey(typeof (TReq)) == false)
-                    {
-                        var handlers = new List<SynchronousBlock>();
-                        handlers.Add(objectHandler);
-                        replyHandlers.Add(t, handlers);
-                    }
-                    else
-                    {
-                        replyHandlers[t].Add(objectHandler);
-                    }
+                    var handlers = new List<SynchronousBlock>();
+                    handlers.Add(objectHandler);
+                    replyHandlers.Add(t, handlers);
+                }
+                else
+                {
+                    replyHandlers[t].Add(objectHandler);
                 }
             }
+
         }
 
 

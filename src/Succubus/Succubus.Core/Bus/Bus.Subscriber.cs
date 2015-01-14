@@ -75,10 +75,8 @@ namespace Succubus.Core
 
             List<SynchronousBlock> handlers = null;
 
-            lock (replyHandlers)
-            {
-                replyHandlers.TryGetValue(type, out handlers);
-            }
+            replyHandlers.TryGetValue(type, out handlers);
+
             if (handlers != null)
             {
 

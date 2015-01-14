@@ -10,19 +10,7 @@ namespace Succubus.Collections.Test
     [TestFixture]
     public class TimedOutDictionaryTest
     {
-
-        [Test]
-        public void Test2()
-        {
-            
-        }
-
-        [Test]
-        public void Test()
-        {
-            Console.WriteLine("Testing R# testrunner");
-            Assert.AreEqual(1, 1);
-        }
+    
 
     }
 }

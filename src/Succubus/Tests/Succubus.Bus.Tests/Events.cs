@@ -29,7 +29,7 @@ namespace Succubus.Bus.Tests
                 config.On<BasicEvent>(ev =>
                 {
                     if (ev.Message == "Wohey")
-                    {
+                    {                        
                         basicCounter++;
                         mre.Set();
                     }
@@ -99,19 +99,19 @@ namespace Succubus.Bus.Tests
         [Test]
         public void CheckOriginator()
         {
-            basicCounter = 0;
+            objectCounter = 0;
             machineName = String.Empty;
             mre.Reset();
           
 
-            bus.Publish(new BasicEvent() { Message = "Wohey" });
+            bus.Publish(new BasicEvent() { Message = "WUT" });
             if (mre.WaitOne(1500) == false)
             {
                 Assert.Fail("Timeout waiting for event");
             }
             else
             {
-                Assert.AreEqual(1, basicCounter);
+                Assert.AreEqual(2, objectCounter);
                 Assert.AreNotEqual(String.Empty, machineName);
             }
 
@@ -147,10 +147,12 @@ namespace Succubus.Bus.Tests
             BusDiagnose.CheckDiagnose(bus);
         }
 
+        
+
         [Test]
         public void ReqResAsEvents()
         {
-            int counter = 0;
+            objectCounter = 0;
             mre.Reset();
 
          
@@ -165,7 +167,7 @@ namespace Succubus.Bus.Tests
             }
             else
             {
-                Assert.AreEqual(2, counter);
+                Assert.AreEqual(3, objectCounter);
                 Assert.AreEqual(response.Message, "Testing eventing of synchronous messages");
             }
             BusDiagnose.CheckDiagnose(bus);
