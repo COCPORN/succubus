@@ -89,24 +89,7 @@ namespace Succubus.Bus.Tests
                     Assert.Fail("Got unexpected reply");
                 });
 
-                config.OnRawMessage((o) =>
-                {
-                    MessageBase b = o as MessageBase;
-                    Synchronous s = o as Synchronous;
-                    if (s != null && b != null)
-                    {
-                        if (String.IsNullOrEmpty(b.Originator) == false)
-                        {
-                            gotOriginator.Set();
-                        }
-                        if (String.IsNullOrEmpty(s.Responder) == false)
-                        {
-                            gotResponder.Set();
-                        }
-                    }
-
-
-                });
+   
 
             });
          
@@ -139,15 +122,27 @@ namespace Succubus.Bus.Tests
 
             IBus rawbus = Configuration.Factory.CreateBusWithHosting(config => {
                 config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse() { Message = req.Message });
+                config.OnRawMessage((o) =>
+                {
+                    MessageBase b = o as MessageBase;
+                    Synchronous s = o as Synchronous;
+                    if (s != null && b != null)
+                    {
+                        if (String.IsNullOrEmpty(b.Originator) == false)
+                        {
+                            gotOriginator.Set();
+                        }
+                        if (String.IsNullOrEmpty(s.Responder) == false)
+                        {
+                            gotResponder.Set();
+                        }
+                    }
+
+
+                });
             }, true);
 
             Thread.Sleep(1000);
-
-           
-
-       
-
-
        
 
             var response = rawbus.Call<BasicRequest, BasicResponse>(new BasicRequest() { Message = "Wohey" });

@@ -91,8 +91,8 @@ namespace Succubus.Bus.Tests
         [Test]
         public void SimpleEventWithCorrectAddressing()
         {
-            int counter = 0;
-            ManualResetEvent mre = new ManualResetEvent(false);
+            counter = 0;
+            mre.Reset();
                     
             bus.Publish(new BasicEvent() { Message = "Wohey" }, "CORRECTADDRESS");
             if (mre.WaitOne(2500) == false)

@@ -30,7 +30,7 @@ namespace Succubus.Bus.Tests
                 {
                     if (ev.Message == "Wohey")
                     {
-                        counter++;
+                        basicCounter++;
                         mre.Set();
                     }
                 });
@@ -41,29 +41,15 @@ namespace Succubus.Bus.Tests
                 config.On<Marker>(ev =>
                 {
                     mre.Set();
-                });
-                config.On<object>(ev =>
-                {
-                    Console.WriteLine("Got event: {0}", ev.ToString());
-                    if (ev is BasicRequest || ev is BasicResponse)
-                    {
-                        counter++;
-
-                    }
-                    if (counter == 2)
-                    {
-                        mre.Set();
-                    }
-                });
+                });           
                 config.On<object>(ev =>
                 {
                     Console.WriteLine("Got event: {0}", ev.ToString());
                     if (ev is BasicRequest || ev is BasicResponse || ev is BasicEvent)
                     {
-                        counter++;
-
+                        objectCounter++;
                     }
-                    if (counter == 3)
+                    if (objectCounter == 3)
                     {
                         mre.Set();
                     }
@@ -77,7 +63,7 @@ namespace Succubus.Bus.Tests
                     if (b != null)
                     {
                         Console.WriteLine("Got the request: " + o + " MachineName: " + b.Originator);
-                        counter++;
+                        objectCounter++;
                         machineName = b.Originator;
                         mre.Set();
                     }
@@ -87,7 +73,8 @@ namespace Succubus.Bus.Tests
         
         }
 
-        int counter = 0;
+        int basicCounter = 0;
+        int objectCounter = 0;
         ManualResetEvent mre = new ManualResetEvent(false);
          
 
@@ -95,14 +82,14 @@ namespace Succubus.Bus.Tests
         public void SimpleEvent()
         {
             mre.Reset();
-            counter = 0;
+            basicCounter = 0;
             bus.Publish(new BasicEvent() { Message = "Wohey" });
             if (mre.WaitOne(500) == false)
             {
                 Assert.Fail("Timeout waiting for event");
             }
             else
-                Assert.AreEqual(1, counter);
+                Assert.AreEqual(1, basicCounter);
 
             BusDiagnose.CheckDiagnose(bus);
         }
@@ -112,7 +99,7 @@ namespace Succubus.Bus.Tests
         [Test]
         public void CheckOriginator()
         {
-            counter = 0;
+            basicCounter = 0;
             machineName = String.Empty;
             mre.Reset();
           
@@ -124,7 +111,7 @@ namespace Succubus.Bus.Tests
             }
             else
             {
-                Assert.AreEqual(1, counter);
+                Assert.AreEqual(1, basicCounter);
                 Assert.AreNotEqual(String.Empty, machineName);
             }
 
@@ -164,7 +151,7 @@ namespace Succubus.Bus.Tests
         public void ReqResAsEvents()
         {
             int counter = 0;
-            ManualResetEvent mre = new ManualResetEvent(false);
+            mre.Reset();
 
          
             var response =
@@ -186,14 +173,9 @@ namespace Succubus.Bus.Tests
 
         [Test]
         public void ReqResAsEventsSecondBusInstance()
-        {
-            var bus2 = Configuration.Factory.CreateBus(config => { });
-            //Thread.Sleep(1000);
-
-            int counter = 0;
-            ManualResetEvent mre = new ManualResetEvent(false);
-
-           
+        {         
+            objectCounter = 0;
+            mre.Reset();
 
             var response =
                 bus.Call<BasicRequest, BasicResponse>(new BasicRequest()
@@ -207,7 +189,11 @@ namespace Succubus.Bus.Tests
             }
             else
             {
-                Assert.AreEqual(3, counter);
+                // Request and response are 2 on the first bus
+                // Request and response are 2 on the second bus
+                // The bus publish on the first bus should show up as a catchall on the second
+                // -> 5
+                Assert.AreEqual(5, objectCounter);
                 Assert.AreEqual(response.Message, "Testing eventing of synchronous messages");
             }
             BusDiagnose.CheckDiagnose(bus);
