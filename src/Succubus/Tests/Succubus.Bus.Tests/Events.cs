@@ -21,29 +21,81 @@ namespace Succubus.Bus.Tests
         public void Init()
         {
 
-            bus = Configuration.Factory.CreateBusWithHosting(true);
-            bus2 = Configuration.Factory.CreateBus(true);
+            bus = Configuration.Factory.CreateBusWithHosting(config => {
+                config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+                {
+                    Message = req.Message
+                });
+                config.On<BasicEvent>(ev =>
+                {
+                    if (ev.Message == "Wohey")
+                    {
+                        counter++;
+                        mre.Set();
+                    }
+                });
+                config.On<ParentEvent>(ev =>
+                {
+                    mre.Set();
+                });
+                config.On<Marker>(ev =>
+                {
+                    mre.Set();
+                });
+                config.On<object>(ev =>
+                {
+                    Console.WriteLine("Got event: {0}", ev.ToString());
+                    if (ev is BasicRequest || ev is BasicResponse)
+                    {
+                        counter++;
+
+                    }
+                    if (counter == 2)
+                    {
+                        mre.Set();
+                    }
+                });
+                config.On<object>(ev =>
+                {
+                    Console.WriteLine("Got event: {0}", ev.ToString());
+                    if (ev is BasicRequest || ev is BasicResponse || ev is BasicEvent)
+                    {
+                        counter++;
+
+                    }
+                    if (counter == 3)
+                    {
+                        mre.Set();
+                    }
+                });
+            }, true);
+            bus2 = Configuration.Factory.CreateBus(config => {
+                config.OnRawMessage((o) =>
+                {
+                    Console.WriteLine(o.ToString());
+                    var b = o as MessageBase;
+                    if (b != null)
+                    {
+                        Console.WriteLine("Got the request: " + o + " MachineName: " + b.Originator);
+                        counter++;
+                        machineName = b.Originator;
+                        mre.Set();
+                    }
+                });
+            }, true);
          
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
-            {
-                Message = req.Message
-            });
+        
         }
+
+        int counter = 0;
+        ManualResetEvent mre = new ManualResetEvent(false);
+         
 
         [Test]
         public void SimpleEvent()
         {
-            int counter = 0;
-            ManualResetEvent mre = new ManualResetEvent(false);
-            bus.On<BasicEvent>(ev =>
-            {
-                if (ev.Message == "Wohey")
-                {
-                    counter++;
-                    mre.Set();
-                }
-            });
-
+            mre.Reset();
+            counter = 0;
             bus.Publish(new BasicEvent() { Message = "Wohey" });
             if (mre.WaitOne(500) == false)
             {
@@ -55,25 +107,15 @@ namespace Succubus.Bus.Tests
             BusDiagnose.CheckDiagnose(bus);
         }
 
+        string machineName = String.Empty;
 
         [Test]
         public void CheckOriginator()
         {
-            int counter = 0; 
-            string machineName = String.Empty;
-            ManualResetEvent mre = new ManualResetEvent(false);
-            bus2.OnRawMessage((o) =>
-            {
-                Console.WriteLine(o.ToString());
-                var b = o as MessageBase;
-                if (b != null)
-                {
-                    Console.WriteLine("Got the request: " + o + " MachineName: " + b.Originator);
-                    counter++;
-                    machineName = b.Originator;
-                    mre.Set();
-                }
-            });
+            counter = 0;
+            machineName = String.Empty;
+            mre.Reset();
+          
 
             bus.Publish(new BasicEvent() { Message = "Wohey" });
             if (mre.WaitOne(1500) == false)
@@ -94,12 +136,8 @@ namespace Succubus.Bus.Tests
         [Test]
         public void InheritedEvent()
         {
-            ManualResetEvent mre = new ManualResetEvent(false);
-
-            bus.On<ParentEvent>(ev =>
-            {
-                mre.Set();
-            });
+            mre.Reset();
+            
             bus.Publish(new ChildEvent() { Message = "Child calling" });
             if (mre.WaitOne(2500) == false)
             {
@@ -112,12 +150,8 @@ namespace Succubus.Bus.Tests
         [Test]
         public void InterfaceDispatch()
         {
-            ManualResetEvent mre = new ManualResetEvent(false);
-
-            bus.On<Marker>(ev =>
-            {
-                mre.Set();
-            });
+            mre.Reset();
+        
             bus.Publish(new ChildEvent() { Message = "Child calling" });
             if (mre.WaitOne(500) == false)
             {
@@ -132,20 +166,7 @@ namespace Succubus.Bus.Tests
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);
 
-            bus.On<object>(ev =>
-            {
-                Console.WriteLine("Got event: {0}", ev.ToString());
-                if (ev is BasicRequest || ev is BasicResponse)
-                {
-                    counter++;
-
-                }
-                if (counter == 2)
-                {
-                    mre.Set();
-                }
-            });
-
+         
             var response =
                 bus.Call<BasicRequest, BasicResponse>(new BasicRequest()
                 {
@@ -166,25 +187,13 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ReqResAsEventsSecondBusInstance()
         {
-            var bus2 = Configuration.Factory.CreateBus();
+            var bus2 = Configuration.Factory.CreateBus(config => { });
             //Thread.Sleep(1000);
 
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);
 
-            bus2.On<object>(ev =>
-            {
-                Console.WriteLine("Got event: {0}", ev.ToString());
-                if (ev is BasicRequest || ev is BasicResponse || ev is BasicEvent)
-                {
-                    counter++;
-
-                }
-                if (counter == 3)
-                {
-                    mre.Set();
-                }
-            });
+           
 
             var response =
                 bus.Call<BasicRequest, BasicResponse>(new BasicRequest()

@@ -13,17 +13,15 @@ namespace Succubus.Bus.Tests
         [SetUp]
         public void Init()
         {
-            bus = Configuration.Factory.CreateBusWithHosting();
-
-
-
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
-            {
-                Message = req.Message
-            }, marshal: (handler, request) =>
-            {
-                return handler(request);
-            });
+            bus = Configuration.Factory.CreateBusWithHosting(config =>
+                config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+                {
+                    Message = req.Message
+                }, marshal: (handler, request) =>
+                {
+                    return handler(request);
+                })
+            );
         }
 
         [Test]

@@ -22,18 +22,19 @@ namespace Succubus.Bus.Tests
             {
                 succubus.WithLoopback();
                 succubus.CorrelationIdProvider = new PredeterminedCorrelationProvider();
-            });
-
-
-
-            overlapbus.ReplyTo<BasicRequest, BasicResponse>(req =>
-            {
-                Thread.Sleep(500);
-                return new BasicResponse
+                succubus.ReplyTo<BasicRequest, BasicResponse>(req =>
                 {
-                    Message = req.Message
-                };
+                    Thread.Sleep(500);
+                    return new BasicResponse
+                    {
+                        Message = req.Message
+                    };
+                });
             });
+
+
+
+           
         }
 
 

@@ -22,30 +22,43 @@ namespace Succubus.Bus.Tests
         [SetUp]
         public void Init()
         {
-            bus = Configuration.Factory.CreateBusWithHosting();
+            bus = Configuration.Factory.CreateBusWithHosting(config =>
+                {
+                    config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+                    {
+                        Message = req.Message
+                    }, "ADDRESS");
+
+                    config.On<BasicEvent>(ev =>
+                    {
+                        if (ev.Message == "Wohey")
+                        {
+                            counter++;
+                            mre.Set();
+                        }
+                    }, "NOTADDRESS");
+                    config.On<BasicEvent>(ev =>
+                    {
+                        if (ev.Message == "Wohey")
+                        {
+                            counter++;
+                            mre.Set();
+                        }
+                    }, "CORRECTADDRESS");
+                });
             
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
-            {
-                Message = req.Message
-            }, "ADDRESS");
+         
         }
 
-        
+        int counter = 0;
+        ManualResetEvent mre = new ManualResetEvent(false);
 
         [Test]
         public void SimpleEventWithIncorrectAddressing()
         {
-            int counter = 0;
-            ManualResetEvent mre = new ManualResetEvent(false);
-            bus.On<BasicEvent>(ev =>
-            {
-                if (ev.Message == "Wohey")
-                {
-                    counter++;
-                    mre.Set();
-                }
-            }, "NOTADDRESS");
-
+            counter = 0;
+            mre.Reset();
+         
             bus.Publish(new BasicEvent() { Message = "Wohey" }, "ADDRESS");
             if (mre.WaitOne(500) == false)
             {
@@ -80,15 +93,7 @@ namespace Succubus.Bus.Tests
         {
             int counter = 0;
             ManualResetEvent mre = new ManualResetEvent(false);
-            bus.On<BasicEvent>(ev =>
-            {
-                if (ev.Message == "Wohey")
-                {
-                    counter++;
-                    mre.Set();
-                }
-            }, "CORRECTADDRESS");
-            Thread.Sleep(1000);
+                    
             bus.Publish(new BasicEvent() { Message = "Wohey" }, "CORRECTADDRESS");
             if (mre.WaitOne(2500) == false)
             {

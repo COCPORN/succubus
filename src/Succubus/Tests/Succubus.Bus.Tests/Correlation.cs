@@ -19,14 +19,17 @@ namespace Succubus.Bus.Tests
         public void Init()
         {
 
-            overlapbus = Configuration.Factory.CreateBusWithHosting();
-
-
-
-            overlapbus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+            overlapbus = Configuration.Factory.CreateBusWithHosting(config =>
             {
-                Message = req.Message
+                config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+                {
+                    Message = req.Message
+                });
             });
+
+
+
+           
         }
 
 

@@ -10,20 +10,21 @@ namespace Succubus.Bus.Tests
 {
     class LoopbackFactory : IFactory
     {
-        public Core.Interfaces.IBus CreateBus(bool reportRaw = false)
+        public Core.Interfaces.IBus CreateBus(Action<IBusConfigurator> configurator, bool reportRaw = false)
         {
             IBus bus = new Succubus.Core.Bus();
-            bus.Initialize(config => {
+            bus.Initialize(config => {                
                 config.WithLoopback(clear: false);
                 if (reportRaw == true)
                 {
                     (config.Transport as Succubus.Backend.Loopback.Transport).ReportRaw = true;
-                }                
+                }
+                configurator(config);
             });
             return bus;
         }
 
-        public Core.Interfaces.IBus CreateBusWithHosting(bool reportRaw = false)
+        public Core.Interfaces.IBus CreateBusWithHosting(Action<IBusConfigurator> configurator, bool reportRaw = false)
         {
             IBus bus = new Succubus.Core.Bus();
             bus.Initialize(config =>
@@ -32,6 +33,7 @@ namespace Succubus.Bus.Tests
                 if (reportRaw == true) { 
                     (config.Transport as Succubus.Backend.Loopback.Transport).ReportRaw = true;                
                 }
+                configurator(config);
             });
             return bus;
         }

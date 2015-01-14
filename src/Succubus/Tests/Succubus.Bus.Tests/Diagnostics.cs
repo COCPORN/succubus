@@ -20,8 +20,8 @@ namespace Succubus.Bus.Tests
         [SetUp]
         public void Init()
         {
-            bus = Configuration.Factory.CreateBusWithHosting();
-            bus2 = Configuration.Factory.CreateBus();
+            bus = Configuration.Factory.CreateBusWithHosting(config => { });
+            bus2 = Configuration.Factory.CreateBus(config => { });
         }
 
         [Test]

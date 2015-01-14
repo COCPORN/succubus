@@ -12,35 +12,36 @@ namespace Succubus.Bus.Tests
 {
     class ZeroMQFactory : IFactory
     {
-        public Core.Interfaces.IBus CreateBus(bool reportRaw = false)
+        public Core.Interfaces.IBus CreateBus(Action<IBusConfigurator> configurator, bool reportRaw = false)
         {
             IBus bus = new Succubus.Core.Bus();
-            bus.Initialize(config => {
+            bus.Initialize(config => {                
                 config.WithZeroMQ();
                 var transport = config.Transport as Succubus.Backend.ZeroMQ.Transport;
                 if (reportRaw == true)
                 {
                     transport.ReportRaw = true;
                 }
+                configurator(config);
             });
 
             return bus;
         }
 
         IBus hostingbus = null;
-        public Core.Interfaces.IBus CreateBusWithHosting(bool reportRaw = false)
+        public Core.Interfaces.IBus CreateBusWithHosting(Action<IBusConfigurator> configurator, bool reportRaw = false)
         {
             if (hostingbus == null)
             {
                 hostingbus = new Succubus.Core.Bus();
-                hostingbus.Initialize(config => {
+                hostingbus.Initialize(config => {                    
                     config.WithZeroMQ(c => c.StartMessageHost());
                     var transport = config.Transport as Succubus.Backend.ZeroMQ.Transport;
                     if (reportRaw == true)
                     {
                         transport.ReportRaw = true;
                     }
-                    
+                    configurator(config);
                 });
                 Thread.Sleep(2000);
             }

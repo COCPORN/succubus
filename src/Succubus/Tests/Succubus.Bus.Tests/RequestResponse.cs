@@ -23,29 +23,94 @@ namespace Succubus.Bus.Tests
         public void Init()
         {
 
-            bus = Configuration.Factory.CreateBusWithHosting();
+            bus = Configuration.Factory.CreateBusWithHosting(config =>
+            {
+                config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+                {
+                    Message = req.Message
+                });
+
+                config.ReplyTo<StaticRequest, StaticResponse>(req => new StaticResponse
+                {
+                    Message = req.Message
+                });
+
+                config.ReplyTo<BaseRequest, ChildBase>(req =>
+                {
+                    if (req.Message == "Child1")
+                    {
+                        return new ChildResponse1 { Message = req.Message };
+                    }
+                    else
+                    {
+                        return new ChildResponse2 { Message = req.Message };
+                    }
+                });
+
+                config.OnReply<StaticRequest, StaticResponse>((req, res) =>
+                {
+
+                    Assert.AreEqual("Hello", req.Message);
+                    Assert.AreEqual(req.Message, res.Message);
+                    mre.Set();
+
+                });
+
+                config.ReplyTo<Request1, Response2>(req => new Response2 { Message = "RESPONSE 2 " + req.Message });
+                config.ReplyTo<Request1, Response1>(req => new Response1 { Message = "RESPONSE 1 " + req.Message });
+                config.ReplyTo<Request1, Response3>(req => new Response3 { Message = "RESPONSE 3 " + req.Message });
+
+                config.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
+                {
+                    res1res2in = true;
+                    mre1.Set();
+                });
+
+                config.OnReply<Request1, Response1, Response2, Response3>((request, response1, response2, response3) =>
+                {
+                    res1res2res3in = true;
+                    mre2.Set();
+                });
+
+                config.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
+                {
+                    res1res2in = true;
+                    mre1.Set();
+                });
+
+                config.OnReply<Request1, Response1, Response2, Response3>((request, response1, response2, response3) =>
+                {
+                    res1res2res3in = true;
+                    mre2.Set();
+                });
+
+                config.OnReply<BaseRequest, ChildBase, ChildResponse2>((req, cb, cr2) =>
+                {
+                    Assert.Fail("Got unexpected reply");
+                });
+
+                config.OnRawMessage((o) =>
+                {
+                    MessageBase b = o as MessageBase;
+                    Synchronous s = o as Synchronous;
+                    if (s != null && b != null)
+                    {
+                        if (String.IsNullOrEmpty(b.Originator) == false)
+                        {
+                            gotOriginator.Set();
+                        }
+                        if (String.IsNullOrEmpty(s.Responder) == false)
+                        {
+                            gotResponder.Set();
+                        }
+                    }
+
+
+                });
+
+            });
          
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
-            {
-                Message = req.Message
-            });
-
-            bus.ReplyTo<StaticRequest, StaticResponse>(req => new StaticResponse
-            {
-                Message = req.Message
-            });
-
-            bus.ReplyTo<BaseRequest, ChildBase>(req =>
-            {
-                if (req.Message == "Child1")
-                {
-                    return new ChildResponse1 { Message = req.Message };
-                }
-                else
-                {
-                    return new ChildResponse2 { Message = req.Message };
-                }
-            });
+            
         }
 
 
@@ -63,39 +128,27 @@ namespace Succubus.Bus.Tests
             BusDiagnose.CheckDiagnose(bus);
         }
 
-
+        ManualResetEvent gotOriginator = new ManualResetEvent(false);
+        ManualResetEvent gotResponder = new ManualResetEvent(false);
 
         [Test]
         public async void CheckSynchronousOriginatorAndResponder()
         {
-            IBus rawbus = Configuration.Factory.CreateBusWithHosting(true);
+            gotOriginator.Reset();
+            gotResponder.Reset();
+
+            IBus rawbus = Configuration.Factory.CreateBusWithHosting(config => {
+                config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse() { Message = req.Message });
+            }, true);
 
             Thread.Sleep(1000);
 
-            rawbus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse() { Message = req.Message });
+           
 
-            ManualResetEvent gotOriginator = new ManualResetEvent(false);
-            ManualResetEvent gotResponder = new ManualResetEvent(false);
-
-
-            rawbus.OnRawMessage((o) =>
-            {
-                MessageBase b = o as MessageBase;
-                Synchronous s = o as Synchronous;
-                if (s != null && b != null)
-                {
-                    if (String.IsNullOrEmpty(b.Originator) == false)
-                    {                      
-                        gotOriginator.Set();
-                    }
-                    if (String.IsNullOrEmpty(s.Responder) == false)
-                    {                     
-                        gotResponder.Set();
-                    }
-                }
+       
 
 
-            });
+       
 
             var response = rawbus.Call<BasicRequest, BasicResponse>(new BasicRequest() { Message = "Wohey" });
 
@@ -113,19 +166,14 @@ namespace Succubus.Bus.Tests
             BusDiagnose.CheckDiagnose(rawbus);
         }
 
+        ManualResetEvent mre = new ManualResetEvent(false);
+
         [Test]
         public void SimpleReqResStaticRouteSynchronous()
         {
-            var mre = new ManualResetEvent(false);
+            
 
-            bus.OnReply<StaticRequest, StaticResponse>((req, res) =>
-            {
-
-                Assert.AreEqual("Hello", req.Message);
-                Assert.AreEqual(req.Message, res.Message);
-                mre.Set();
-
-            });
+        
             bus.Call(new StaticRequest { Message = "Hello" });
             if (mre.WaitOne(500) == false)
             {
@@ -134,39 +182,22 @@ namespace Succubus.Bus.Tests
             BusDiagnose.CheckDiagnose(bus);
         }
 
-        void OrchestrationSetup1()
-        {
+        ManualResetEvent mre1 = new ManualResetEvent(false);
+        ManualResetEvent mre2 = new ManualResetEvent(false);
 
-            bus.ReplyTo<Request1, Response2>(req => new Response2 { Message = "RESPONSE 2 " + req.Message });
-            bus.ReplyTo<Request1, Response1>(req => new Response1 { Message = "RESPONSE 1 " + req.Message });
-        }
 
-        private void OrchestrationSetup2()
-        {
-            bus.ReplyTo<Request1, Response3>(req => new Response3 { Message = "RESPONSE 3 " + req.Message });
-        }
+        bool res1res2in = false;
+        bool res1res2res3in = false;
 
         [Test]
         public void ComplexOrchestration1()
         {
-            OrchestrationSetup1();
+            res1res2in = false;
+            res1res2res3in = false;
 
-            bool res1res2in = false;
-            bool res1res2res3in = false;
-            var mre1 = new ManualResetEvent(false);
-            var mre2 = new ManualResetEvent(false);
-
-            bus.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
-            {
-                res1res2in = true;
-                mre1.Set();
-            });
-
-            bus.OnReply<Request1, Response1, Response2, Response3>((request, response1, response2, response3) =>
-            {
-                res1res2res3in = true;
-                mre2.Set();
-            });
+            mre1.Reset();
+            mre2.Reset();
+      
 
             bus.Call(new Request1 { Message = "Hello!" }, timeout:500);
             
@@ -187,25 +218,12 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ComplexOrchestration2()
         {
-            OrchestrationSetup1();
-            OrchestrationSetup2();
-
-            bool res1res2in = false;
-            bool res1res2res3in = false;
-            var mre1 = new ManualResetEvent(false);
-            var mre2 = new ManualResetEvent(false);
-
-            bus.OnReply<Request1, Response1, Response2>((request, response1, response2) =>
-            {
-                res1res2in = true;
-                mre1.Set();
-            });
-
-            bus.OnReply<Request1, Response1, Response2, Response3>((request, response1, response2, response3) =>
-            {
-                res1res2res3in = true;
-                mre2.Set();
-            });
+            
+            res1res2in = false;
+            res1res2res3in = false;
+            mre1.Reset();
+            mre2.Reset();
+           
 
             bus.Call(new Request1 { Message = "Hello!" });
 
@@ -267,10 +285,7 @@ namespace Succubus.Bus.Tests
         [Test]
         public void ChildMessages4_BaseClassOrchestrationTimeout()
         {           
-            bus.OnReply<BaseRequest, ChildBase, ChildResponse2>((req, cb, cr2) =>
-            {
-                Assert.Fail("Got unexpected reply");
-            });
+          
 
             bus.Call(new BaseRequest { Message = "Child1" }, (req) =>
             {

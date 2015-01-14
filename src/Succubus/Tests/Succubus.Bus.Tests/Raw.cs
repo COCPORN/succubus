@@ -16,27 +16,32 @@ namespace Succubus.Bus.Tests
         [SetUp]
         public void Init()
         {
-            bus = Configuration.Factory.CreateBusWithHosting(true);
+            bus = Configuration.Factory.CreateBusWithHosting(config => {
+                config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+                {
+                    Message = req.Message
+                });
 
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
-            {
-                Message = req.Message
-            });
+                config.OnRawMessage(o =>
+                {
+                    Assert.IsTrue(o is MessageBase);
+                    Assert.IsTrue(o is Core.MessageFrames.Event);
+                    success = true;
+                    mre.Set();
+                });
+            }, true);
+
+            
         }
 
-
+        bool success = false;
+        ManualResetEvent mre = new ManualResetEvent(false);
+        
         [Test]
         public void Test()
         {
-            bool success = false;
-            ManualResetEvent mre = new ManualResetEvent(false);
-            bus.OnRawMessage(o =>
-            {
-                Assert.IsTrue(o is MessageBase);       
-                Assert.IsTrue(o is Core.MessageFrames.Event);                
-                success = true;
-                mre.Set();
-            });
+            success = false;
+            mre.Reset();
 
             bus.Publish(new BasicEvent() { Message = "Wohey" });
             if (mre.WaitOne(1000) == false)

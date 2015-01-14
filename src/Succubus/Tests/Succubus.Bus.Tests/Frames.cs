@@ -15,34 +15,33 @@ namespace Succubus.Bus.Tests
         [SetUp]
         public void Init()
         {
-            bus = Configuration.Factory.CreateBusWithHosting();
-#if ZEROMQ_BACKEND
-            bus.Initialize(succubus => succubus.WithZeroMQ(config => config.StartMessageHost()));
-            Thread.Sleep(2500);
-#else
-            bus.Initialize(succubus => succubus.WithLoopback(clear: true, loopbackConfigurator: config => config.ReportRaw = true));
-#endif
-
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+            bus = Configuration.Factory.CreateBusWithHosting(config =>
             {
-                Message = req.Message
-            });
+                config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+                {
+                    Message = req.Message
+                });
+
+                config.On<IMessageFrame>(o =>
+                {
+                    Assert.IsTrue(o is Core.MessageFrames.Event);
+                    Assert.IsTrue((o as Core.MessageFrames.Event).Message is BasicEvent);
+                    success = true;
+                    mre.Set();
+                });                
+            }, true);           
         }
 
+        bool success = false;
+
+        ManualResetEvent mre = new ManualResetEvent(false);
 
         [Test]
         public void Test()
         {
-            bool success = false;
-            ManualResetEvent mre = new ManualResetEvent(false);
-            bus.On<IMessageFrame>(o =>
-            {
-                Assert.IsTrue(o is Core.MessageFrames.Event);
-                Assert.IsTrue((o as Core.MessageFrames.Event).Message is BasicEvent);
-                success = true;
-                mre.Set();
-            });
-
+            mre.Reset();
+            success = false;
+          
             bus.Publish(new BasicEvent() { Message = "Wohey"});
             if (mre.WaitOne(1000) == false)
             {

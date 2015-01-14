@@ -17,18 +17,20 @@ namespace Succubus.Bus.Tests
         [SetUp]
         public void Init()
         {
-            bus = Configuration.Factory.CreateBusWithHosting();
+            bus = Configuration.Factory.CreateBusWithHosting(config =>
+            {
+                config.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
+                {
+                    Message = req.Message
+                });
+
+                config.ReplyTo<ErrorRequest, BasicResponse>(req =>
+                {
+                    throw new Exception("Yeah, see, that doesn't really work");
+                });
+            });
             
 
-            bus.ReplyTo<BasicRequest, BasicResponse>(req => new BasicResponse
-            {
-                Message = req.Message
-            });
-
-            bus.ReplyTo<ErrorRequest, BasicResponse>(req =>
-            {
-                throw new Exception("Yeah, see, that doesn't really work");
-            });
 
             bus.HandlerException += (sender, args) =>
             {
