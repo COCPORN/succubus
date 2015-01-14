@@ -52,20 +52,20 @@ namespace Succubus.Backend.ZeroMQ
 
         public void Subscribe(string address)
         {
-            subscribeSocket.Subscribe(Encoding.ASCII.GetBytes(address));            
+            subscribeSocket.Subscribe(Encoding.ASCII.GetBytes(address));
 
             // Make sure the reply channel is fully registered on the host before contiuing.
             // The reply channel is only setup once per bus instance, so this sleep will only incur
             // once
-            if (address.StartsWith("__REPLY")) Thread.Sleep(100); 
-            
+            if (address.StartsWith("__REPLY")) Thread.Sleep(100);
+
         }
 
         ManualResetEvent subscriberOnline = new ManualResetEvent(false);
 
         public ManualResetEvent SubscriberOnline
         {
-            get { return subscriberOnline; }            
+            get { return subscriberOnline; }
         }
 
         bool run = true;
@@ -129,36 +129,49 @@ namespace Succubus.Backend.ZeroMQ
                             Bridge.RawData(serialized);
                         }
 
-                        object coreMessage = JsonFrame.Deserialize(serialized, coreType);
-                        
-                        if (coreMessage == null)
+                        object coreMessage = null;
+
+                        try
+                        {
+                            coreMessage = JsonFrame.Deserialize(serialized, coreType);
+                            if (coreMessage == null)
+                            {
+                                Bridge.UnableToCreateMessage(
+                                    new Exception(
+                                        String.Format(
+                                            "Unable to create message from: Address: {0} Typename: {1} Serialized: {2}",
+                                            address, typename, serialized)));
+                            }
+
+                            var synchronousFrame = coreMessage as Core.MessageFrames.Synchronous;
+                            var eventFrame = coreMessage as Core.MessageFrames.Event;
+                            if (synchronousFrame != null)
+                            {
+                                Bridge.ProcessSynchronousMessages(synchronousFrame, address);
+                                Bridge.ProcessCatchAllEvents(synchronousFrame, address);
+                                if (ReportRaw)
+                                {
+                                    Bridge.RawMessage(synchronousFrame);
+                                }
+                            }
+                            else if (eventFrame != null)
+                            {
+                                Bridge.ProcessEvents(eventFrame, address);
+                                if (ReportRaw)
+                                {
+                                    Bridge.RawMessage(eventFrame);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
                         {
                             Bridge.UnableToCreateMessage(
-                                new Exception(
-                                    String.Format(
-                                        "Unable to create message from: Address: {0} Typename: {1} Serialized: {2}",
-                                        address, typename, serialized)));
+                            new Exception(
+                                String.Format(
+                                    "Unable to create message from: Address: {0} Typename: {1} Serialized: {2}",
+                                    address, typename, serialized), ex));
                         }
 
-                        var synchronousFrame = coreMessage as Core.MessageFrames.Synchronous;
-                        var eventFrame = coreMessage as Core.MessageFrames.Event;
-                        if (synchronousFrame != null)
-                        {                            
-                            Bridge.ProcessSynchronousMessages(synchronousFrame, address);
-                            Bridge.ProcessCatchAllEvents(synchronousFrame, address);
-                            if (ReportRaw)
-                            {
-                                Bridge.RawMessage(synchronousFrame);
-                            }
-                        }
-                        else if (eventFrame != null)
-                        {
-                            Bridge.ProcessEvents(eventFrame, address);
-                            if (ReportRaw)
-                            {
-                                Bridge.RawMessage(eventFrame);
-                            }
-                        }
 
                     }
                 }
@@ -197,13 +210,13 @@ namespace Succubus.Backend.ZeroMQ
         public void BusPublish(object message, string address, Action<Action> marshal)
         {
             if (marshal == null) BusPublish(message, address);
-            else marshal(() => BusPublish(message, address));          
+            else marshal(() => BusPublish(message, address));
         }
 
 
         public void QueuePublish(object message, string address, Action<Action> marshal)
         {
-            
+
         }
 
 
