@@ -17,50 +17,61 @@ namespace Succubus.Backend.Loopback
 
         public void BusPublish(object message, string address)
         {
-   
+
+            List<Transport> t_transports = new List<Transport>();
             lock (transports)
             {
                 foreach (var transport in transports)
                 {
-                   
+                    t_transports.Add(transport);
+                }
 
-                    bool receive = false;
-                    lock (transport.SubscriptionList)
+            }
+
+
+            foreach (var transport in t_transports)
+            {
+
+                bool receive = false;
+                lock (transport.SubscriptionList)
+                {
+                    foreach (var subAddress in transport.SubscriptionList)
                     {
-                        foreach (var subAddress in transport.SubscriptionList)
-                        {
-                            if (address.StartsWith(subAddress)) receive = true;
-                        }
-                    }
-                    if (receive == false) continue;
-                    var synchronousFrame = message as Core.MessageFrames.Synchronous;
-                    var eventFrame = message as Core.MessageFrames.Event;
-                    if (synchronousFrame != null)
-                    {                    
-                        transport.Bridge.ProcessSynchronousMessages(synchronousFrame, address);
-                        transport.Bridge.ProcessCatchAllEvents(synchronousFrame, address);
-                        if (transport.ReportRaw)
-                        {
-                            transport.Bridge.RawMessage(synchronousFrame);
-                        }
-                    }
-                    else if (eventFrame != null)
-                    {
-                        transport.Bridge.ProcessEvents(eventFrame, address);
-                        if (transport.ReportRaw)
-                        {
-                            transport.Bridge.RawMessage(eventFrame);
-                        }
+                        if (address.StartsWith(subAddress)) receive = true;
                     }
                 }
+                if (receive == false) continue;
+
+                var synchronousFrame = message as Core.MessageFrames.Synchronous;
+                var eventFrame = message as Core.MessageFrames.Event;
+                if (synchronousFrame != null)
+                {
+                    transport.Bridge.ProcessSynchronousMessages(synchronousFrame, address);
+                    transport.Bridge.ProcessCatchAllEvents(synchronousFrame, address);
+                    if (transport.ReportRaw)
+                    {
+                        transport.Bridge.RawMessage(synchronousFrame);
+                    }
+                }
+                else if (eventFrame != null)
+                {
+                    transport.Bridge.ProcessEvents(eventFrame, address);
+                    if (transport.ReportRaw)
+                    {
+                        transport.Bridge.RawMessage(eventFrame);
+                    }
+                }
+
+
             }
+
 
         }
 
         public void BusPublish(object message, string address, Action<Action> marshal)
         {
             if (marshal == null) BusPublish(message, address);
-            else marshal(() => BusPublish(message, address));           
+            else marshal(() => BusPublish(message, address));
         }
 
         public void Subscribe(string address)
