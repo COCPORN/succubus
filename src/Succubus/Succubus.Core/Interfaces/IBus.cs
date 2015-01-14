@@ -39,28 +39,6 @@ namespace Succubus.Core.Interfaces
 
         #endregion
 
-#if false
-        #region Deferrence
-        
-        void Defer<TReq, T>();
-        void Defer<TReq, T1, T2>();
-        void Defer<TReq, T1, T2, T3>();
-        void Defer<TReq, T1, T2, T3, T4>();
-        void Defer<TReq, T1, T2, T3, T4, T5>();
-        void Defer<TReq, T1, T2, T3, T4, T5, T6>();
-        void Defer<TReq, T1, T2, T3, T4, T5, T6, T7>();
-
-        void Pickup<TReq, T>(string correlationId, Action<TReq, T> handler) where TReq : class;
-        void Pickup<TReq, T1, T2>(string correlationId, Action<TReq, T1, T2> handler) where TReq : class;
-        void Pickup<TReq, T1, T2, T3>(string correlationId, Action<TReq, T1, T2, T3> handler) where TReq : class;
-        void Pickup<TReq, T1, T2, T3, T4>(string correlationId, Action<TReq, T1, T2, T3, T4> handler) where TReq : class;
-        void Pickup<TReq, T1, T2, T3, T4, T5>(string correlationId, Action<TReq, T1, T2, T3, T4, T5> handler) where TReq : class;
-        void Pickup<TReq, T1, T2, T3, T4, T5, T6>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6> handler) where TReq : class;
-        void Pickup<TReq, T1, T2, T3, T4, T5, T6, T7>(string correlationId, Action<TReq, T1, T2, T3, T4, T5, T6, T7> handler) where TReq : class;
-
-        #endregion
-#endif
-
         #region Publish/subscribe
 
         // Post an event on the bus
@@ -69,6 +47,13 @@ namespace Succubus.Core.Interfaces
         // Act on events
         void On<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
         
+        #endregion
+
+        #region Queue
+
+        void Enqueue<T>(T request, string address = null, Action<Action> marshal = null);        
+        void Dequeue<T>(Action<T> handler, string address = null, Action<Action> marshal = null);
+
         #endregion
 
         #region Error handling
