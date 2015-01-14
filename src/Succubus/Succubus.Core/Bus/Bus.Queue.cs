@@ -7,7 +7,7 @@ namespace Succubus.Core
     public partial class Bus
     {
 
-        public void Queue<T>(T request, string address = null, Action<Action> marshal = null)
+        public void Enqueue<T>(T request, string address = null, Action<Action> marshal = null)
         {
             Action execute = () => Transport.QueuePublish(FrameWorkItem(request), address ?? "__QUEUE");
 
