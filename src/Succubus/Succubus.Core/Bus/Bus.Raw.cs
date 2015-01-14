@@ -5,6 +5,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using Succubus.Core.Interfaces;
+using System.Threading;
 
 namespace Succubus.Core
 {
@@ -47,7 +48,7 @@ namespace Succubus.Core
                 {
                     if (handler.Marshal == null)
                     {
-                        Task.Factory.StartNew(() =>
+                        new Thread(new ThreadStart(delegate()
                         {
                             try
                             {
@@ -65,7 +66,7 @@ namespace Succubus.Core
                             {
                                 RaiseExceptionEvent(ex);
                             }
-                        });                        
+                        })).Start();                      
                     }
                     else
                     {
@@ -90,7 +91,7 @@ namespace Succubus.Core
                 {
                     if (handler.Marshal == null)
                     {
-                        Task.Factory.StartNew(() =>
+                        new Thread(new ThreadStart(async delegate()
                         {
                             try
                             {
@@ -108,7 +109,7 @@ namespace Succubus.Core
                             {
                                 RaiseExceptionEvent(ex);
                             }
-                        });
+                        })).Start();
                         
                     }
                     else

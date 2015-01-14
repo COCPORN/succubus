@@ -64,7 +64,7 @@ namespace Succubus
             ResolvedResetEvent = new ManualResetEvent(false);
         }
 
-        private bool timedOut = false;
+        private volatile bool timedOut = false;
 
         public bool TimedOut
         {
@@ -92,7 +92,7 @@ namespace Succubus
         }
 
         public int TimeoutMilliseconds { get; set; }
-
+        
         public bool ResolveFor(object message)
         {
             if (TimedOut == true) return false;

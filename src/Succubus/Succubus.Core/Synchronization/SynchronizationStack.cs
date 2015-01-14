@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Succubus
@@ -55,7 +56,7 @@ namespace Succubus
                 {
                  
                     SynchronizationFrame localFrame = frame;
-                    Task.Factory.StartNew(() =>
+                    new Thread(new ThreadStart(delegate()
                     {
                         switch (ctx.ContextType)
                         {
@@ -69,8 +70,8 @@ namespace Succubus
                                 localFrame.CallDeferredHandler(ctx.castMessages);
                                 break;
                         }
-                    
-                    });
+
+                    })).Start();
                     frame.Resolved = true;
                 }
                 else

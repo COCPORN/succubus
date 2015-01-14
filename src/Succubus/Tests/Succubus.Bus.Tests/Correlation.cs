@@ -14,7 +14,7 @@ namespace Succubus.Bus.Tests
     public class Correlation
     {
         IBus overlapbus;
-      
+
         [SetUp]
         public void Init()
         {
@@ -32,7 +32,7 @@ namespace Succubus.Bus.Tests
 
         [Test]
         public async void CorrelationOverlap()
-        {            
+        {
             object lockObject = new object();
             int matchCount = 0;
             List<Task> tasks = new List<Task>();
@@ -48,10 +48,10 @@ namespace Succubus.Bus.Tests
                         var treply2 =
                             overlapbus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = guid1 });
                         var treply =
-                            overlapbus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = guid2 }, timeout:20000);
+                            overlapbus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = guid2 }, timeout: 20000);
                         Assert.AreEqual(guid2, treply.Message);
                         Assert.AreEqual(guid1, (await treply2).Message);
-                        lock (lockObject)
+                        // lock (lockObject)
                         {
                             matchCount++;
                         }
@@ -70,19 +70,23 @@ namespace Succubus.Bus.Tests
         [Test]
         public async void ThreadedRun()
         {
-              object lockObject = new object();
+            object lockObject = new object();
             int matchCount = 0;
             List<Task> tasks = new List<Task>();
-            for (int i = 0; i < 10; i++)
+
+            int numThreads = 30;
+            int numRequests = 20;
+
+            for (int i = 0; i < numThreads; i++)
             {
-                tasks.Add(Task.Run(async () =>
+                new Thread(new ThreadStart(async delegate()
                 {
-                    for (int j = 0; j < 20; j++)
+                    for (int j = 0; j < numRequests; j++)
                     {
                         var treply2 =
-                            overlapbus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Hello" });
+                            overlapbus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Hello" }, timeout: 20000);
                         var treply =
-                            overlapbus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" }, timeout:20000);
+                            overlapbus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" }, timeout: 20000);
                         Assert.AreEqual("Howdy", treply.Message);
                         Assert.AreEqual("Hello", (await treply2).Message);
                         lock (lockObject)
@@ -90,13 +94,30 @@ namespace Succubus.Bus.Tests
                             matchCount++;
                         }
                     }
-                }));
+                })).Start();
+
+                //tasks.Add(Task.Run(async () =>
+                //{
+                //    for (int j = 0; j < numRequests; j++)
+                //    {
+                //        var treply2 =
+                //            overlapbus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Hello" }, timeout: 20000);
+                //        var treply =
+                //            overlapbus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" }, timeout: 20000);
+                //        Assert.AreEqual("Howdy", treply.Message);
+                //        Assert.AreEqual("Hello", (await treply2).Message);
+                //        lock (lockObject)
+                //        {
+                //            matchCount++;
+                //        }
+                //    }
+                //}));
             }
 
-            await Task.WhenAll(tasks);
+            Thread.Sleep(3000);
             BusDiagnose.CheckDiagnose(overlapbus);
 
-            Assert.AreEqual(200, matchCount);
+            Assert.AreEqual(numThreads * numRequests, matchCount);
             return;
 #if false
 

@@ -62,6 +62,7 @@ namespace Succubus.Core
                 }
                 catch
                 {
+                    ;
                 }
             }
 
@@ -88,7 +89,7 @@ namespace Succubus.Core
                     {
                         try
                         {
-                            Task.Factory.StartNew(() =>
+                            new Thread(new ThreadStart(delegate()
                             {
                                 try
                                 {
@@ -112,7 +113,7 @@ namespace Succubus.Core
                                 {
                                     RaiseExceptionEvent(ex);
                                 }
-                            });
+                            })).Start();
                         }
                         catch (Exception ex)
                         {

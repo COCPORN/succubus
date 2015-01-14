@@ -30,6 +30,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.Caliburn.M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.AzureServiceBus", "Succubus.Backend.AzureServiceBus\Succubus.Backend.AzureServiceBus.csproj", "{DCE02A2B-4106-421A-997E-359618312BC3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27EAE3AA-99F1-489D-9553-260E2E79CF89}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+		Performance2.psess = Performance2.psess
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,5 +85,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FE3AEB80-CF59-4C05-8E99-3EFC39E7C928} = {B04A49CA-1098-4C2A-98DF-A1CA29B2C93F}
 		{42C12367-216B-455F-82E3-FAB7AF5E429E} = {B04A49CA-1098-4C2A-98DF-A1CA29B2C93F}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

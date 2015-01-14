@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Succubus.Core.Interfaces;
+using System.Threading;
 
 namespace Succubus.Core
 {
@@ -26,7 +27,7 @@ namespace Succubus.Core
                 {
                     if (handler.Marshal == null)
                     {
-                        Task.Factory.StartNew(() =>
+                        new Thread(new ThreadStart(delegate()
                         {
                             try
                             {
@@ -44,7 +45,7 @@ namespace Succubus.Core
                             {
                                 RaiseExceptionEvent(ex);
                             }
-                        });
+                        })).Start();
                     }
                     else
                     {
