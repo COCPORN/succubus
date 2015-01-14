@@ -5,10 +5,6 @@ namespace Succubus.Core
 {
     public partial class Bus : IBusConfigurator
     {
-
         public ITransportBridge Bridge { get; set; }
-
-     
-
     }
 }

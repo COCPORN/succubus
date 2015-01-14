@@ -12,5 +12,9 @@ namespace Succubus.Core.Interfaces
         ISubscriptionManager SubscriptionManager { get; set; }
         ICorrelationIdProvider CorrelationIdProvider { get; set; }
         ITransportBridge Bridge { get; set; }
+
+        #region Handlers
+
+        #endregion
     }
 }

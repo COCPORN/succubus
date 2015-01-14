@@ -90,7 +90,7 @@ namespace Succubus.Hosting
                     {
                         Address = address,
                         Message = coreMessage,
-                        RawJson = serialized                      
+                        RawJson = serialized
 
                     });
                 }
