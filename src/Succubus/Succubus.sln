@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Core", "Succubus.Core\Succubus.Core.csproj", "{F7EFB776-3BF5-41F6-9ED2-0F92E38DA4AC}"
 EndProject
@@ -27,6 +27,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.Loopback", "Succubus.Backend.Loopback\Succubus.Backend.Loopback.csproj", "{39472ED0-BB38-4865-81C9-9F55423FCA60}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.Caliburn.Micro.EventAggregator", "Succubus.Backend.Caliburn.Micro.EventAggregator\Succubus.Backend.Caliburn.Micro.EventAggregator.csproj", "{961406ED-7628-4FF7-8E4F-E4F7DED8D392}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Succubus.Backend.AzureServiceBus", "Succubus.Backend.AzureServiceBus\Succubus.Backend.AzureServiceBus.csproj", "{DCE02A2B-4106-421A-997E-359618312BC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,10 @@ Global
 		{961406ED-7628-4FF7-8E4F-E4F7DED8D392}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{961406ED-7628-4FF7-8E4F-E4F7DED8D392}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{961406ED-7628-4FF7-8E4F-E4F7DED8D392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCE02A2B-4106-421A-997E-359618312BC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCE02A2B-4106-421A-997E-359618312BC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCE02A2B-4106-421A-997E-359618312BC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCE02A2B-4106-421A-997E-359618312BC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
