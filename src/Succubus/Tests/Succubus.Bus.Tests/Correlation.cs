@@ -73,12 +73,13 @@ namespace Succubus.Bus.Tests
         [Test]
         public async void ThreadedRun()
         {
+            Thread.Sleep(2000);
             object lockObject = new object();
             int matchCount = 0;
             List<Task> tasks = new List<Task>();
 
-            int numThreads = 30;
-            int numRequests = 20;
+            int numThreads = 100;
+            int numRequests = 60;
 
             for (int i = 0; i < numThreads; i++)
             {
@@ -99,25 +100,10 @@ namespace Succubus.Bus.Tests
                     }
                 })).Start();
 
-                //tasks.Add(Task.Run(async () =>
-                //{
-                //    for (int j = 0; j < numRequests; j++)
-                //    {
-                //        var treply2 =
-                //            overlapbus.CallAsync<BasicRequest, BasicResponse>(new BasicRequest { Message = "Hello" }, timeout: 20000);
-                //        var treply =
-                //            overlapbus.Call<BasicRequest, BasicResponse>(new BasicRequest { Message = "Howdy" }, timeout: 20000);
-                //        Assert.AreEqual("Howdy", treply.Message);
-                //        Assert.AreEqual("Hello", (await treply2).Message);
-                //        lock (lockObject)
-                //        {
-                //            matchCount++;
-                //        }
-                //    }
-                //}));
+     
             }
 
-            Thread.Sleep(3000);
+            Thread.Sleep(4000);
             BusDiagnose.CheckDiagnose(overlapbus);
 
             Assert.AreEqual(numThreads * numRequests, matchCount);

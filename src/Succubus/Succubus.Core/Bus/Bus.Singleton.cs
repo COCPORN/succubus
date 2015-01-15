@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Succubus.Core.Interfaces;
+using System;
 
 namespace Succubus.Core
 {
@@ -7,7 +8,7 @@ namespace Succubus.Core
         private static volatile Bus instance;
         private static object syncRoot = new Object();
 
-        public static Bus Instance
+        public static IBus Instance
         {
             get
             {
