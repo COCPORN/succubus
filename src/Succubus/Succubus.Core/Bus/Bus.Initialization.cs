@@ -50,6 +50,19 @@ namespace Succubus.Core
         #endregion
 
 
+        #region Disposing
+
+        public void Dispose()
+        {
+            var disposable = Transport as IDisposable;
+            if (disposable != null)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        #endregion
+
 
     }
 

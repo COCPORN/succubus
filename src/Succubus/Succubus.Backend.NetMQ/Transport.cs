@@ -11,7 +11,7 @@ using NetMQ;
 
 namespace Succubus.Backend.NetMQ
 {
-    public class Transport : ITransport, INetMQConfigurator, ISubscriptionManager, ICorrelationIdProvider
+    public class Transport : ITransport, INetMQConfigurator, ISubscriptionManager, ICorrelationIdProvider, IDisposable
     {
         public void SetupSubscriber(string address)
         {
@@ -247,6 +247,13 @@ namespace Succubus.Backend.NetMQ
         public string CreateCorrelationId(object o)
         {
             return Guid.NewGuid().ToString();
+        }
+
+        public void Dispose()
+        {
+            publishSocket.Dispose();
+            subscribeSocket.Dispose();
+            context.Dispose();
         }
     }
 }

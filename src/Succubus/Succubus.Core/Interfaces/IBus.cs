@@ -4,7 +4,7 @@ using Succubus.Core.Diagnostics;
 
 namespace Succubus.Core.Interfaces
 {
-    public interface IBus
+    public interface IBus : IDisposable
     {
         #region Initialization
         void Initialize(Action<IBusConfigurator> initializationHandler);

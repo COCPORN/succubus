@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Succubus.io")]
 [assembly: AssemblyProduct("Succubus")]
-[assembly: AssemblyCopyright("Copyright © Succubus.io 2014")]
+[assembly: AssemblyCopyright("Copyright © Succubus.io 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyInformationalVersion("0.1.19-pre")]
