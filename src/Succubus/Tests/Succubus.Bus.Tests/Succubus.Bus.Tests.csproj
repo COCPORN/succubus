@@ -69,6 +69,7 @@
     <Compile Include="Messages\Routing.cs" />
     <Compile Include="Messages\StaticRequest.cs" />
     <Compile Include="Messages\StaticResponse.cs" />
+    <Compile Include="NetMQFactory.cs" />
     <Compile Include="PredeterminedCorrelationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Frames.cs" />
@@ -82,6 +83,10 @@
     <ProjectReference Include="..\..\Succubus.Backend.Loopback\Succubus.Backend.Loopback.csproj">
       <Project>{39472ed0-bb38-4865-81c9-9f55423fca60}</Project>
       <Name>Succubus.Backend.Loopback</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Succubus.Backend.NetMQ\Succubus.Backend.NetMQ.csproj">
+      <Project>{59bd59bb-c3fb-41e8-97bd-cbbd8101278a}</Project>
+      <Name>Succubus.Backend.NetMQ</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Succubus.Backend.ZeroMQ\Succubus.Backend.ZeroMQ.csproj">
       <Project>{ab82e968-7a81-40ad-b7a1-82692a74c80d}</Project>

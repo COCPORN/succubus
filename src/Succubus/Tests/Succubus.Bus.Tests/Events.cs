@@ -56,6 +56,14 @@ namespace Succubus.Bus.Tests
                 });
             }, true);
             bus2 = Configuration.Factory.CreateBus(config => {
+                config.On<BasicEvent>(ev =>
+                {
+                    if (ev.Message == "Wohey")
+                    {
+                        secondBasicCounter++;
+                        mre.Set();
+                    }
+                });
                 config.OnRawMessage((o) =>
                 {
                     Console.WriteLine(o.ToString());
@@ -74,8 +82,10 @@ namespace Succubus.Bus.Tests
         }
 
         int basicCounter = 0;
+        int secondBasicCounter = 0;
         int objectCounter = 0;
         ManualResetEvent mre = new ManualResetEvent(false);
+        ManualResetEvent mreBusTwo = new ManualResetEvent(false);
          
 
         [Test]
@@ -92,6 +102,31 @@ namespace Succubus.Bus.Tests
                 Assert.AreEqual(1, basicCounter);
 
             BusDiagnose.CheckDiagnose(bus);
+        }
+
+
+        [Test]
+        public void SimpleEventTwoBusses()
+        {
+            mre.Reset();
+            basicCounter = 0;
+            bus.Publish(new BasicEvent() { Message = "Wohey" });
+            if (mre.WaitOne(500) == false)
+            {
+                if (mreBusTwo.WaitOne(500))
+                {
+                    Assert.Fail("Timeout waiting for event");
+                }
+            }
+            else
+            {
+                Assert.AreEqual(1, basicCounter);
+                Assert.AreEqual(1, secondBasicCounter);
+            }
+            
+
+            BusDiagnose.CheckDiagnose(bus);
+            BusDiagnose.CheckDiagnose(bus2);
         }
 
         string machineName = String.Empty;
