@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Backends\Loopback\ILoopbackConfigurator.cs" />
+    <Compile Include="Backends\Loopback\Transport.cs" />
+    <Compile Include="Backends\Loopback\TransportSetup.cs" />
     <Compile Include="Bus\Bus.Configurator.cs" />
     <Compile Include="Bus\Bus.Core.cs" />
     <Compile Include="Bus\Bus.Diagnostics.cs" />
