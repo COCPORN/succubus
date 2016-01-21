@@ -16,7 +16,8 @@ namespace Succubus.Backend.AzureServiceBus
         public static void WithAzureServiceBus(this IBusConfigurator configurator, Action<IAzureServiceBusConfigurator> initializationHandler)
         {
             var transport = new Transport();
-            initializationHandler(transport);            
+            initializationHandler(transport);
+            transport.Initialize();        
         }
     }
 }

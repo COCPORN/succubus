@@ -1,4 +1,7 @@
-﻿using Succubus.Core.Interfaces;
+﻿using Microsoft.ServiceBus;
+using Microsoft.ServiceBus.Messaging;
+using Microsoft.WindowsAzure;
+using Succubus.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,29 +14,37 @@ namespace Succubus.Backend.AzureServiceBus
     {
         public string ConnectionString
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get; set;
         }
 
-        public IAzureServiceBusTopicConfigurator WithTopic(string topicName)
-        {
-            throw new NotImplementedException();
-        }
+        NamespaceManager namespaceManager;
+        MessagingFactory messagingFactory;
+        
 
-        public IAzureServiceBusQueueConfigurator WithQueue(string queueName)
+        public void Initialize()
         {
-            throw new NotImplementedException();
+            string connectionString =
+                CloudConfigurationManager.GetSetting(ConnectionString);
+
+            namespaceManager =
+                NamespaceManager.CreateFromConnectionString(connectionString);
+
+            messagingFactory = MessagingFactory.CreateFromConnectionString(ConnectionString); 
         }
 
         public void BusPublish(object message, string address, Action<Action> marshal = null)
         {
-            throw new NotImplementedException();
+            if (marshal == null) BusPublish(message, address);
+            else marshal(() => BusPublish(message, address));
+        }
+
+        public void BusPublish(object message, string address)
+        {
+            var destination = String.IsNullOrEmpty(address) ? message.GetType().Name : address;
+            var client = messagingFactory.CreateTopicClient(destination);
+            var bmessage = new BrokeredMessage(message);
+            bmessage.Properties.Add("Type", message.GetType().ToString());
+            client.Send(bmessage);
         }
 
         public void QueuePublish(object message, string address, Action<Action> marshal = null)
@@ -43,17 +54,40 @@ namespace Succubus.Backend.AzureServiceBus
 
         public string CreateCorrelationId(object o)
         {
-            throw new NotImplementedException();
+            var message = o as BrokeredMessage;
+            if (message != null)
+            {
+                return message.MessageId;
+            }
+            throw new InvalidOperationException("Unable to create correlation ID");
         }
+
+        Dictionary<string, Subscriber> subscribers = new Dictionary<string, Subscriber>();
 
         public void Subscribe(string address)
         {
-            throw new NotImplementedException();
+            lock (subscribers)
+            {
+                if (subscribers.ContainsKey(address)) return;                
+            }
+            if (!namespaceManager.TopicExists(address))
+            {
+                namespaceManager.CreateTopic(address);
+            }
+            if (!namespaceManager.SubscriptionExists(address, "AllMessages"))
+            {
+                namespaceManager.CreateSubscription(address, "AllMessages");
+            }
+            lock (subscribers)
+            {
+                var client = SubscriptionClient.Create(address, "AllMessages");
+                subscribers.Add(address, new Subscriber(client, this));
+            }
         }
 
         public void SubscribeAll()
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException();
         }
     }
 }

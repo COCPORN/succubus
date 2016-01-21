@@ -92,7 +92,7 @@ namespace Succubus.Core
 
         }
 
-        public void ProcessEvents(MessageFrames.Event eventFrame, string address)
+        public async void ProcessEvents(MessageFrames.Event eventFrame, string address)
         {
             FrameMessage(eventFrame);
 

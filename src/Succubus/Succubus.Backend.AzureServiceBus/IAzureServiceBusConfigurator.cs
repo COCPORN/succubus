@@ -14,17 +14,5 @@ namespace Succubus.Backend.AzureServiceBus
 
         #endregion
 
-        #region Topic creation
-
-        IAzureServiceBusTopicConfigurator WithTopic(string topicName);
-
-        #endregion
-
-        #region Queue creation
-
-        IAzureServiceBusQueueConfigurator WithQueue(string queueName);
-            
-        #endregion
-
     }
 }

@@ -91,7 +91,7 @@ namespace Succubus.Core
                 {
                     if (handler.Marshal == null)
                     {
-                        new Thread(new ThreadStart(async delegate()
+                        new Thread(new ThreadStart(delegate()
                         {
                             try
                             {
