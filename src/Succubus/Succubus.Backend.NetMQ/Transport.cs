@@ -128,6 +128,7 @@ namespace Succubus.Backend.NetMQ
                         {
                             HandleSocketCommunication();
                         }
+                        publisherAddressChanged = false;
                     }
                 }
             }
