@@ -11,7 +11,12 @@ using NetMQ;
 
 namespace Succubus.Backend.NetMQ
 {
-    public class Transport : ITransport, INetMQConfigurator, ISubscriptionManager, ICorrelationIdProvider, IDisposable
+    public class Transport : ITransport,
+        INetMQConfigurator,
+        IPostConfigurator,
+        ISubscriptionManager,
+        ICorrelationIdProvider,
+        IDisposable
     {
         public void SetupSubscriber(string address)
         {
@@ -113,66 +118,16 @@ namespace Succubus.Backend.NetMQ
         {
             try
             {
-                using (subscribeSocket = context.CreateSubscriberSocket())
+                while (run)
                 {
-                    ConnectSubscriber();
-                    subscriberOnline.Set();
-                    while (run)
+                    using (subscribeSocket = context.CreateSubscriberSocket())
                     {
-                        string address = subscribeSocket.ReceiveString(Encoding.ASCII);
-                        string typename = subscribeSocket.ReceiveString(Encoding.Unicode);
-                        string serialized = subscribeSocket.ReceiveString(Encoding.Unicode);
-                        Type coreType = Type.GetType(typename + ", Succubus.Core");
-
-                        if (reportRaw == true)
+                        ConnectSubscriber();
+                        subscriberOnline.Set();
+                        while (publisherAddressChanged == false)
                         {
-                            Bridge.RawData(serialized);
+                            HandleSocketCommunication();
                         }
-
-                        object coreMessage = null;
-
-                        try
-                        {
-                            coreMessage = JsonFrame.Deserialize(serialized, coreType);
-                            if (coreMessage == null)
-                            {
-                                Bridge.UnableToCreateMessage(
-                                    new Exception(
-                                        String.Format(
-                                            "Unable to create message from: Address: {0} Typename: {1} Serialized: {2}",
-                                            address, typename, serialized)));
-                            }
-
-                            var synchronousFrame = coreMessage as Core.MessageFrames.Synchronous;
-                            var eventFrame = coreMessage as Core.MessageFrames.Event;
-                            if (synchronousFrame != null)
-                            {
-                                Bridge.ProcessSynchronousMessages(synchronousFrame, address);
-                                Bridge.ProcessCatchAllEvents(synchronousFrame, address);
-                                if (ReportRaw)
-                                {
-                                    Bridge.RawMessage(synchronousFrame);
-                                }
-                            }
-                            else if (eventFrame != null)
-                            {
-                                Bridge.ProcessEvents(eventFrame, address);
-                                if (ReportRaw)
-                                {
-                                    Bridge.RawMessage(eventFrame);
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Bridge.UnableToCreateMessage(
-                            new Exception(
-                                String.Format(
-                                    "Unable to create message from: Address: {0} Typename: {1} Serialized: {2}",
-                                    address, typename, serialized), ex));
-                        }
-
-
                     }
                 }
             }
@@ -182,12 +137,91 @@ namespace Succubus.Backend.NetMQ
             }
         }
 
+        private void HandleSocketCommunication()
+        {
+            string address = subscribeSocket.ReceiveString(Encoding.ASCII);
+            string typename = subscribeSocket.ReceiveString(Encoding.Unicode);
+            string serialized = subscribeSocket.ReceiveString(Encoding.Unicode);
+            Type coreType = Type.GetType(typename + ", Succubus.Core");
+
+            if (reportRaw == true)
+            {
+                Bridge.RawData(serialized);
+            }
+
+            object coreMessage = null;
+
+            try
+            {
+                coreMessage = JsonFrame.Deserialize(serialized, coreType);
+                if (coreMessage == null)
+                {
+                    Bridge.UnableToCreateMessage(
+                        new Exception(
+                            String.Format(
+                                "Unable to create message from: Address: {0} Typename: {1} Serialized: {2}",
+                                address, typename, serialized)));
+                }
+
+                var synchronousFrame = coreMessage as Core.MessageFrames.Synchronous;
+                var eventFrame = coreMessage as Core.MessageFrames.Event;
+                if (synchronousFrame != null)
+                {
+                    Bridge.ProcessSynchronousMessages(synchronousFrame, address);
+                    Bridge.ProcessCatchAllEvents(synchronousFrame, address);
+                    if (ReportRaw)
+                    {
+                        Bridge.RawMessage(synchronousFrame);
+                    }
+                }
+                else if (eventFrame != null)
+                {
+                    Bridge.ProcessEvents(eventFrame, address);
+                    if (ReportRaw)
+                    {
+                        Bridge.RawMessage(eventFrame);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Bridge.UnableToCreateMessage(
+                new Exception(
+                    String.Format(
+                        "Unable to create message from: Address: {0} Typename: {1} Serialized: {2}",
+                        address, typename, serialized), ex));
+            }
+        }
 
         public string Network { get; set; }
 
         public string PublishAddress { get; set; }
 
-        public string SubscribeAddress { get; set; }
+        #region Reconnection
+
+        bool publisherAddressChanged = false;
+
+        #endregion
+
+        string subscribeAddress;
+        public string SubscribeAddress
+        {
+            get
+            {
+                return subscribeAddress;
+            }
+            set
+            {
+                if (subscribeAddress != value)
+                {
+                    subscribeAddress = value;
+                    if (subscribeAddress != default(string))
+                    {
+                        publisherAddressChanged = true;
+                    }
+                }
+            }
+        }
 
         public void GetFromConfigurationFile()
         {

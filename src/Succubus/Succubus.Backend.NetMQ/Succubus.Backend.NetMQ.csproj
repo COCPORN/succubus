@@ -59,9 +59,10 @@
   <ItemGroup>
     <Compile Include="Hosting\Configuration.cs" />
     <Compile Include="Hosting\MessageHost.cs" />
-    <Compile Include="INetMQConfigurator.cs" />
+    <Compile Include="Interfaces\INetMQConfigurator.cs" />
     <Compile Include="Interfaces\IHostConfigurator.cs" />
     <Compile Include="Interfaces\IMessageHost.cs" />
+    <Compile Include="Interfaces\IPostConfigurator.cs" />
     <Compile Include="Interfaces\ProcessedMessageEventArgs.cs" />
     <Compile Include="JsonFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

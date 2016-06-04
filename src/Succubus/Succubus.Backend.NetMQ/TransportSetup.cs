@@ -6,7 +6,7 @@ namespace Succubus.Backend.NetMQ
 {
     public static class TransportSetup
     {
-        public static void WithNetMQ(this IBusConfigurator configurator)
+        public static IPostConfigurator WithNetMQ(this IBusConfigurator configurator)
         {
             Transport transport = new Transport();
             transport.Configurator = configurator;
@@ -21,9 +21,10 @@ namespace Succubus.Backend.NetMQ
             {
                 throw new Exception("Subscriber thread timeout");
             }
+            return transport;
         }
 
-        public static void WithNetMQ(this IBusConfigurator configurator,
+        public static IPostConfigurator WithNetMQ(this IBusConfigurator configurator,
             Action<INetMQConfigurator> initializationHandler)
         {
             Transport transport = new Transport();
@@ -39,6 +40,7 @@ namespace Succubus.Backend.NetMQ
             {
                 throw new Exception("Subscriber thread timeout");
             }
+            return transport;
         }
     }
 }
