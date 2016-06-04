@@ -50,12 +50,22 @@ namespace Succubus.Backend.NetMQ
             }
         }
 
+        bool subscribeAll = false;
         public void SubscribeAll()
         {
+            subscribeAll = true;
             subscribeSocket.Subscribe(String.Empty);
         }
 
+        List<string> subscriptions = new List<string>();
+
         public void Subscribe(string address)
+        {
+            subscriptions.Add(address);
+            SubscribeImpl(address);
+        }
+
+        private void SubscribeImpl(string address)
         {
             subscribeSocket.Subscribe(Encoding.ASCII.GetBytes(address));
 
@@ -63,7 +73,6 @@ namespace Succubus.Backend.NetMQ
             // The reply channel is only setup once per bus instance, so this sleep will only incur
             // once
             if (address.StartsWith("__REPLY")) Thread.Sleep(100);
-
         }
 
         ManualResetEvent subscriberOnline = new ManualResetEvent(false);
@@ -276,6 +285,11 @@ namespace Succubus.Backend.NetMQ
         private void ConnectSubscriber()
         {
             subscribeSocket.Connect(SubscribeAddress);
+            if (subscribeAll) SubscribeAll();
+            foreach (var subscription in subscriptions)
+            {
+                SubscribeImp(subscription);
+            }
         }
 
 
